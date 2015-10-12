@@ -1,6 +1,6 @@
 % !TeX root = RJwrapper.tex
-\title{Capitalized Title Here}
-\author{by Author One, Author Two and Author Three}
+\title{Network Visualizations in \CRANpkg{ggplot2}}
+\author{by Sam Tyner, Fran\c{c}ois Briatte and  Heike Hofmann}
 
 \maketitle
 
@@ -37,20 +37,20 @@ This file is only a basic article template. For full details of \emph{The R Jour
 
 \bibliography{tyner-briatte-hofmann}
 
-\address{Author One\\
-  Affiliation\\
-  Address\\
-  Country\\}
-\email{author1@work}
+\address{Samantha Tyner\\
+  Department of Statistics and Statistical Laboratory\\
+  Iowa State University\\
+  United States\\}
+\email{sctyner@mail.iastate.edu}
 
-\address{Author Two\\
+\address{Fran\c{c}ois Briatte\\
   Affiliation\\
   Address\\
   Country\\}
-\email{author2@work}
+\email{francois.briatte@sciencespo.fr}
 
-\address{Author Three\\
-  Affiliation\\
-  Address\\
-  Country\\}
-\email{author3@work}
+\address{Heike Hofmann\\
+  Department of Statistics and Statistical Laboratory\\
+  Iowa State University\\
+  United States\\}
+\email{hofmann@mail.iastate.edu}

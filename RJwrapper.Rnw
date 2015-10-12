@@ -7,6 +7,15 @@
 
 %% load any required packages here
 
+\usepackage[font=small,skip=5pt]{caption}
+\usepackage{subcaption}
+\usepackage{afterpage}
+
+\usepackage{color}
+\definecolor{purple}{rgb}{.4,0,.8}
+\newcommand{\hh}[1]{{\color{magenta} #1}}
+\newcommand{\sct}[1]{{\color{purple} #1}}
+\newcommand{\fb}[1]{{\color{forestgreen} #1}} 
 
 \begin{document}
 
