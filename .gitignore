@@ -3,3 +3,8 @@
 .RData
 test_references.*
 *.Rproj
+*.pdf
+*.bbl
+*.log
+*.brf
+*.tex
