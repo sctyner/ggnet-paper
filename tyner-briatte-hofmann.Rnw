@@ -660,6 +660,53 @@ ggplot(
 \caption{\label{fig.cap:football_ex} The network of regular season Division I college football games in the season of fall 2000. The vertices and their labels are colored by conference.}
 \end{figure}
 \afterpage{\clearpage}
+
+\subsection{Les Mis\'{e}rables}
+This next network comes from \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book, and an edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.  
+This network is shown in figures~\ref{fig.cap:lesmis_ex:ggnet2},~\ref{fig.cap:lesmis_ex:ggnet}, and~\ref{fig.cap:lesmis_ex:ggnetwork}. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
+
+<<lesmis_ex_ggnet2, echo=TRUE>>=
+# source for ggnet2
+ggnet2(lesmis$edges[, 1:2 ], mode = "kamadakawai", color = "white", label = TRUE,
+       edge.size = lesmis$edges$degree / mean(lesmis$edges$degree),
+       layout.exp = 0.25)
+@
+
+<<lesmis_ex_ggnet, echo=TRUE, fig.width=9.5>>=
+# source for geom_net
+
+# data step: merge vertices and edges
+lesmisnet <- merge(lesmis$edges, lesmis$vertices, by.x="from", by.y="label", all=TRUE)
+lesmisnet$degree[is.na(lesmisnet$degree)] <- 0
+
+# create data plot
+ggplot(data = lesmisnet, aes(from_id = from, to_id = to, 
+                             linewidth = degree/5 + 0.1 )) +
+  geom_net(colour = "grey30",  aes(size = degree, alpha=degree),
+           ecolour = "grey60", vjust = -0.75,
+           layout = 'fruchtermanreingold', label = TRUE) +
+  theme_net() + scale_alpha(range=c(0.3, 1))
+@
+
+\begin{figure}
+\includegraphics[width=\textwidth]{figure/lesmis_ex_ggnet2-1.pdf}
+\caption{\label{fig.cap:lesmis_ex:ggnet2} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using ggnet2.}
+\end{figure}
+%
+\begin{figure}
+\includegraphics[width=\textwidth]{figure/lesmis_ex_ggnet-1.pdf}
+\caption{\label{fig.cap:lesmis_ex:ggnet} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using geom\_net.}
+\end{figure}
+%
+\begin{figure}
+%\includegraphics[width=\textwidth]{figure/lesmis_ex_ggnetwork-1.pdf}
+\hh{include ggnetwork example}
+\caption{\label{fig.cap:lesmis_ex:ggnetwork} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using ggnetwork.}
+\end{figure}
+%
+\afterpage{\clearpage}
+
+
 \section{Summary}
 
 This file is only a basic article template. For full details of \emph{The R Journal} style and information on how to prepare your article for submission, see the \href{http://journal.r-project.org/share/author-guide.pdf}{Instructions for Authors}.

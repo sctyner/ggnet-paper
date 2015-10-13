@@ -607,10 +607,10 @@ The network of football games is given in figure \ref{fig.cap:football_ex}. Here
 \end{figure}
 \afterpage{\clearpage}
 
-  \subsection{Les Mis\'{e}rables}
-  This next network comes from \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book. An edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.  This network is shown in figure \ref{fig.cap:lesmis_ex}. This
-  ted daughter.
-<<lesmis_ex, echo=TRUE, fig.cap="Coappearance network of characters in Victor Hugo's \\emph{Les Mis\\'{e}rables}">>=
+\subsection{Les Mis\'{e}rables}
+This next network comes from \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book, and an edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.  This network is shown in figure \ref{fig.cap:lesmis_ex}. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
+
+<<lesmis_ex, echo=TRUE>>=
 ggplot(data = lesmisnet, aes(from_id = from, to_id = to, linewidth = degree/5 + 0.1 )) +
   geom_net(colour = "grey30",  aes(size=degree),
            ecolour="grey60", vjust=-0.5,
