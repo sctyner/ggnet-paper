@@ -1,0 +1,153 @@
+% !TeX root = RJwrapper.tex
+\title{Network Visualizations in \CRANpkg{ggplot2}}
+\author{by Sam Tyner, Fran\c{c}ois Briatte and  Heike Hofmann}
+
+\maketitle
+
+\abstract{
+An abstract of less than 150 words.
+}
+
+<<setup_knitr, echo=FALSE>>=
+library(knitr)
+opts_chunk$set(
+  tidy = FALSE, echo=FALSE, cache=FALSE, eval = TRUE,
+  message = FALSE, warning = FALSE, highlight = FALSE, background = '#FFFFFF',
+  fig.height = 8, fig.width = 8, fig.align = 'center', fig.show='hide'
+)
+@
+
+<<load_packages, results='hide'>>=
+## ggplot2
+library(ggplot2) # needs to be version ≥ 1.0.1.9003
+
+## ggnet
+if (!require(ggnet, quietly = TRUE)) {
+  devtools::install_github("sctyner/ggnet")
+}
+library(ggnet)
+
+## ggnetwork
+if (!require(ggnetwork, quietly = TRUE)) {
+  devtools::install_github("briatte/ggnetwork")
+}
+library(ggnetwork)
+
+## ggnet2
+source("https://raw.githubusercontent.com/briatte/ggnet/master/ggnet2.R")
+@
+
+<<read_data, eval=TRUE, echo=FALSE>>=
+data(madmen)
+
+# set up networks for all of the data sets
+MMnet <- merge(madmen$edges, madmen$vertices, by.x="Name1", by.y="label", all=TRUE)
+levels(MMnet$Gender) <- c("female", "male")
+@
+
+% introductory section
+\hh{We need a slightly more gentle intro to networks. }
+At its core, a network is simply a set of points connected in pairs by a set of lines \citep{newman}.  Here, we refer to the lines as edges and the points as vertices, although these are also called nodes.  These two seemingly simple sets of graphical objects, points and segments, are used to encode a huge variety and quantity of information across many fields of study. For instance, networks of scientific collaboration, a food web of marine animals, and American college football games are all covered in a paper on community detection in networks by \citet{football}.  \citet{networkfailures} examine node failure in interdependent networks like power grids.  Social networks, such as links between actors found on \url{www.imdb.com}, and neural networks, like the completely mapped neural network of the \textit{C. elegans} worm are also etensively studied \citep{smallworld}.  Networks vary widely in scope and complexity: the smallest network is simply an edge between two vertices, while one of the most commonly used and most complex networks, the world wide web, has billions of vertices (webpages) and billions of edges (hyperlinks) connecting them.  The edges in a network can  be directed or undirected: directed edges represent information travelling from one vertex to another, and switching the direction would change the structure of the network. The world wide web is an example of a directed network because one webpage may link to another, but not necessarily the other way around. Undirected edges are simply connections between vertices. In co-authorship networks nodes are authors connected by an edge, if they author an academic publication together. Co-authorship networks are examples of undirected networks because if two people author a paper together, it creates a connection between them that is bidirectional.
+
+\par A social network is a network that everyone is a part of in one way or another.  We do not necessarily refer here to social media like Facebook or LinkedIn, but rather to the connections we form with other people. To demonstrate the functionality of our geometry for plotting networks, we have chosen an example of a social network from the popular television show Mad Men.  This network, compiled by \citet{madmen}, is made up of 52 vertices and 87 edges. Each vertex represents a character on the show, and there is an edge between every two characters who have had a romantic relationship.
+
+Figure~\ref{fig.cap:madmen_ex} shows this network.
+In the plot, we can see one central character who has many more relationships than any other character. This vertex represents the main character of the show, Don Draper, who is quite the ``ladies' man."  This example shows just how ubiquitous networks are. %% if we have to say that something is fun, it no longer is ...
+
+\begin{figure}[hbtp]
+\centering
+<<madmen_ex_ggnet, dependson='reading_data', fig.cap = 'Network of Relationships in Mad Men', out.width='\\textwidth', fig.width=9, fig.height=9>>=
+library(ggplot2)
+ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
+  geom_net(aes(colour=Gender), size=4, label= TRUE, vjust=-0.6,
+           ecolour="grey50") +
+  scale_colour_manual(values=c( "#FF69B4", "#0099ff")) +
+  xlim(c(-0.05, 1.05)) +
+  theme_net() +
+  theme(legend.position = "bottom")
+@
+\includegraphics[width=\textwidth]{figure/madmen_ex_ggnet-1.pdf}
+\caption{\label{fig.cap:madmen_ex} \hh{we only need one example here, this is not yet a start into the comparison of the different implementations} Graph of the characters in the show Mad Men who are linked by a romantic relationship.}
+\end{figure}
+\afterpage{\clearpage}
+
+% Network analysis is important in many fields
+\hh{include at least one citation for each one of the examples:}
+\par There are many kinds of networks, and networks are extensively studied across many disciplines.  Many sociologists study social networks, and many biologists study protein networks. As different as these and the many other disciplines that study networks are, they all need the ability to quickly and effectively visualize networks.
+\hh{quickly and effectively are a bit vague as measures for why we need a geom implementation. We don't want to do any studies measuring time to result or define effectiveness. It might be better to give some concrete examples of packages doing network layouts and discuss the problematic that there is no standard way of bundling up the results, which makes working with them hard, and even harder to modify output to include additional information for visualizations. }
+
+% Visualization of networks helps with analysis
+Coloring the vertices or edges in a graph is a quick and easy way to visualize grouping and can help with pattern or cluster detection. The vertices in a network and the edges between them compose the structure of a network, and being able to discover patterns among them visually is a key part of network analysis. Viewing multiple layouts of the same network can also help reveal patterns or clusters that would not be discovered when only viewing one layout or analyzing only an adjacency matrix.
+
+% Many network packages exist, but are not easy to use
+Many \texttt{R} packages already exist for network analysis and visualization such as \texttt{igraph} by \citet{igraph}, \texttt{sna} by \citet{sna}, and \texttt{network} by \citet{network.jss, network} but we have found these packages to have unintuitive or burdensome \hh{you're shooting sharp -- it might be better to describe that our approach is more customizable and more intuitive to use} methods for customizing the colors, sizes, etc of the vertices and edges of the network. For instance, the \texttt{igraph} package allows for coloring vertices by groups but the user must assign the colors to each vertex individually as opposed to assigning color by a grouping factor variable.
+
+% ggplot2 as an implementation framework
+We found the current tools to be lacking in this ability, so we chose to fill this gap by adding network plotting capabilities to the popular and widely used \texttt{R} package \texttt{ggplot2}. Just to give an idea of the popularity and the wide-spread use of \texttt{ggplot2}, from January 1, 2015 to October 4, 2015, \texttt{ggplot2} was downloaded over 1.2 Million times, or approximately 4,342 downloads per day. It has also been downloaded in 215 countries at least once, and in 61 of those countries, including China, Israel, and Colombia, it has been downloaded over 1,000 times\footnote{\texttt{ggplot2} usage statistics taken from \url{http://cran-logs.rstudio.com/}.}. This is the user base we are aiming at by making network visualizations a part of \texttt{ggplot2}.
+
+\hh{Besides the wide-spread use of ggplot2, its design based on the Grammar of Graphics \citep{wilkinson} makes it relatively easy to extend. Examples include}
+\fb{
+%Perhaps we could stress that one of the benefits of learning the
+%``grammar of graphics" is the opportunity to use that grammar in many
+%different situations, e.g. with 
+maps (see ggmap by \citet{ggmap}), e.g. with statistical models (see
+ggfortify: https://github.com/sinhrks/ggfortify).
+What the paper does
+is to extend the benefits of learning the "gg" to network
+visualization.
+
+A lot of recent changes to ggplot2 are aimed at
+facilitating the extension of ggplot2 in form of developing additional geoms, which is exactly
+what the article illustrates.}
+
+\hh{XXX there are quite a few other extensions that we should mention at this point: GGally \citep{ggally}, ggbio \citep{ggbio}, ... XXX need to add}
+
+\hh{There are two main approaches to making use of the ggplot2 framework: (i) implement network visualizations using ggplot2, i.e. providing a wrapper for the user to visualize a network with ggplot2 elements, and (ii) implement networks as an internal layer of ggplot2.  For the second approach, two main implementations exist. We will discuss all of these  in this paper. }
+
+\hh{XXX Provide roadmap for the rest of the paper. }
+
+
+
+\section{Section title in sentence case}
+
+This section may contain a figure such as Figure~\ref{figure:rlogo}.
+
+\begin{figure}[htbp]
+  \centering
+  \includegraphics{Rlogo}
+  \caption{The logo of R.}
+  \label{figure:rlogo}
+\end{figure}
+
+\section{Another section}
+
+There will likely be several sections, perhaps including code snippets, such as:
+
+\begin{example}
+  x <- 1:10
+  result <- myFunction(x)
+\end{example}
+
+\section{Summary}
+
+This file is only a basic article template. For full details of \emph{The R Journal} style and information on how to prepare your article for submission, see the \href{http://journal.r-project.org/share/author-guide.pdf}{Instructions for Authors}.
+
+\bibliography{tyner-briatte-hofmann}
+
+\address{Samantha Tyner\\
+  Department of Statistics and Statistical Laboratory\\
+  Iowa State University\\
+  United States\\}
+\email{sctyner@mail.iastate.edu}
+
+\address{Fran\c{c}ois Briatte\\
+  Affiliation\\
+  Address\\
+  Country\\}
+\email{francois.briatte@sciencespo.fr}
+
+\address{Heike Hofmann\\
+  Department of Statistics and Statistical Laboratory\\
+  Iowa State University\\
+  United States\\}
+\email{hofmann@mail.iastate.edu}
