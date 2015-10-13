@@ -611,7 +611,7 @@ The network of football games is given in figure \ref{fig.cap:football_ex}. Here
   This next network comes from \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book. An edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.  This network is shown in figure \ref{fig.cap:lesmis_ex}. This
   ted daughter.
 <<lesmis_ex, echo=TRUE, fig.cap="Coappearance network of characters in Victor Hugo's \\emph{Les Mis\\'{e}rables}">>=
-ggplot(data = lesmisnet, aes(from_id = from, to_id = to, linewidth = degree/5 + 0.1 )) +
+ggplot(data = lesmisnet, aes(from_id = from, to_id = to, linewidth = degree/5 + 0.1)) +
   geom_net(colour = "grey30",  aes(size=degree),
            ecolour="grey60", vjust=-0.5,
            layout = 'fruchtermanreingold', label=TRUE) +
@@ -656,7 +656,9 @@ ggplot(aes(from_id=Start.station, to_id=End.station), data=tripnet) +
 # compare to https://secure.capitalbikeshare.com/map/
 
 ggplot(aes(from_id=Start.station, to_id=End.station),  data=tripnet) +
-  geom_net(layout=NULL, label=TRUE, vjust=-0.5,
+  geom_net(
+    #layout=NULL, 
+    label=TRUE, vjust=-0.5,
            aes(x=long, y=lat, linewidth=n/15, colour=Metro)) +
   theme_net() +
   scale_colour_manual("Metro Station", values=c("grey40", "darkorange")) +

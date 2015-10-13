@@ -5,7 +5,7 @@
 \maketitle
 
 \abstract{
-An abstract of less than 150 words.
+\sct{This paper explores three new functionalities built on the \CRANpkg{ggplot2} framework: \texttt{geom_net}, \texttt{ggnet2}, and \texttt{ggnetwork}.  Together, these additions }
 }
 
 <<setup_knitr, echo=FALSE>>=
