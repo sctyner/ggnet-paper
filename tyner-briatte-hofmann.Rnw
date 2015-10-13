@@ -179,11 +179,9 @@ ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
   theme(legend.position = "bottom")
 @
 \includegraphics[width=\textwidth]{figure/madmen_ex_ggnet-1.pdf}
-\caption{\label{fig.cap:madmen_ex} \hh{we only need one example here, this is not yet a start into the comparison of the different implementations} Graph of the characters in the show Mad Men who are linked by a romantic relationship.}
+\caption{\label{fig.cap:madmen_ex} Graph of the characters in the show Mad Men who are linked by a romantic relationship. }
 \end{figure}
 \afterpage{\clearpage}
-
-
 
 
 \hh{In the next section we will discuss the motivation and ideas behind each one of the three approaches. This will be followed up by an extensive discussion of network examples, in which we will provide side by side code and examples of each implementation.}
@@ -200,11 +198,11 @@ ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
 
 \section{Examples}
 
-In this section, we demonstrate the current capabilities of \texttt{ggnet2}, {geom\_net} and \code{ggnetwork} in a series of side by side examples.
+In this section, we demonstrate the current capabilities of \samp{ggnet2}, {geom\_net} and \code{ggnetwork} in a series of side by side examples.
 For each of these examples, we are going to present the code necessary to produce the network, and discuss it in detail.
 
-  \subsection{Blood Donation}
-  In this directed network, there are eight vertices and 27 edges.  The vertices represent the eight different blood types in humans that are most important for donation: the ABO blood types A, B, AB, and O, combined with the RhD positive (+) and negative (-) types. The edges are directed: a person whose blood type is that of a \emph{from} vertex can to donate blood to a person whose blood type is that of a corresponding \emph{to} vertex. In the example below, loops are removed because loops exist on every vertex in this example, as blood between two people of matching ABO and RhD type can always be exchanged.
+\subsection{Blood Donation}
+In this directed network, there are eight vertices and 27 edges.  The vertices represent the eight different blood types in humans that are most important for donation: the ABO blood types A, B, AB, and O, combined with the RhD positive (+) and negative (-) types. The edges are directed: a person whose blood type is that of a \emph{from} vertex can to donate blood to a person whose blood type is that of a corresponding \emph{to} vertex. In the example below, loops are removed because loops exist on every vertex in this example, as blood between two people of matching ABO and RhD type can always be exchanged.
 
 <<blood_common>>=
 data(blood)
@@ -218,9 +216,9 @@ ggnet2(network(blood$edges[, 1:2]), mode = "circle", size = 15,
 
 <<blood_ex_ggnet, echo=TRUE, fig.width=6, fig.height=6>>=
 ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
-  geom_net(colour = "darkred", layout = "circle", label = TRUE, size = 15,
-           directed = TRUE, vjust = 0.5, labelcolour = "grey80",
-           arrowsize = 1.5, linewidth = 0.75, arrowgap = 0.05) +
+  geom_net(layout = "circle", size = 15, colour = "darkred", 
+           label = TRUE, labelcolour = "grey80",
+           directed = TRUE, linewidth = 0.75, arrowsize = 1.5, arrowgap = 0.05) +
   theme_net()
 @
 
@@ -233,7 +231,7 @@ ggplot(ggnetwork(network(blood$edges[, 1:2]), layout = "circle"),
   theme_blank()
 @
 
-This network is shown in figure \ref{fig.cap:blood_ex}.  Here, we have used the aesthetics \texttt{colour} and \texttt{size} set to identity values to change the size and color of all vertices. We have also used the \texttt{layout} and \texttt{label} arguments to change the default layout to a circle layout and to print the blood types, respectively. The circle layout places blood types of the same ABO type next to each other and spreads the vertices out far enough to distinguish between the various ``in" and ``out" types.  You can tell clearly from this plot that the O- type is the universal donor: it has an out-degree of seven and an in-degree of zero. Additionally, we can see that the AB+ type is the universal recepient, with an in-degree of seven and an out-degree of zero. Anyone looking at this plot can quickly determine which type(s) of blood they can receive and which type(s) can receive their blood.
+This network is shown in figure \ref{fig.cap:blood_ex}.  Here, we have used the aesthetics \samp{colour} and \samp{size} set to identity values to change the size and color of all vertices. We have also used the \samp{layout} and \samp{label} arguments to change the default layout to a circle layout and to print the blood types, respectively. The circle layout places blood types of the same ABO type next to each other and spreads the vertices out far enough to distinguish between the various ``in" and ``out" types.  You can tell clearly from this plot that the O- type is the universal donor: it has an out-degree of seven and an in-degree of zero. Additionally, we can see that the AB+ type is the universal recepient, with an in-degree of seven and an out-degree of zero. Anyone looking at this plot can quickly determine which type(s) of blood they can receive and which type(s) can receive their blood.
 
 \begin{figure}
 \begin{subfigure}[t]{.32\textwidth}
@@ -323,7 +321,7 @@ ggplot(ggnetwork(em.net),
 \afterpage{\clearpage}
 
 This network is plotted in figure \ref{fig.cap:email_ex}.  There are six distinct clusters in this network which almost perfectly correspond to the six different types of employee in this company: administration, engineering, executive, facilities, information technology, and security. %Unfortunately, there is currently no legend to associate color with employment type. This will be remedied in the final version of our geometry.
-Additionally, the edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the value of the \texttt{ealpha} aesthetic: more emails between two employees lead to darker edges.  The value is set to 0.1 in this example, so that ten or more emails between two employees result in a completely opaque edge. This pattern of heavy communication between employees of the same type is fairly unsurprising. 
+Additionally, the edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the value of the \samp{ealpha} aesthetic: more emails between two employees lead to darker edges.  The value is set to 0.1 in this example, so that ten or more emails between two employees result in a completely opaque edge. This pattern of heavy communication between employees of the same type is fairly unsurprising. 
 
 To make this visualization more interesting and informative, we facet the network by day: each panel in \ref{fig:email_ex_facet} shows the different email networks associated with each day of the week.
 
@@ -412,10 +410,10 @@ gridExtra::grid.arrange(grobs = g, nrow = 2)
 \caption{\label{fig:email_ex_facet} The same email network as in figure~\ref{fig.cap:email_ex} facetted by day of the week.}
 \end{figure}
 %
-This plot is shown in Figure~\ref{fig:email_ex_facet}. With the facetting, we can see that there are several days where one or more departments do not communicate with any of the other departments. There are only two days, 13 and 15, without any isolated department communications. Facetting is one of the major benefits of creating a geometry for networks in \texttt{ggplot2}.  Facetting quickly separates dense networks into separate subnetworks for easy visual comparison and  analyses.
+This plot is shown in Figure~\ref{fig:email_ex_facet}. With the facetting, we can see that there are several days where one or more departments do not communicate with any of the other departments. There are only two days, 13 and 15, without any isolated department communications. Facetting is one of the major benefits of creating a geometry for networks in \pkg{ggplot2}.  Facetting quickly separates dense networks into separate subnetworks for easy visual comparison and  analyses.
 
-\subsection{\texttt{ggplot2} Theme Elements}
-This example comes from the \texttt{theme()} help page in the \texttt{ggplot2} documentation \citep{ggplot}.  It is a directed network which shows the structure of the inheritance of theme options in the construction of a \texttt{ggplot2} plot.  There are 53 vertices and 36 edges in this network. Each vertex represents one possible theme option. There is an arrow from one theme option to another if the element represented by the \emph{to} vertex inherits its values from the \emph{from} vertex.  For example, the \texttt{axis.ticks.x} option inherits its value from the \texttt{axis.ticks} value, which in turn inherits its value from the \texttt{line} option.  Thus, setting the \texttt{line} option to a value such as \texttt{element\_blank()} sets the entire inheritance tree to \texttt{element\_blank()}, and no lines appear anywhere on the plot background. Finally, we note that the vertices with no edges were incorporated into the plot by adding their labels to the edges data frame in both the  `from\_id' and `to\_id' columns before passing the edges data frame to \texttt{ggplot}.
+\subsection{\pkg{ggplot2} Theme Elements}
+This example comes from the \samp{theme()} help page in the \pkg{ggplot2} documentation \citep{ggplot}.  It is a directed network which shows the structure of the inheritance of theme options in the construction of a \pkg{ggplot2} plot.  There are 53 vertices and 36 edges in this network. Each vertex represents one possible theme option. There is an arrow from one theme option to another if the element represented by the \emph{to} vertex inherits its values from the \emph{from} vertex.  For example, the \samp{axis.ticks.x} option inherits its value from the \samp{axis.ticks} value, which in turn inherits its value from the \samp{line} option.  Thus, setting the \samp{line} option to a value such as \samp{element\_blank()} sets the entire inheritance tree to \samp{element\_blank()}, and no lines appear anywhere on the plot background. Finally, we note that the vertices with no edges were incorporated into the plot by adding their labels to the edges data frame in both the  \samp{from\_id} and \samp{to\_id} columns before passing the edges data frame to \samp{ggplot}.
 
 
 
@@ -475,11 +473,11 @@ ggplot(ggnetwork(te.net),
 @
 \end{subfigure}
 
-\caption{\label{fig.cap:theme_ex} Inheritance structure of \texttt{ggplot2} theme elements. This is a recreation of the graph found at \protect\url{http://docs.ggplot2.org/current/theme.html}.}
+\caption{\label{fig.cap:theme_ex} Inheritance structure of \pkg{ggplot2} theme elements. This is a recreation of the graph found at \protect\url{http://docs.ggplot2.org/current/theme.html}.}
 \end{figure}
 \afterpage{\clearpage}
 
-The inheritance structure is plotted in figure \ref{fig.cap:theme_ex}.  In this plot, it is easy to quickly determine the parent and child vertices. Using this plot made creation of the \texttt{theme\_net} object used throughout these examples very simple. We just made set each of the major parent elements, \texttt{text}, \texttt{rect}, and \texttt{line} to \texttt{element\_blank()} and then set the aspect ratio equal to one.
+The inheritance structure is plotted in figure \ref{fig.cap:theme_ex}.  In this plot, it is easy to quickly determine the parent and child vertices. Using this plot made creation of the \samp{theme\_net} object used throughout these examples very simple. We just made set each of the major parent elements, \samp{text}, \samp{rect}, and \samp{line} to \samp{element\_blank()} and then set the aspect ratio equal to one.
 
 \subsection{Mad Men Networks}
   The following code creates the network example given in the introduction. We changed the vertex size and edge color for all vertices and edges, included vertex labels, and colored the vertices according to the character's gender.
@@ -524,7 +522,7 @@ ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
 \end{figure}
 \afterpage{\clearpage}
 
- There is another Mad Men network included in the \texttt{gcookbook} package \citep{madmen}. It is a directed network, also of romantic relationships between characters, but it also includes advances made by one character that were rejected by the other.  For example, Roger Sterling made advances toward Betty Draper, but Betty refused him, and so there is a directed edge going from Roger to Betty, but not from Betty to Roger.  If the advance is reciprocated, like between Sal Romano and the Bellhop, there are two directed edges between the two vertices.
+ There is another Mad Men network included in the \samp{gcookbook} package \citep{madmen}. It is a directed network, also of romantic relationships between characters, but it also includes advances made by one character that were rejected by the other.  For example, Roger Sterling made advances toward Betty Draper, but Betty refused him, and so there is a directed edge going from Roger to Betty, but not from Betty to Roger.  If the advance is reciprocated, like between Sal Romano and the Bellhop, there are two directed edges between the two vertices.
 
 
 
@@ -572,7 +570,7 @@ ggplot(data = MM2net,
     aes(colour=Gender),  directed = TRUE, 
     label = TRUE, ecolour = "grey50", 
     linewidth = 0.5, size = 2.5, vjust = -.5,
-    layout='fruchtermanreingold') +
+    layout = 'fruchtermanreingold') +
   scale_colour_manual(
     values = c( "#FF69B4", "#0099ff")) +
   theme_net() + xlim(c(-.1, 1.1)) + 
@@ -608,7 +606,7 @@ This network is shown in figure \ref{fig.cap:madmen2_ex}.  It is a lot more dens
 \subsection{College Football}
 This next example comes from M.E.J. Newman's network data web page \citep{football}.  It is an undirected network consisting of all regular season college football games played between Division I schools in Fall of 2000.  There are 115 vertices and 613 edges: each vertex represents a school, and an edge represents a game played between two schools. There is an additional variable in the vertex data frame corresponding to the conference each team belongs to, and there is an additional variable in the edge data frame that is equal to one if the game occured between teams in the same conference or zero if the game occured between teams in different conferences.
 
-The network of football games is given in figure \ref{fig.cap:football_ex}. Here, we have changed the \texttt{linetype} aesthetic to correspond to games that occur between teams in the same conference or different conferences.  These lines are dotted and solid, respectively. We have also assigned a different color to each conference, and the vertices and their labels are colored according to their conference. This coloring and changing of the linetypes make the structure of the game network easier to view.  There is one conference consisting of Navy, Notre Dame, Utah State, Central Florida, and Connecticut, which is spread out, whereas most other conferences' teams are all very close to each other because they play within conference much more than they play out of conference.  At the time, these five schools were all independents and did not have a home conference.  Without the coloring capability, we would not have been able to pick out that difference as easily.
+The network of football games is given in figure \ref{fig.cap:football_ex}. Here, we have changed the \samp{linetype} aesthetic to correspond to games that occur between teams in the same conference or different conferences.  These lines are dotted and solid, respectively. We have also assigned a different color to each conference, and the vertices and their labels are colored according to their conference. This coloring and changing of the linetypes make the structure of the game network easier to view.  There is one conference consisting of Navy, Notre Dame, Utah State, Central Florida, and Connecticut, which is spread out, whereas most other conferences' teams are all very close to each other because they play within conference much more than they play out of conference.  At the time, these five schools were all independents and did not have a home conference.  Without the coloring capability, we would not have been able to pick out that difference as easily.
 \begin{figure}
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}\vspace{-.5cm}
@@ -757,7 +755,7 @@ ggplot(aes(from_id=Start.station, to_id=End.station),  data=tripnet) +
 
 
 \subsection{Protein Interaction Network in Yeast}
-  This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, and there are 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}. These interactions and their associated proteins are plotted  in figure \ref{fig.cap:yeast_ex}.  We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \texttt{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices.
+  This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, and there are 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}. These interactions and their associated proteins are plotted  in figure \ref{fig.cap:yeast_ex}.  We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \samp{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices.
 
 <<yeast_ex_ggnet2, echo=TRUE, cache=FALSE>>=
 # plot with ggnet2
