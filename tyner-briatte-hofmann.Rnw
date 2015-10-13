@@ -15,6 +15,80 @@ opts_chunk$set(
   message = FALSE, warning = FALSE, highlight = FALSE, background = '#FFFFFF',
   fig.height = 8, fig.width = 8, fig.align = 'center', fig.show='hide'
 )
+
+
+## From Josh O'Brien's stackoverflow answer:
+## http://stackoverflow.com/questions/11030898/knitr-how-to-align-code-and-plot-side-by-side
+## These two settings control text width in codefig vs. usual code blocks
+partWidth <- 35
+fullWidth <- 80
+options(width = fullWidth)
+
+##  (1) CHUNK HOOK FUNCTION
+##   First, to set R's textual output width on a per-chunk basis, we
+## need to define a hook function which temporarily resets global R's
+## option() settings, just for the current chunk
+knit_hooks$set(r.opts=local({
+    ropts <- NA
+    function(before, options, envir) {
+        if (before) {
+            ropts <<- options(options$r.opts)
+        } else {
+            options(ropts)
+        }
+    }
+}))
+
+## (2) OUTPUT HOOK FUNCTION
+
+##   Define a custom output hook function. This function processes _all_
+## evaluated chunks, but will return the same output as the usual one,
+## UNLESS a 'codefig' argument appeared in the chunk's header.  In that
+## case, wrap the usual textual output in LaTeX code placing it in a
+## narrower adjustbox environment and setting the graphics that it
+## produced in another box beside it.
+
+defaultChunkHook <- environment(knit_hooks[["get"]])$defaults$chunk
+
+codefigChunkHook <- function (x, options) {
+        main <-  defaultChunkHook(x, options)
+        before <-
+            "\\vspace{1em}\n
+             \\begin{adjustbox}{valign=t}\n
+             \\begin{minipage}{.49\\textwidth}\n"
+        after <-
+            paste("\\vspace{1em}\n
+                   \\end{minipage}\n
+                  \\begin{minipage}{.49\\textwidth}\n",
+                   paste0("\\includegraphics[width=\\textwidth]{figure/",
+                          options[["label"]], "-1.pdf}\n
+                          \\end{minipage}\n
+                          \\end{adjustbox}"),
+                          sep="\n")
+    ## Was a codefig option supplied in chunk header?
+    ## If so, wrap code block and graphical output with needed LaTeX code.
+    if (!is.null(options$codefig)) {
+      return(sprintf("%s %s %s", before, main, after))
+    } else {
+      return(main)
+    }
+}
+
+knit_hooks[["set"]](chunk = codefigChunkHook)
+
+
+## (3) TEMPLATE
+##   codefig=TRUE is just one of several options needed for the
+## side-by-side code block and a figure to come out right. Rather
+## than typing out each of them in every single chunk header, we
+## define a _template_ which bundles them all together. Then we can
+## set all of those options simply by typing opts.label="codefig".
+
+opts_template[["set"]](
+codefig = list(codefig=TRUE, fig.show = "hide",
+               r.opts = list(width=partWidth),
+               tidy.opts = list(width.cutoff = partWidth)))
+
 @
 
 <<load_packages, results='hide'>>=
@@ -85,7 +159,7 @@ Many \texttt{R} packages already exist for network analysis and visualization su
 % ggplot2 as an implementation framework
 We found the current tools to be lacking in this ability, so we chose to fill this gap by adding network plotting capabilities to the popular and widely used \texttt{R} package \texttt{ggplot2}. Just to give an idea of the popularity and the wide-spread use of \texttt{ggplot2}, from January 1, 2015 to October 4, 2015, \texttt{ggplot2} was downloaded over 1.2 Million times, or approximately 4,342 downloads per day. It has also been downloaded in 215 countries at least once, and in 61 of those countries, including China, Israel, and Colombia, it has been downloaded over 1,000 times\footnote{\texttt{ggplot2} usage statistics taken from \url{http://cran-logs.rstudio.com/}.}. This is the user base we are aiming at by making network visualizations a part of \texttt{ggplot2}.
 
-\hh{Besides the wide-spread use of ggplot2, its design based on the Grammar of Graphics \citep{wilkinson} makes it relatively easy to extend. Examples include}
+\hh{Besides the wide-spread use of ggplot2, its design based on the Grammar of Graphics \citep{wilkinson:1999} makes it relatively easy to extend. Examples include}
 \fb{
 %Perhaps we could stress that one of the benefits of learning the
 %``grammar of graphics" is the opportunity to use that grammar in many
@@ -108,25 +182,139 @@ what the article illustrates.}
 
 
 
-\section{Section title in sentence case}
+\section{Three implementations of network visualizations}
 
-This section may contain a figure such as Figure~\ref{figure:rlogo}.
+\subsection{ggnet2}
+\subsection{geom\_net}
+\subsection{geom\_node and geom\_edge}
 
-\begin{figure}[htbp]
-  \centering
-  \includegraphics{Rlogo}
-  \caption{The logo of R.}
-  \label{figure:rlogo}
+\section{Examples}
+
+In this section, we demonstrate the current capabilities of \texttt{ggnet2}, {geom\_net} and \code{ggnetwork} in a series of side by side examples.
+For each of these examples, we are going to present the code necessary to produce the network, and discuss it in detail.
+
+  \subsection{Blood Donation}
+  In this directed network, there are eight vertices and 27 edges.  The vertices represent the eight different blood types in humans that are most important for donation: the ABO blood types A, B, AB, and O, combined with the RhD positive (+) and negative (-) types. The edges are directed: a person whose blood type is that of a \emph{from} vertex can to donate blood to a person whose blood type is that of a corresponding \emph{to} vertex. In the example below, loops are removed because loops exist on every vertex in this example, as blood between two people of matching ABO and RhD type can always be exchanged.
+
+<<blood_common>>=
+data(blood)
+@
+
+<<blood_ex_ggnet2, echo=TRUE, fig.cap= "Directed network of blood type donations in humans.", fig.width=6, fig.height=6>>=
+ggnet2(network(blood$edges[, 1:2]), mode = "circle", size = 15,
+       label = TRUE, arrow.size = 7.5, arrow.gap = 0.95, vjust = 0.5,
+       node.color="darkred", label.color="grey80")
+@
+
+<<blood_ex_ggnet, echo=TRUE, fig.cap= "Directed network of blood type donations in humans.", fig.width=6, fig.height=6>>=
+ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
+  geom_net(colour = "darkred", layout = "circle", label = TRUE, size = 15,
+           directed = TRUE, vjust = 0.5, labelcolour = "grey80",
+           arrowsize = 1.5, linewidth = 0.75, arrowgap = 0.05) +
+  theme_net()
+@
+
+<<blood_ex_ggnetwork, echo=TRUE, fig.cap= "Directed network of blood type donations in humans.", fig.width=6, fig.height=6>>=
+ggplot(ggnetwork(network(blood$edges[, 1:2]), layout = "circle"),
+       aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(arrow = arrow(length = unit(7.5, "pt"), type = "closed")) +
+  geom_nodes(size = 15, color = "darkred") +
+  geom_nodetext(aes(label = vertex.names), color = "grey80") +
+  theme_blank()
+@
+
+This network is shown in figure \ref{fig.cap:blood_ex}.  Here, we have used the aesthetics \texttt{colour} and \texttt{size} set to identity values to change the size and color of all vertices. We have also used the \texttt{layout} and \texttt{label} arguments to change the default layout to a circle layout and to print the blood types, respectively. The circle layout places blood types of the same ABO type next to each other and spreads the vertices out far enough to distinguish between the various ``in" and ``out" types.  You can tell clearly from this plot that the O- type is the universal donor: it has an out-degree of seven and an in-degree of zero. Additionally, we can see that the AB+ type is the universal recepient, with an in-degree of seven and an out-degree of zero. Anyone looking at this plot can quickly determine which type(s) of blood they can receive and which type(s) can receive their blood.
+
+\begin{figure}
+\begin{subfigure}[t]{.32\textwidth}
+\caption{ggnet2}
+\includegraphics[width=\textwidth]{figure/blood_ex_ggnet2-1.pdf}
+\end{subfigure}
+\begin{subfigure}[t]{.32\textwidth}
+\caption{geom\_net}
+\includegraphics[width=\textwidth]{figure/blood_ex_ggnet-1.pdf}
+\end{subfigure}
+\begin{subfigure}[t]{.32\textwidth}
+\caption{ggnetwork}
+\includegraphics[width=\textwidth]{figure/blood_ex_ggnetwork-1.pdf}
+\end{subfigure}
+\caption{\label{fig.cap:blood_ex} Network of blood donation possibilities in humans by ABO and RhD blood types.}
 \end{figure}
+\afterpage{\clearpage}
 
-\section{Another section}
+\subsection{Email Network}
 
-There will likely be several sections, perhaps including code snippets, such as:
+  This email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a directed network of emails between company employees with 55 vertices and 9,063 edges. Each vertex is an employee of the company, and each edge is an email sent from one employee to one or more other employees. The arrow of the directed edge points to the recipient(s) of the email. The network contains two business weeks of emails across the entire company. In order to better visualize the structure of the communication network between employees, emails that were sent out to all employees are removed in the subsequent examples.
 
-\begin{example}
-  x <- 1:10
-  result <- myFunction(x)
-\end{example}
+
+\begin{figure}
+\begin{subfigure}[t]{\textwidth}
+\caption{ggnet2}
+<<email_ex_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
+em.cet = as.character(
+  email$nodes$CurrentEmploymentType)
+names(em.cet) = email$nodes$label
+
+edges <- subset(email$edges, nrecipients < 54)
+em.net = edges[, c("From", "to") ]
+em.net = network(em.net)
+em.net %v% "curr_empl_type" = 
+  em.cet[ network.vertex.names(em.net) ]
+
+ggnet2(em.net, color = "curr_empl_type", 
+       size = 4, palette = "Set1", 
+       arrow.size = 10, arrow.gap = 0.95, 
+       edge.alpha = 0.5, 
+       color.legend = "Employment Type") +
+  theme(legend.position="bottom")
+@
+
+\end{subfigure}
+%
+\begin{subfigure}[t]{\textwidth}
+\caption{geom\_net}
+<<email_ex, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
+emailnet <- merge(
+  subset(email$edges, nrecipients < 54), email$nodes, 
+  by.x="From", by.y="label", all=TRUE)
+
+ggplot(data = emailnet, 
+       aes(from_id = From, to_id = to)) +
+  geom_net(aes(colour= CurrentEmploymentType), 
+           linewidth=0.5, ealpha=0.5, size=4, 
+           directed=TRUE) +
+  scale_colour_brewer("Employment Type", 
+                      palette="Set1") + 
+  theme_net() + 
+  theme(legend.position="bottom")
+@
+\end{subfigure}
+%
+\begin{subfigure}[t]{\textwidth}
+\caption{ggnetwork}
+<<email_ex_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
+ggplot(ggnetwork(em.net), 
+       aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(
+    alpha = 0.5, color = "grey50",
+    arrow = arrow(length = unit(10, "pt"), 
+                  type = "closed")) +
+  geom_nodes(aes(color = curr_empl_type), 
+             size = 4) +
+  scale_color_brewer("Employment Type", 
+                     palette = "Set1") +
+  theme_blank() +
+  theme(legend.position = "bottom")
+@
+\end{subfigure}
+
+\caption{\label{fig.cap:email_ex} Email network within a company over a two week period.}
+\end{figure}
+\afterpage{\clearpage}
+
+This network is plotted in figure \ref{fig.cap:email_ex}.  There are six distinct clusters in this network which almost perfectly correspond to the six different types of employee in this company: administration, engineering, executive, facilities, information technology, and security. %Unfortunately, there is currently no legend to associate color with employment type. This will be remedied in the final version of our geometry.
+Additionally, the edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the value of the \texttt{ealpha} aesthetic: more emails between two employees lead to darker edges.  The value is set to 0.1 in this example, so that ten or more emails between two employees result in a completely opaque edge. This pattern of heavy communication between employees of the same type is fairly unsurprising. 
+
 
 \section{Summary}
 

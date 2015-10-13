@@ -7,6 +7,7 @@
 
 %% load any required packages here
 
+\usepackage{adjustbox}            %% to align tops of minipages
 \usepackage[font=small,skip=5pt]{caption}
 \usepackage{subcaption}
 \usepackage{afterpage}
