@@ -315,6 +315,94 @@ ggplot(ggnetwork(em.net),
 This network is plotted in figure \ref{fig.cap:email_ex}.  There are six distinct clusters in this network which almost perfectly correspond to the six different types of employee in this company: administration, engineering, executive, facilities, information technology, and security. %Unfortunately, there is currently no legend to associate color with employment type. This will be remedied in the final version of our geometry.
 Additionally, the edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the value of the \texttt{ealpha} aesthetic: more emails between two employees lead to darker edges.  The value is set to 0.1 in this example, so that ten or more emails between two employees result in a completely opaque edge. This pattern of heavy communication between employees of the same type is fairly unsurprising. 
 
+To make this visualization more interesting and informative, we facet the network by day: each panel in \ref{fig:email_ex_facet} shows the different email networks associated with each day of the week.
+
+
+<<email_ex_facet_ggnet2, fig.height=4, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
+# source for ggnet2
+em.day = subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
+em.day = lapply(unique(em.day$day), function(x) subset(em.day, day == x)[, 1:2 ])
+em.day = lapply(em.day, network, directed = TRUE)
+for (i in 1:length(em.day)) {
+  em.day[[ i ]] %v% "curr_empl_type" = em.cet[ network.vertex.names(em.day[[ i ]]) ]
+  em.day[[ i ]] %n% "day" = unique(email$edges$day)[ i ]
+}
+
+g = list(length(em.day))
+for (i in 1:length(em.day)) {
+  g[[ i ]] = ggnet2(em.day[[ i ]], size = 2, color = "curr_empl_type",
+                    palette = "Set1", arrow.size = 0, arrow.gap=0.01,
+                    edge.alpha = 0.1, legend.position = "none") +
+    ggtitle(paste("Day", em.day[[ i ]] %n% "day")) +
+    theme(panel.border = element_rect(color = "grey50", fill = NA))
+}
+gridExtra::grid.arrange(grobs = g, nrow = 2)
+@
+
+<<email_ex_facet, fig.height=5, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
+# source for geom_net
+
+# data step: making sure that there is one entry for each person on each day
+employee <- data.frame(expand.grid(label=unique(email$nodes$label),
+                                   day=unique(email$edges$day)))
+employee <- merge(employee, email$nodes, by="label")
+emailnet <- merge(subset(email$edges, nrecipients < 54), employee, 
+                  by.x=c("From", "day"), by.y=c("label", "day"), all=TRUE)
+
+# creating the plot
+ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
+  geom_net(aes(colour= CurrentEmploymentType), fiteach=TRUE, linewidth=0.5, 
+           ealpha=0.5, size=2, directed=TRUE, arrowsize=.5) +
+  scale_colour_brewer(palette="Set1") + theme_net() +
+  facet_wrap(~day, nrow = 2, labeller="label_both") +
+  theme(legend.position="bottom",
+        panel.border = element_rect(fill=NA, colour = "grey60"))
+@
+
+<<email_ex_facet_ggnetwork, fig.height=4, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
+# source for ggnetwork
+em.day = subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
+em.day = lapply(unique(em.day$day), function(x) subset(em.day, day == x)[, 1:2 ])
+em.day = lapply(em.day, network, directed = TRUE)
+for (i in 1:length(em.day)) {
+  em.day[[ i ]] %v% "curr_empl_type" = em.cet[ network.vertex.names(em.day[[ i ]]) ]
+  em.day[[ i ]] %n% "day" = unique(email$edges$day)[ i ]
+}
+
+g = list(length(em.day))
+for (i in 1:length(em.day)) {
+  g[[ i ]] = ggplot(ggnetwork(em.day[[ i ]]), aes(x, y, xend = xend, yend = yend)) +
+    geom_edges(color = "grey50",
+               arrow = arrow(length = unit(6, "pt"), type = "closed")) +
+    geom_nodes(aes(color = curr_empl_type)) +
+    scale_colour_brewer(palette = "Set1") +
+    theme_blank() +
+    theme(legend.position = "none") +
+    ggtitle(paste("Day", em.day[[ i ]] %n% "day"))
+}
+gridExtra::grid.arrange(grobs = g, nrow = 2)
+@
+
+\begin{figure}
+\begin{subfigure}[t]{\textwidth}
+\caption{ggnet2}
+\includegraphics[width=\textwidth]{figure/email_ex_facet_ggnet2-1.pdf}
+\end{subfigure}
+%
+\begin{subfigure}[t]{\textwidth}
+\caption{geom\_net}
+\includegraphics[width=\textwidth]{figure/email_ex_facet-1.pdf}
+\end{subfigure}
+%
+\begin{subfigure}[t]{\textwidth}
+\caption{ggnetwork}
+\includegraphics[width=\textwidth]{figure/email_ex_facet_ggnetwork-1.pdf}
+\end{subfigure}
+
+\caption{\label{fig:email_ex_facet} The same email network as in figure~\ref{fig.cap:email_ex} facetted by day of the week.}
+\end{figure}
+%
+This plot is shown in Figure~\ref{fig:email_ex_facet}. With the facetting, we can see that there are several days where one or more departments do not communicate with any of the other departments. There are only two days, 13 and 15, without any isolated department communications. Facetting is one of the major benefits of creating a geometry for networks in \texttt{ggplot2}.  Facetting quickly separates dense networks into separate subnetworks for easy visual comparison and  analyses.
 
 \section{Summary}
 
