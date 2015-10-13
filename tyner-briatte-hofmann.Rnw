@@ -114,47 +114,25 @@ library(ggplot2)
 @
 
 % introductory section
-\hh{We need a slightly more gentle intro to networks. }
-At its core, a network is simply a set of points connected in pairs by a set of lines \citep{newman}.  Here, we refer to the lines as edges and the points as vertices, although these are also called nodes.  These two seemingly simple sets of graphical objects, points and segments, are used to encode a huge variety and quantity of information across many fields of study. For instance, networks of scientific collaboration, a food web of marine animals, and American college football games are all covered in a paper on community detection in networks by \citet{football}.  \citet{networkfailures} examine node failure in interdependent networks like power grids.  Social networks, such as links between actors found on \url{www.imdb.com}, and neural networks, like the completely mapped neural network of the \textit{C. elegans} worm are also etensively studied \citep{smallworld}.  Networks vary widely in scope and complexity: the smallest network is simply an edge between two vertices, while one of the most commonly used and most complex networks, the world wide web, has billions of vertices (webpages) and billions of edges (hyperlinks) connecting them.  The edges in a network can  be directed or undirected: directed edges represent information travelling from one vertex to another, and switching the direction would change the structure of the network. The world wide web is an example of a directed network because one webpage may link to another, but not necessarily the other way around. Undirected edges are simply connections between vertices. In co-authorship networks nodes are authors connected by an edge, if they author an academic publication together. Co-authorship networks are examples of undirected networks because if two people author a paper together, it creates a connection between them that is bidirectional.
-
-\par A social network is a network that everyone is a part of in one way or another.  We do not necessarily refer here to social media like Facebook or LinkedIn, but rather to the connections we form with other people. To demonstrate the functionality of our geometry for plotting networks, we have chosen an example of a social network from the popular television show Mad Men.  This network, compiled by \citet{madmen}, is made up of 52 vertices and 87 edges. Each vertex represents a character on the show, and there is an edge between every two characters who have had a romantic relationship.
-
-Figure~\ref{fig.cap:madmen_ex} shows this network.
-In the plot, we can see one central character who has many more relationships than any other character. This vertex represents the main character of the show, Don Draper, who is quite the ``ladies' man."  This example shows just how ubiquitous networks are. %% if we have to say that something is fun, it no longer is ...
-
-\begin{figure}[hbtp]
-\centering
-<<madmen_ex_ggnet, dependson='reading_data', out.width='\\textwidth', fig.width=9, fig.height=9>>=
-# source for geom_net - see Fig.1
-# data step: merge edges and nodes
-MMnet <- merge(madmen$edges, madmen$vertices, by.x = "Name1", by.y = "label", all = TRUE)
-
-# create plot
-ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
-  geom_net(aes(colour = Gender), size = 4, label= TRUE, vjust = -0.6, ecolour = "grey50") +
-  scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
-  xlim(c(-0.05, 1.05)) +
-  theme_net() +
-  theme(legend.position = "bottom")
-@
-\includegraphics[width=\textwidth]{figure/madmen_ex_ggnet-1.pdf}
-\caption{\label{fig.cap:madmen_ex} \hh{we only need one example here, this is not yet a start into the comparison of the different implementations} Graph of the characters in the show Mad Men who are linked by a romantic relationship.}
-\end{figure}
-\afterpage{\clearpage}
 
 % Network analysis is important in many fields
-\hh{include at least one citation for each one of the examples:}
-\par There are many kinds of networks, and networks are extensively studied across many disciplines.  Many sociologists study social networks, and many biologists study protein networks. As different as these and the many other disciplines that study networks are, they all need the ability to quickly and effectively visualize networks.
-\hh{quickly and effectively are a bit vague as measures for why we need a geom implementation. We don't want to do any studies measuring time to result or define effectiveness. It might be better to give some concrete examples of packages doing network layouts and discuss the problematic that there is no standard way of bundling up the results, which makes working with them hard, and even harder to modify output to include additional information for visualizations. }
+\hh{XXX include at least one citation for each one of the examples:}
+\par There are many kinds of networks, and networks are extensively studied across many disciplines.  Many sociologists study social networks, and many biologists study protein networks. As different as these and the many other disciplines that study networks are, they all \hh{benefit from good network visualizations.}
+%need the ability to quickly and effectively visualize networks.
+%\hh{quickly and effectively are a bit vague as measures for why we need a geom implementation. We don't want to do any studies measuring time to result or define effectiveness. It might be better to give some concrete examples of packages doing network layouts and discuss the problematic that there is no standard way of bundling up the results, which makes working with them hard, and even harder to modify output to include additional information for visualizations. }
 
 % Visualization of networks helps with analysis
 Coloring the vertices or edges in a graph is a quick and easy way to visualize grouping and can help with pattern or cluster detection. The vertices in a network and the edges between them compose the structure of a network, and being able to discover patterns among them visually is a key part of network analysis. Viewing multiple layouts of the same network can also help reveal patterns or clusters that would not be discovered when only viewing one layout or analyzing only an adjacency matrix.
 
 % Many network packages exist, but are not easy to use
-Many \texttt{R} packages already exist for network analysis and visualization such as \texttt{igraph} by \citet{igraph}, \texttt{sna} by \citet{sna}, and \texttt{network} by \citet{network.jss, network} but we have found these packages to have unintuitive or burdensome \hh{you're shooting sharp -- it might be better to describe that our approach is more customizable and more intuitive to use} methods for customizing the colors, sizes, etc of the vertices and edges of the network. For instance, the \texttt{igraph} package allows for coloring vertices by groups but the user must assign the colors to each vertex individually as opposed to assigning color by a grouping factor variable.
+Many R packages already exist for network analysis and visualization such as \CRANpkg{igraph} by \citet{igraph}, \CRANpkg{sna} by \citet{sna}, and \CRANpkg{network} by \citet{network.jss, network}.
+\hh{Unfortunately, there is not a standard format for network results, which requires from  users detailed knowledge of each one of these packages to be able to make meaningful changes to the network, such as}
+%but we have found these packages to have unintuitive or burdensome \hh{ XXX you're shooting sharp -- it might be better to describe that our approach is more customizable and more intuitive to use} methods for 
+customizing the colors, sizes, etc of the vertices and edges of the network. For instance, the \pkg{igraph} package allows for coloring vertices by groups but the user has to assign the colors to each vertex individually as opposed to assigning color by a grouping factor variable.
 
 % ggplot2 as an implementation framework
-We found the current tools to be lacking in this ability, so we chose to fill this gap by adding network plotting capabilities to the popular and widely used \texttt{R} package \texttt{ggplot2}. Just to give an idea of the popularity and the wide-spread use of \texttt{ggplot2}, from January 1, 2015 to October 4, 2015, \texttt{ggplot2} was downloaded over 1.2 Million times, or approximately 4,342 downloads per day. It has also been downloaded in 215 countries at least once, and in 61 of those countries, including China, Israel, and Colombia, it has been downloaded over 1,000 times\footnote{\texttt{ggplot2} usage statistics taken from \url{http://cran-logs.rstudio.com/}.}. This is the user base we are aiming at by making network visualizations a part of \texttt{ggplot2}.
+%We found the current tools to be lacking in this ability, so 
+We chose to fill this gap by adding network plotting capabilities to the popular and widely used R package \CRANpkg{ggplot2}. Just to give an idea of the popularity and the wide-spread use of \pkg{ggplot2}, from January 1, 2015 to October 10, 2015, \pkg{ggplot2} was downloaded over 1.2 Million times, or more than 4,000 times per day. It has also been downloaded in 215 countries at least once, and in 21 of those countries, including China, Israel, and Colombia, it has been downloaded over 10,000 times\footnote{\pkg{ggplot2} usage statistics taken from \url{http://cran-logs.rstudio.com/}.}. This is the user base we are aiming at by making network visualizations a part of \pkg{ggplot2}.
 
 \hh{Besides the wide-spread use of ggplot2, its design based on the Grammar of Graphics \citep{wilkinson:1999} makes it relatively easy to extend. Examples include}
 \fb{
@@ -173,17 +151,52 @@ what the article illustrates.}
 
 \hh{XXX there are quite a few other extensions that we should mention at this point: GGally \citep{ggally}, ggbio \citep{ggbio}, ... XXX need to add}
 
-\hh{There are two main approaches to making use of the ggplot2 framework: (i) implement network visualizations using ggplot2, i.e. providing a wrapper for the user to visualize a network with ggplot2 elements, and (ii) implement networks as an internal layer of ggplot2.  For the second approach, two main implementations exist. We will discuss all of these  in this paper. }
+\hh{There are two main approaches of making use of the ggplot2 framework: (i) implement network visualizations using ggplot2, i.e. providing a wrapper for the user to visualize a network with ggplot2 elements, and (ii) implement networks as  internal layers of ggplot2.  For the second approach, two main implementations exist: one, which implements main parts of a network, such as nodes, edges and node labels as independent geoms. A second implementation wraps all network parts into a single geom. We will discuss all of these approaches in this paper. }
 
-\hh{XXX Provide roadmap for the rest of the paper. }
+% getting into more of the nitty-gritty details
+At its core, a network is simply a set of points connected in pairs by a set of lines \citep{newman}.  Here, we refer to the lines as edges and the points as vertices, although these are also called nodes.  These two seemingly simple sets of graphical objects, points and segments, are used to encode a huge variety and quantity of information across many fields of study. For instance, networks of scientific collaboration, a food web of marine animals, and American college football games are all covered in a paper on community detection in networks by \citet{football}.  \citet{networkfailures} examine node failure in interdependent networks like power grids.  Social networks, such as links between actors found on \url{www.imdb.com}, and neural networks, like the completely mapped neural network of the \textit{C. elegans} worm are also etensively studied \citep{smallworld}.  Networks vary widely in scope and complexity: the smallest network is simply an edge between two vertices, while one of the most commonly used and most complex networks, the world wide web, has billions of vertices (webpages) and billions of edges (hyperlinks) connecting them.  The edges in a network can  be directed or undirected: directed edges represent information travelling from one vertex to another, and switching the direction would change the structure of the network. The world wide web is an example of a directed network because one webpage may link to another, but not necessarily the other way around. Undirected edges are simply connections between vertices. In co-authorship networks nodes are authors connected by an edge, if they author an academic publication together. Co-authorship networks are examples of undirected networks because if two people author a paper together, it creates a connection between them that is bidirectional.
+
+\par A social network is a network that everyone is a part of in one way or another.  We do not necessarily refer here to social media like Facebook or LinkedIn, but rather to the connections we form with other people. To demonstrate the functionality of our geometry for plotting networks, we have chosen an example of a social network from the popular television show Mad Men.  This network, compiled by \citet{madmen}, is made up of 52 vertices and 87 edges. Each vertex represents a character on the show, and there is an edge between every two characters who have had a romantic relationship.
+
+Figure~\ref{fig.cap:madmen_ex} shows this network.
+In the plot, we can see one central character who has many more relationships than any other character. This vertex represents the main character of the show, Don Draper, who is quite the ``ladies' man."  This example shows just how ubiquitous networks are. %% if we have to say that something is fun, it no longer is ...
+
+\begin{figure}[hbtp]
+\centering
+<<madmen_ex_ggnet, dependson='reading_data', out.width='\\textwidth', fig.width=9, fig.height=9.5>>=
+# source for geom_net - see Fig.1
+# data step: merge edges and nodes
+MMnet <- merge(madmen$edges, madmen$vertices, 
+               by.x = "Name1", by.y = "label", all = TRUE)
+
+# create plot
+ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
+  geom_net(aes(colour = Gender), size = 4, label = TRUE, vjust = -0.6,
+           ecolour = "grey50") +
+  scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
+  xlim(c(-0.05, 1.05)) +
+  theme_net() +
+  theme(legend.position = "bottom")
+@
+\includegraphics[width=\textwidth]{figure/madmen_ex_ggnet-1.pdf}
+\caption{\label{fig.cap:madmen_ex} \hh{we only need one example here, this is not yet a start into the comparison of the different implementations} Graph of the characters in the show Mad Men who are linked by a romantic relationship.}
+\end{figure}
+\afterpage{\clearpage}
+
+
+
+
+\hh{In the next section we will discuss the motivation and ideas behind each one of the three approaches. This will be followed up by an extensive discussion of network examples, in which we will provide side by side code and examples of each implementation.}
 
 
 
 \section{Three implementations of network visualizations}
 
 \subsection{ggnet2}
-\subsection{geom\_net}
-\subsection{geom\_node and geom\_edge}
+
+\subsection{ggnet: geom\_net}
+
+\subsection{ggnetwork: geom\_node and geom\_edge}
 
 \section{Examples}
 
@@ -199,7 +212,7 @@ data(blood)
 
 <<blood_ex_ggnet2, echo=TRUE, fig.width=6, fig.height=6>>=
 ggnet2(network(blood$edges[, 1:2]), mode = "circle", size = 15,
-       label = TRUE, arrow.size = 7.5, arrow.gap = 0.95, vjust = 0.5,
+       label = TRUE, arrow.size = 7.5, arrow.gap = 0.05, vjust = 0.5,
        node.color="darkred", label.color="grey80")
 @
 
@@ -260,7 +273,7 @@ em.net %v% "curr_empl_type" =
 
 ggnet2(em.net, color = "curr_empl_type", 
        size = 4, palette = "Set1", 
-       arrow.size = 10, arrow.gap = 0.95, 
+       arrow.size = 10, arrow.gap = 0.05, 
        edge.alpha = 0.5, 
        color.legend = "Employment Type") +
   theme(legend.position="bottom")

@@ -31,7 +31,8 @@
 
 %% replace RJtemplate with your article
 \begin{article}
-
+\tableofcontents
+\newpage
 <<intro, child='tyner-briatte-hofmann.Rnw', eval=TRUE>>=
 @
 
