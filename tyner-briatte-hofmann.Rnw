@@ -109,14 +109,8 @@ library(ggnetwork)
 
 ## ggnet2
 source("https://raw.githubusercontent.com/briatte/ggnet/master/ggnet2.R")
-@
 
-<<read_data, eval=TRUE, echo=FALSE>>=
-data(madmen)
-
-# set up networks for all of the data sets
-MMnet <- merge(madmen$edges, madmen$vertices, by.x="Name1", by.y="label", all=TRUE)
-levels(MMnet$Gender) <- c("female", "male")
+library(ggplot2)
 @
 
 % introductory section
@@ -130,12 +124,15 @@ In the plot, we can see one central character who has many more relationships th
 
 \begin{figure}[hbtp]
 \centering
-<<madmen_ex_ggnet, dependson='reading_data', fig.cap = 'Network of Relationships in Mad Men', out.width='\\textwidth', fig.width=9, fig.height=9>>=
-library(ggplot2)
+<<madmen_ex_ggnet, dependson='reading_data', out.width='\\textwidth', fig.width=9, fig.height=9>>=
+# source for geom_net - see Fig.1
+# data step: merge edges and nodes
+MMnet <- merge(madmen$edges, madmen$vertices, by.x = "Name1", by.y = "label", all = TRUE)
+
+# create plot
 ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
-  geom_net(aes(colour=Gender), size=4, label= TRUE, vjust=-0.6,
-           ecolour="grey50") +
-  scale_colour_manual(values=c( "#FF69B4", "#0099ff")) +
+  geom_net(aes(colour = Gender), size = 4, label= TRUE, vjust = -0.6, ecolour = "grey50") +
+  scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
   xlim(c(-0.05, 1.05)) +
   theme_net() +
   theme(legend.position = "bottom")
@@ -200,13 +197,13 @@ For each of these examples, we are going to present the code necessary to produc
 data(blood)
 @
 
-<<blood_ex_ggnet2, echo=TRUE, fig.cap= "Directed network of blood type donations in humans.", fig.width=6, fig.height=6>>=
+<<blood_ex_ggnet2, echo=TRUE, fig.width=6, fig.height=6>>=
 ggnet2(network(blood$edges[, 1:2]), mode = "circle", size = 15,
        label = TRUE, arrow.size = 7.5, arrow.gap = 0.95, vjust = 0.5,
        node.color="darkred", label.color="grey80")
 @
 
-<<blood_ex_ggnet, echo=TRUE, fig.cap= "Directed network of blood type donations in humans.", fig.width=6, fig.height=6>>=
+<<blood_ex_ggnet, echo=TRUE, fig.width=6, fig.height=6>>=
 ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
   geom_net(colour = "darkred", layout = "circle", label = TRUE, size = 15,
            directed = TRUE, vjust = 0.5, labelcolour = "grey80",
@@ -214,7 +211,7 @@ ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
   theme_net()
 @
 
-<<blood_ex_ggnetwork, echo=TRUE, fig.cap= "Directed network of blood type donations in humans.", fig.width=6, fig.height=6>>=
+<<blood_ex_ggnetwork, echo=TRUE, fig.width=6, fig.height=6>>=
 ggplot(ggnetwork(network(blood$edges[, 1:2]), layout = "circle"),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges(arrow = arrow(length = unit(7.5, "pt"), type = "closed")) +
@@ -412,7 +409,7 @@ This example comes from the \texttt{theme()} help page in the \texttt{ggplot2} d
 \begin{figure}
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
-<<theme_ex_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE, fig.cap= 'Inheritance structure for \\texttt{theme} elements in \\texttt{ggplot2}.'>>=
+<<theme_ex_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
 te.net = network(theme_elements$edges)
 te.net %v% "size" = 
   sqrt(10 * (sna::degree(te.net) + 1))
@@ -424,7 +421,7 @@ ggnet2(te.net, label = TRUE, color = "white",
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{geom\_net}
-<<theme_ex_ggnet, size="footnotesize", opts.label="codefig", echo=TRUE, fig.cap= 'Inheritance structure for \\texttt{theme} elements in \\texttt{ggplot2}.'>>=
+<<theme_ex_ggnet, size="footnotesize", opts.label="codefig", echo=TRUE>>=
 # data step: merge nodes and edges and 
 # introduce a degree-out variable
 library(dplyr)
@@ -448,7 +445,7 @@ ggplot(data = TEnet,
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
-<<theme_ex_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, fig.cap= 'Inheritance structure for \\texttt{theme} elements in \\texttt{ggplot2}.'>>=
+<<theme_ex_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
 te.net = network(theme_elements$edges)
 te.net %v% "size" = 
   sqrt(10 * (sna::degree(te.net) + 1))
@@ -470,6 +467,130 @@ ggplot(ggnetwork(te.net),
 \afterpage{\clearpage}
 
 The inheritance structure is plotted in figure \ref{fig.cap:theme_ex}.  In this plot, it is easy to quickly determine the parent and child vertices. Using this plot made creation of the \texttt{theme\_net} object used throughout these examples very simple. We just made set each of the major parent elements, \texttt{text}, \texttt{rect}, and \texttt{line} to \texttt{element\_blank()} and then set the aspect ratio equal to one.
+
+\subsection{Mad Men Networks}
+  The following code creates the network example given in the introduction. We changed the vertex size and edge color for all vertices and edges, included vertex labels, and colored the vertices according to the character's gender.
+<<print_ex, ref.label="madmen_ex_ggnet", eval=FALSE, echo=TRUE,cache=FALSE>>=
+@
+
+The code for the other two approaches follows below and the corresponding networks are shown in figure~\ref{fig:madmen-2}.
+
+<<madmen_ex_ggnet2, echo=TRUE, dependson='reading_data',  out.width='\\textwidth', fig.width=9, fig.height=9>>=
+# source for ggnet2
+plot(1:10, 1:10)
+@
+
+<<madmen_ex_ggnetwork, echo=TRUE,  out.width='\\textwidth', fig.width=9, fig.height=9>>=
+# source for ggnetwork
+rownames(madmen$vertices) = madmen$vertices$label
+mm.net = network(madmen$edges[, 1:2], directed = FALSE)
+mm.net %v% "Gender" = as.character(madmen$vertices[ network.vertex.names(mm.net), "Gender"])
+
+ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(color = "grey50") +
+  geom_nodes(aes(colour = Gender), size = 4) + # label= TRUE, vjust = -0.6
+  geom_nodetext(aes(colour = Gender, label = vertex.names), size = 4, vjust = -0.6) +
+  scale_colour_manual(values = c( "#FF69B4", "#0099ff")) +
+  xlim(c(-0.05, 1.05)) +
+  theme_blank() +
+  theme(legend.position = "bottom")
+@
+
+
+\begin{figure}[hbtp]
+\begin{subfigure}[t]{.495\textwidth}
+\caption{ggnet2}
+\includegraphics[width=\textwidth]{figure/madmen_ex_ggnet2-1.pdf}
+\end{subfigure}
+\begin{subfigure}[t]{.495\textwidth}
+\caption{ggnetwork}
+\includegraphics[width=\textwidth]{figure/madmen_ex_ggnetwork-1.pdf}
+\end{subfigure}
+
+\caption{\label{fig:madmen-2} Graph of the characters in the show Mad Men who are linked by a romantic relationship, ggnet2 and ggnetwork implementation.}
+\end{figure}
+\afterpage{\clearpage}
+
+ There is another Mad Men network included in the \texttt{gcookbook} package \citep{madmen}. It is a directed network, also of romantic relationships between characters, but it also includes advances made by one character that were rejected by the other.  For example, Roger Sterling made advances toward Betty Draper, but Betty refused him, and so there is a directed edge going from Roger to Betty, but not from Betty to Roger.  If the advance is reciprocated, like between Sal Romano and the Bellhop, there are two directed edges between the two vertices.
+
+
+
+
+
+
+\begin{figure}
+\begin{subfigure}[t]{\textwidth}
+\caption{ggnet2}
+<<madmen2_ex_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+rownames(mm.directed$vertices) = mm.directed$vertices$label
+mm.directed$vertices$Gender = 
+  as.character(mm.directed$vertices$Gender)
+
+mm.dir = network(mm.directed$edges, 
+                 directed = TRUE)
+mm.dir %v% "gender" = 
+  mm.directed$vertices[ 
+    network.vertex.names(mm.dir), "Gender" ]
+
+# gender color palette
+mm.col = c("female" = "#ff69b4", 
+           "male" = "#0099ff")
+
+ggnet2(mm.dir, mode = "fruchtermanreingold", size = 3,
+       color = mm.col[ mm.dir %v% "gender" ],
+       label = TRUE, 
+       label.color = mm.col[ mm.dir %v% "gender" ],
+       hjust = -0.1, legend.position = "bottom", 
+       layout.exp = 0.15, arrow.size = 10)
+@
+\end{subfigure}
+%
+\begin{subfigure}[t]{\textwidth}
+\caption{geom\_net}
+<<madmen2_ex_ggnet, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+MM2net <- merge(
+  mm.directed$edges, 
+  mm.directed$vertices, 
+  by.x="Name1", by.y="label", all=TRUE)
+
+ggplot(data = MM2net, 
+       aes(from_id = Name1, to_id = Name2)) +
+  geom_net(
+    aes(colour=Gender),  directed = TRUE, 
+    label = TRUE, ecolour = "grey50", 
+    linewidth = 0.5, size = 2.5, vjust = -.5,
+    layout='fruchtermanreingold') +
+  scale_colour_manual(
+    values = c( "#FF69B4", "#0099ff")) +
+  theme_net() + xlim(c(-.1, 1.1)) + 
+  theme(legend.position = "bottom")
+@
+\end{subfigure}
+%
+\begin{subfigure}[t]{\textwidth}
+\caption{ggnetwork}
+<<madmen2_ex_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+ggplot(
+  ggnetwork(mm.dir, 
+            layout = "fruchtermanreingold"),
+       aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(
+    color = "grey50", 
+    arrow = arrow(length = unit(10, "pt"), 
+                  type = "closed")) +
+  geom_nodes(size = 3, 
+             color = mm.col[ mm.dir %v% "gender" ]) +
+  geom_nodetext(aes(label = vertex.names), 
+                color = mm.col[ mm.dir %v% "gender" ], 
+                hjust = -0.1) +
+  theme_blank() +
+  theme(legend.position = "bottom")
+@
+\end{subfigure}
+
+\caption{\label{fig.cap:madmen2_ex} A directed network of relationships in Mad Men.}
+\end{figure}
+This network is shown in figure \ref{fig.cap:madmen2_ex}.  It is a lot more densely connected than the previous Mad Men example.  This network allows us to see much more of the drama in the show. For instance, we can see that Roger made advances towards Betty, his business partner's wife, which is much more scandalous than what appears in the first network.
 
 \section{Summary}
 
