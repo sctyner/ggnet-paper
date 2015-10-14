@@ -188,6 +188,7 @@ ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
 \section{Three implementations of network visualizations}
 
 \subsection{ggnet2}
+\fb{ggnet2 is the most 'hacky' of the three implementations presented in this paper. The function takes a network object as input, and then recreates every necessary step internally to convert that object for use with ggplot2. This happens through the creation of two data frames, one for edges, another one for nodes, which are then passed to ggplot2. All steps happen internally; as a consequence, while it uses the grammar of graphics to produce the plot, the function still works very much like the plotting functions of the igraph and network packages, i.e. through a long series of arguments that control either the aspect of the edges or the aspect of the nodes.}
 
 \subsection{ggnet: geom\_net}
 \subsubsection{Data Structure}
@@ -413,29 +414,37 @@ ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
         panel.border = element_rect(fill = NA, colour = "grey60"))
 @
 
+%% NOTE: the code used to create a "sequential data frame" might become an
+%% option to ggnetwork in the ggnetwork package
+
 <<email_facet_ggnetwork, fig.height=4, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
-# source for ggnetwork
+# plot with ggnetwork
+
+# data step 1: create a sequence of networks
 em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
 em.day <- lapply(unique(em.day$day), function(x) subset(em.day, day == x)[, 1:2 ])
 em.day <- lapply(em.day, network, directed = TRUE)
 for (i in 1:length(em.day)) {
   em.day[[ i ]] %v% "curr_empl_type" <- em.cet[ network.vertex.names(em.day[[ i ]]) ]
-  em.day[[ i ]] %n% "day" <- unique(email$edges$day)[ i ]
+  em.day[[ i ]] %n% "t" <- unique(email$edges$day)[ i ]
 }
+# data step 2: convert sequence to a data frame
+em.day <- lapply(em.day, function(x) {
+  df <- ggnetwork(x, arrow.gap = 0.02)
+  df$day <- x %n% "t"
+  df
+})
+em.day <- dplyr::bind_rows(em.day)
 
-g <- list(length(em.day))
-for (i in 1:length(em.day)) {
-  g[[ i ]] <- ggplot(ggnetwork(em.day[[ i ]], arrow.gap = 0.025),
-                     aes(x, y, xend = xend, yend = yend)) +
-    geom_edges(color = "grey50",
-               arrow = arrow(length = unit(3, "pt"), type = "closed")) +
+# create the plot
+ggplot(em.day, aes(x, y, xend = xend, yend = yend)) +
+    geom_edges(color = "grey50") +
     geom_nodes(aes(color = curr_empl_type)) +
-    scale_colour_brewer(palette = "Set1") +
-    theme_blank() +
-    theme(legend.position = "none") +
-    ggtitle(paste("Day", em.day[[ i ]] %n% "day"))
-}
-gridExtra::grid.arrange(grobs = g, nrow = 2)
+    facet_wrap(~ day) +
+  scale_colour_brewer("Current employment type", palette = "Set1") +
+  theme_blank() +
+  facet_wrap(~ day, nrow = 2, labeller = "label_both") +
+  theme(legend.position = "bottom")
 @
 
 \begin{figure}
