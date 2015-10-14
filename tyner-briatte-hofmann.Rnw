@@ -159,24 +159,24 @@ Many \texttt{R} packages already exist for network analysis and visualization su
 % ggplot2 as an implementation framework
 We found the current tools to be lacking in this ability, so we chose to fill this gap by adding network plotting capabilities to the popular and widely used \texttt{R} package \texttt{ggplot2}. Just to give an idea of the popularity and the wide-spread use of \texttt{ggplot2}, from January 1, 2015 to October 4, 2015, \texttt{ggplot2} was downloaded over 1.2 Million times, or approximately 4,342 downloads per day. It has also been downloaded in 215 countries at least once, and in 61 of those countries, including China, Israel, and Colombia, it has been downloaded over 1,000 times\footnote{\texttt{ggplot2} usage statistics taken from \url{http://cran-logs.rstudio.com/}.}. This is the user base we are aiming at by making network visualizations a part of \texttt{ggplot2}.
 
-\hh{Besides the widespread use of ggplot2, its design based on the Grammar of Graphics \citep{wilkinson:1999} makes it relatively easy to extend. Examples include}
+\hh{Besides the wide-spread use of \pkg{ggplot2}, its design based on the Grammar of Graphics \citep{wilkinson:1999} makes it relatively easy to extend. Examples include}
 \fb{
 %Perhaps we could stress that one of the benefits of learning the
 %``grammar of graphics" is the opportunity to use that grammar in many
 %different situations, e.g. with
 maps (see ggmap by \citet{ggmap}), e.g. with statistical models (see
-ggfortify: https://github.com/sinhrks/ggfortify).
+ggfortify: \url{https://github.com/sinhrks/ggfortify}).
 What the paper does
 is to extend the benefits of learning the "gg" to network
 visualization.
 
-A lot of recent changes to ggplot2 are aimed at
-facilitating the extension of ggplot2 in form of developing additional geoms, which is exactly
+A lot of recent changes to \pkg{ggplot2} are aimed at
+facilitating the extension of \pkg{ggplot2} in form of developing additional geoms, which is exactly
 what the article illustrates.}
 
 \hh{XXX there are quite a few other extensions that we should mention at this point: GGally \citep{ggally}, ggbio \citep{ggbio}, ... XXX need to add}
 
-\hh{There are two main approaches to making use of the ggplot2 framework: (i) implement network visualizations using ggplot2, i.e. providing a wrapper for the user to visualize a network with ggplot2 elements, and (ii) implement networks as an internal layer of ggplot2.  For the second approach, two main implementations exist. We will discuss all of these  in this paper. }
+\hh{There are two main approaches of making use of the \pkg{ggplot2} framework: (i) implement network visualizations using \pkg{ggplot2}, i.e. providing a wrapper for the user to visualize a network with \pkg{ggplot2} elements, and (ii) implement networks as  internal layers of \pkg{ggplot2}.  For the second approach, two main implementations exist: one, which implements main parts of a network, such as nodes, edges and node labels as independent geoms. A second implementation wraps all network parts into a single geom. We will discuss all of these approaches in this paper. }
 
 \hh{XXX Provide roadmap for the rest of the paper. }
 
@@ -190,7 +190,7 @@ what the article illustrates.}
 
 \section{Examples}
 
-In this section, we demonstrate the current capabilities of \texttt{ggnet2}, {geom\_net} and \code{ggnetwork} in a series of side by side examples.
+In this section, we demonstrate the current capabilities of \samp{ggnet2}, {geom\_net} and \samp{ggnetwork} in a series of side by side examples.
 For each of these examples, we are going to present the code necessary to produce the network, and discuss it in detail.
 
   \subsection{Blood Donation}
