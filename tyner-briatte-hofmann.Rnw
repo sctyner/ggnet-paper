@@ -11,11 +11,10 @@ An abstract of less than 150 words.
 <<setup_knitr, echo=FALSE>>=
 library(knitr)
 opts_chunk$set(
-  tidy = FALSE, echo=FALSE, cache=FALSE, eval = TRUE,
+  tidy = FALSE, echo = FALSE, cache = FALSE, eval = TRUE,
   message = FALSE, warning = FALSE, highlight = FALSE, background = '#FFFFFF',
-  fig.height = 8, fig.width = 8, fig.align = 'center', fig.show='hide'
+  fig.height = 8, fig.width = 8, fig.align = 'center', fig.show = 'hide'
 )
-
 
 ## From Josh O'Brien's stackoverflow answer:
 ## http://stackoverflow.com/questions/11030898/knitr-how-to-align-code-and-plot-side-by-side
@@ -28,7 +27,7 @@ options(width = fullWidth)
 ##   First, to set R's textual output width on a per-chunk basis, we
 ## need to define a hook function which temporarily resets global R's
 ## option() settings, just for the current chunk
-knit_hooks$set(r.opts=local({
+knit_hooks$set(r.opts = local({
     ropts <- NA
     function(before, options, envir) {
         if (before) {
@@ -86,20 +85,20 @@ knit_hooks[["set"]](chunk = codefigChunkHook)
 
 opts_template[["set"]](
 codefig = list(codefig=TRUE, fig.show = "hide",
-               r.opts = list(width=partWidth),
+               r.opts = list(width = partWidth),
                tidy.opts = list(width.cutoff = partWidth)))
-
 @
 
 <<load_packages, results='hide'>>=
 ## ggplot2
 library(ggplot2) # needs to be version ≥ 1.0.1.9003
 
-## ggnet
+## geom_net
 if (!require(ggnet, quietly = TRUE)) {
   devtools::install_github("sctyner/ggnet")
 }
 library(ggnet)
+## TODO: I would recommend renaming the repo to e.g. geom-net for clarity (Fr.)
 
 ## ggnetwork
 if (!require(ggnetwork, quietly = TRUE)) {
@@ -109,13 +108,13 @@ library(ggnetwork)
 
 ## ggnet2
 source("https://raw.githubusercontent.com/briatte/ggnet/master/ggnet2.R")
-
-library(ggplot2)
+## TODO: should be a lightweight package
 @
 
 % introductory section
 
 % Network analysis is important in many fields
+\fb{How about turning the introduction upside down, starting with the fact that many R users have also taken the time to learn the grammar of graphics on top of the R language, and that the R community might therefore benefit from making additional data types amenable to manipulation through that grammar? Once the rationale is clear, move on to the application, which is networks for us.}
 \hh{XXX include at least one citation for each one of the examples:}
 \par There are many kinds of networks, and networks are extensively studied across many disciplines.  Many sociologists study social networks, and many biologists study protein networks. As different as these and the many other disciplines that study networks are, they all \hh{benefit from good network visualizations.}
 %need the ability to quickly and effectively visualize networks.
@@ -127,18 +126,18 @@ Coloring the vertices or edges in a graph is a quick and easy way to visualize g
 % Many network packages exist, but are not easy to use
 Many R packages already exist for network analysis and visualization such as \CRANpkg{igraph} by \citet{igraph}, \CRANpkg{sna} by \citet{sna}, and \CRANpkg{network} by \citet{network.jss, network}.
 \hh{Unfortunately, there is not a standard format for network results, which requires from  users detailed knowledge of each one of these packages to be able to make meaningful changes to the network, such as}
-%but we have found these packages to have unintuitive or burdensome \hh{ XXX you're shooting sharp -- it might be better to describe that our approach is more customizable and more intuitive to use} methods for 
+%but we have found these packages to have unintuitive or burdensome \hh{ XXX you're shooting sharp -- it might be better to describe that our approach is more customizable and more intuitive to use} methods for
 customizing the colors, sizes, etc of the vertices and edges of the network. For instance, the \pkg{igraph} package allows for coloring vertices by groups but the user has to assign the colors to each vertex individually as opposed to assigning color by a grouping factor variable.
 
 % ggplot2 as an implementation framework
-%We found the current tools to be lacking in this ability, so 
+%We found the current tools to be lacking in this ability, so
 We chose to fill this gap by adding network plotting capabilities to the popular and widely used R package \CRANpkg{ggplot2}. Just to give an idea of the popularity and the wide-spread use of \pkg{ggplot2}, from January 1, 2015 to October 10, 2015, \pkg{ggplot2} was downloaded over 1.2 Million times, or more than 4,000 times per day. It has also been downloaded in 215 countries at least once, and in 21 of those countries, including China, Israel, and Colombia, it has been downloaded over 10,000 times\footnote{\pkg{ggplot2} usage statistics taken from \url{http://cran-logs.rstudio.com/}.}. This is the user base we are aiming at by making network visualizations a part of \pkg{ggplot2}.
 
 \hh{Besides the wide-spread use of \pkg{ggplot2}, its design based on the Grammar of Graphics \citep{wilkinson:1999} makes it relatively easy to extend. Examples include}
 \fb{
 %Perhaps we could stress that one of the benefits of learning the
 %``grammar of graphics" is the opportunity to use that grammar in many
-%different situations, e.g. with 
+%different situations, e.g. with
 maps (see ggmap by \citet{ggmap}), e.g. with statistical models (see
 ggfortify: \url{https://github.com/sinhrks/ggfortify}).
 What the paper does
@@ -146,7 +145,7 @@ is to extend the benefits of learning the "gg" to network
 visualization.
 
 A lot of recent changes to \pkg{ggplot2} are aimed at
-facilitating the extension of \pkg{ggplot2} in form of developing additional geoms, 
+facilitating the extension of \pkg{ggplot2} in form of developing additional geoms,
 which is exactly
 what the article illustrates.}
 
@@ -159,15 +158,14 @@ At its core, a network is simply a set of points connected in pairs by a set of 
 
 \par A social network is a network that everyone is a part of in one way or another.  We do not necessarily refer here to social media like Facebook or LinkedIn, but rather to the connections we form with other people. To demonstrate the functionality of our geometry for plotting networks, we have chosen an example of a social network from the popular television show Mad Men.  This network, compiled by \citet{madmen}, is made up of 52 vertices and 87 edges. Each vertex represents a character on the show, and there is an edge between every two characters who have had a romantic relationship.
 
-Figure~\ref{fig.cap:madmen_ex} shows this network.
+Figure~\ref{fig.cap:madmen} shows this network.
 In the plot, we can see one central character who has many more relationships than any other character. This vertex represents the main character of the show, Don Draper, who is quite the ``ladies' man."  This example shows just how ubiquitous networks are. %% if we have to say that something is fun, it no longer is ...
 
 \begin{figure}[hbtp]
 \centering
-<<madmen_ex_ggnet, dependson='reading_data', out.width='\\textwidth', fig.width=9, fig.height=9.5>>=
-# source for geom_net - see Fig.1
+<<madmen_geom_net, out.width='\\textwidth', fig.width=9, fig.height=9.5>>=
 # data step: merge edges and nodes
-MMnet <- merge(madmen$edges, madmen$vertices, 
+MMnet <- merge(madmen$edges, madmen$vertices,
                by.x = "Name1", by.y = "label", all = TRUE)
 
 # create plot
@@ -179,15 +177,13 @@ ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
   theme_net() +
   theme(legend.position = "bottom")
 @
-\includegraphics[width=\textwidth]{figure/madmen_ex_ggnet-1.pdf}
-\caption{\label{fig.cap:madmen_ex} Graph of the characters in the show Mad Men who are linked by a romantic relationship. }
+\includegraphics[width=\textwidth]{figure/madmen_geom_net-1.pdf}
+\caption{\label{fig.cap:madmen} Graph of the characters in the show Mad Men who are linked by a romantic relationship. }
 \end{figure}
 \afterpage{\clearpage}
 
 
 \hh{In the next section we will discuss the motivation and ideas behind each one of the three approaches. This will be followed up by an extensive discussion of network examples, in which we will provide side by side code and examples of each implementation.}
-
-
 
 \section{Three implementations of network visualizations}
 
@@ -204,7 +200,7 @@ Fortunately, R provides functioniality that allows for an easy way of producing 
 }
 \hh{The formal requirement of  \samp{stat\_net} are two columns, called \samp{from\_id} and \samp{to\_id}. During this routine, columns \samp{x, y} and \samp{xend, yend} are calculated and used as a required input for \samp{geom\_net}.}
 
-Other variables may also be included for each edge, such as the edge weight or grouping variable.  
+Other variables may also be included for each edge, such as the edge weight or grouping variable.
 
 
 \subsubsection{Parameters and Aesthetics}
@@ -212,7 +208,7 @@ Other variables may also be included for each edge, such as the edge weight or g
 \begin{itemize}
 \item {\bf layout:}
 the \samp{layout} parameter takes a character value corresponding to the possible layouts in the \CRANpkg{sna} package that are available within the \texttt{gplot.layout.*()} family of functions.  The default layout is the Kamada-Kawai layout.  This is a force-directed layout for undirected networks \citep{kamadakawai}. There are, however, many other layouts possible (see \code{?sna::gplot.layout}).
-Corresponding to each layout, the parameter  \samp{layout.par} consists of a list of the parameters for the chosen layout. \samp{fiteach} is a Boolean, specifying, whether each panel's data should be fit separately (default) or whether the same layout should be used for all of the panels. 
+Corresponding to each layout, the parameter  \samp{layout.par} consists of a list of the parameters for the chosen layout. \samp{fiteach} is a Boolean, specifying, whether each panel's data should be fit separately (default) or whether the same layout should be used for all of the panels.
 \item {\bf nodes/vertices:} any of \pkg{ggplot2}'s aesthetics relating to points, i.e.\ aesthetics such as colour, size, shape, and alpha are available and used for specifying the appearance of nodes in the network.
 %
 \item {\bf edges:} for edges we distinguish between two different sets of aesthetics: aesthetics that only relate to line attributes, such as  linewidth, linetype, and stroke.  These can be used in the regular way.  Additionally, node aesthetics such as alpha or colour are used for vertices unless separately spcified by using the parameters \samp{ecolour} or \samp{ealpha}, which are only applied to the edges.
@@ -226,7 +222,7 @@ Note that the edge specific aesthetics, that overwrite node aesthetics, are curr
 
 \subsection{ggnetwork: geom\_node and geom\_edge}
 
-\fb{`ggnetwork` is 
+\fb{`ggnetwork` is
 a small package that mimicks the behaviour of `geom\_net` by defining
 several geoms to achieve similar results:
 
@@ -258,178 +254,178 @@ In this directed network, there are eight vertices and 27 edges.  The vertices r
 data(blood)
 @
 
-<<blood_ex_ggnet2, echo=TRUE, fig.width=6, fig.height=6>>=
+<<blood_ggnet2, echo=TRUE, fig.width=6, fig.height=6>>=
+# plot with ggnet2
 ggnet2(network(blood$edges[, 1:2]), mode = "circle", size = 15,
-       label = TRUE, arrow.size = 7.5, arrow.gap = 0.05, vjust = 0.5,
-       node.color="darkred", label.color="grey80")
+       label = TRUE, arrow.size = 10, arrow.gap = 0.05, vjust = 0.5,
+       node.color = "darkred", label.color = "grey80")
 @
 
-<<blood_ex_ggnet, echo=TRUE, fig.width=6, fig.height=6>>=
+<<blood_geom_net, echo=TRUE, fig.width=6, fig.height=6>>=
+# plot with geom_net
 ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
-  geom_net(layout = "circle", size = 15, colour = "darkred", 
-           label = TRUE, labelcolour = "grey80",
-           directed = TRUE, linewidth = 0.75, arrowsize = 1.5, arrowgap = 0.05) +
+  geom_net(colour = "darkred", layout = "circle", label = TRUE, size = 15,
+           directed = TRUE, vjust = 0.5, labelcolour = "grey80",
+           arrowsize = 1.5, linewidth = 0.5, arrowgap = 0.05) +
   theme_net()
 @
 
-<<blood_ex_ggnetwork, echo=TRUE, fig.width=6, fig.height=6>>=
+<<blood_ggnetwork, echo=TRUE, fig.width=6, fig.height=6>>=
+# plot with ggnetwork
 ggplot(ggnetwork(network(blood$edges[, 1:2]), layout = "circle"),
        aes(x, y, xend = xend, yend = yend)) +
-  geom_edges(arrow = arrow(length = unit(7.5, "pt"), type = "closed")) +
+  geom_edges(color = "grey50",
+             arrow = arrow(length = unit(10, "pt"), type = "closed")) +
   geom_nodes(size = 15, color = "darkred") +
   geom_nodetext(aes(label = vertex.names), color = "grey80") +
   theme_blank()
 @
 
-This network is shown in figure \ref{fig.cap:blood_ex}.  Here, we have used the aesthetics \samp{colour} and \samp{size} set to identity values to change the size and color of all vertices. We have also used the \samp{layout} and \samp{label} arguments to change the default layout to a circle layout and to print the blood types, respectively. The circle layout places blood types of the same ABO type next to each other and spreads the vertices out far enough to distinguish between the various ``in" and ``out" types.  You can tell clearly from this plot that the O- type is the universal donor: it has an out-degree of seven and an in-degree of zero. Additionally, we can see that the AB+ type is the universal recepient, with an in-degree of seven and an out-degree of zero. Anyone looking at this plot can quickly determine which type(s) of blood they can receive and which type(s) can receive their blood.
+This network is shown in figure \ref{fig.cap:blood}.  Here, we have used the aesthetics \samp{colour} and \samp{size} set to identity values to change the size and color of all vertices. We have also used the \samp{layout} and \samp{label} arguments to change the default layout to a circle layout and to print the blood types, respectively. The circle layout places blood types of the same ABO type next to each other and spreads the vertices out far enough to distinguish between the various ``in" and ``out" types.  You can tell clearly from this plot that the O- type is the universal donor: it has an out-degree of seven and an in-degree of zero. Additionally, we can see that the AB+ type is the universal recepient, with an in-degree of seven and an out-degree of zero. Anyone looking at this plot can quickly determine which type(s) of blood they can receive and which type(s) can receive their blood.
 
 \begin{figure}
 \begin{subfigure}[t]{.32\textwidth}
 \caption{ggnet2}
-\includegraphics[width=\textwidth]{figure/blood_ex_ggnet2-1.pdf}
+\includegraphics[width=\textwidth]{figure/blood_ggnet2-1.pdf}
 \end{subfigure}
 \begin{subfigure}[t]{.32\textwidth}
 \caption{geom\_net}
-\includegraphics[width=\textwidth]{figure/blood_ex_ggnet-1.pdf}
+\includegraphics[width=\textwidth]{figure/blood_geom_net-1.pdf}
 \end{subfigure}
 \begin{subfigure}[t]{.32\textwidth}
 \caption{ggnetwork}
-\includegraphics[width=\textwidth]{figure/blood_ex_ggnetwork-1.pdf}
+\includegraphics[width=\textwidth]{figure/blood_ggnetwork-1.pdf}
 \end{subfigure}
-\caption{\label{fig.cap:blood_ex} Network of blood donation possibilities in humans by ABO and RhD blood types.}
+\caption{\label{fig.cap:blood} Network of blood donation possibilities in humans by ABO and RhD blood types.}
 \end{figure}
 \afterpage{\clearpage}
 
 \subsection{Email Network}
 
-  This email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a directed network of emails between company employees with 55 vertices and 9,063 edges. Each vertex is an employee of the company, and each edge is an email sent from one employee to one or more other employees. The arrow of the directed edge points to the recipient(s) of the email. The network contains two business weeks of emails across the entire company. In order to better visualize the structure of the communication network between employees, emails that were sent out to all employees are removed in the subsequent examples.
-
+This email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a directed network of emails between company employees with 55 vertices and 9,063 edges. Each vertex is an employee of the company, and each edge is an email sent from one employee to one or more other employees. The arrow of the directed edge points to the recipient(s) of the email. The network contains two business weeks of emails across the entire company. In order to better visualize the structure of the communication network between employees, emails that were sent out to all employees are removed in the subsequent examples.
 
 \begin{figure}
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
-<<email_ex_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
-em.cet = as.character(
+<<email_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
+em.cet <- as.character(
   email$nodes$CurrentEmploymentType)
 names(em.cet) = email$nodes$label
 
 edges <- subset(email$edges, nrecipients < 54)
-em.net = edges[, c("From", "to") ]
-em.net = network(em.net)
-em.net %v% "curr_empl_type" = 
+em.net <- edges[, c("From", "to") ]
+em.net <- network(em.net)
+em.net %v% "curr_empl_type" <-
   em.cet[ network.vertex.names(em.net) ]
 
-ggnet2(em.net, color = "curr_empl_type", 
-       size = 4, palette = "Set1", 
-       arrow.size = 10, arrow.gap = 0.05, 
-       edge.alpha = 0.5, 
+ggnet2(em.net, color = "curr_empl_type",
+       size = 4, palette = "Set1",
+       arrow.size = 5, arrow.gap = 0.02,
+       edge.alpha = 0.5,
        color.legend = "Employment Type") +
-  theme(legend.position="bottom")
+  theme(legend.position = "bottom")
 @
 
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{geom\_net}
-<<email_ex, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
+<<email_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
 emailnet <- merge(
-  subset(email$edges, nrecipients < 54), email$nodes, 
+  subset(email$edges, nrecipients < 54), email$nodes,
   by.x="From", by.y="label", all=TRUE)
 
-ggplot(data = emailnet, 
+ggplot(data = emailnet,
        aes(from_id = From, to_id = to)) +
-  geom_net(aes(colour= CurrentEmploymentType), 
-           linewidth=0.5, ealpha=0.5, size=4, 
+  geom_net(aes(colour= CurrentEmploymentType),
+           linewidth=0.5, ealpha=0.5, size=4,
            directed=TRUE) +
-  scale_colour_brewer("Employment Type", 
-                      palette="Set1") + 
-  theme_net() + 
+  scale_colour_brewer("Employment Type",
+                      palette="Set1") +
+  theme_net() +
   theme(legend.position="bottom")
 @
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork}
-<<email_ex_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
-ggplot(ggnetwork(em.net), 
+<<email_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
+ggplot(ggnetwork(em.net, arrow.gap = 0.02),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges(
     alpha = 0.5, color = "grey50",
-    arrow = arrow(length = unit(10, "pt"), 
+    arrow = arrow(length = unit(5, "pt"),
                   type = "closed")) +
-  geom_nodes(aes(color = curr_empl_type), 
+  geom_nodes(aes(color = curr_empl_type),
              size = 4) +
-  scale_color_brewer("Employment Type", 
+  scale_color_brewer("Employment Type",
                      palette = "Set1") +
   theme_blank() +
   theme(legend.position = "bottom")
 @
 \end{subfigure}
 
-\caption{\label{fig.cap:email_ex} Email network within a company over a two week period.}
+\caption{\label{fig.cap:email} Email network within a company over a two week period.}
 \end{figure}
 \afterpage{\clearpage}
 
-This network is plotted in figure \ref{fig.cap:email_ex}.  There are six distinct clusters in this network which almost perfectly correspond to the six different types of employee in this company: administration, engineering, executive, facilities, information technology, and security. %Unfortunately, there is currently no legend to associate color with employment type. This will be remedied in the final version of our geometry.
-Additionally, the edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the value of the \samp{ealpha} aesthetic: more emails between two employees lead to darker edges.  The value is set to 0.1 in this example, so that ten or more emails between two employees result in a completely opaque edge. This pattern of heavy communication between employees of the same type is fairly unsurprising. 
+This network is plotted in figure \ref{fig.cap:email}.  There are six distinct clusters in this network which almost perfectly correspond to the six different types of employee in this company: administration, engineering, executive, facilities, information technology, and security. %Unfortunately, there is currently no legend to associate color with employment type. This will be remedied in the final version of our geometry.
+Additionally, the edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the value of the \samp{ealpha} aesthetic: more emails between two employees lead to darker edges.  The value is set to 0.1 in this example, so that ten or more emails between two employees result in a completely opaque edge. This pattern of heavy communication between employees of the same type is fairly unsurprising.
 
-To make this visualization more interesting and informative, we facet the network by day: each panel in \ref{fig:email_ex_facet} shows the different email networks associated with each day of the week.
+To make this visualization more interesting and informative, we facet the network by day: each panel in \ref{fig:email_facet} shows the different email networks associated with each day of the week.
 
-
-<<email_ex_facet_ggnet2, fig.height=4, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
-# source for ggnet2
-em.day = subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
-em.day = lapply(unique(em.day$day), function(x) subset(em.day, day == x)[, 1:2 ])
-em.day = lapply(em.day, network, directed = TRUE)
+<<email_facet_ggnet2, fig.height=4, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
+em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
+em.day <- lapply(unique(em.day$day), function(x) subset(em.day, day == x)[, 1:2 ])
+em.day <- lapply(em.day, network, directed = TRUE)
 for (i in 1:length(em.day)) {
-  em.day[[ i ]] %v% "curr_empl_type" = em.cet[ network.vertex.names(em.day[[ i ]]) ]
-  em.day[[ i ]] %n% "day" = unique(email$edges$day)[ i ]
+  em.day[[ i ]] %v% "curr_empl_type" <- em.cet[ network.vertex.names(em.day[[ i ]]) ]
+  em.day[[ i ]] %n% "day" <- unique(email$edges$day)[ i ]
 }
 
-g = list(length(em.day))
+g <- list(length(em.day))
 for (i in 1:length(em.day)) {
-  g[[ i ]] = ggnet2(em.day[[ i ]], size = 2, color = "curr_empl_type",
-                    palette = "Set1", arrow.size = 0, arrow.gap=0.01,
-                    edge.alpha = 0.1, legend.position = "none") +
+  g[[ i ]] <- ggnet2(em.day[[ i ]], size = 2, color = "curr_empl_type",
+                     palette = "Set1", arrow.size = 0, arrow.gap=0.01,
+                     edge.alpha = 0.1, legend.position = "none") +
     ggtitle(paste("Day", em.day[[ i ]] %n% "day")) +
     theme(panel.border = element_rect(color = "grey50", fill = NA))
 }
 gridExtra::grid.arrange(grobs = g, nrow = 2)
 @
 
-<<email_ex_facet, fig.height=5, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
-# source for geom_net
-
+<<email_facet_geom_net, fig.height=5, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
 # data step: making sure that there is one entry for each person on each day
-employee <- data.frame(expand.grid(label=unique(email$nodes$label),
-                                   day=unique(email$edges$day)))
-employee <- merge(employee, email$nodes, by="label")
-emailnet <- merge(subset(email$edges, nrecipients < 54), employee, 
-                  by.x=c("From", "day"), by.y=c("label", "day"), all=TRUE)
+employee <- data.frame(expand.grid(label = unique(email$nodes$label),
+                                   day = unique(email$edges$day)))
+employee <- merge(employee, email$nodes, by = "label")
+emailnet <- merge(subset(email$edges, nrecipients < 54), employee,
+                  by.x = c("From", "day"), by.y = c("label", "day"), all = TRUE)
 
 # creating the plot
 ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
-  geom_net(aes(colour= CurrentEmploymentType), fiteach=TRUE, linewidth=0.5, 
-           ealpha=0.5, size=2, directed=TRUE, arrowsize=.5) +
-  scale_colour_brewer(palette="Set1") + theme_net() +
-  facet_wrap(~day, nrow = 2, labeller="label_both") +
-  theme(legend.position="bottom",
-        panel.border = element_rect(fill=NA, colour = "grey60"))
+  geom_net(aes(colour = CurrentEmploymentType), fiteach = TRUE, linewidth = 0.5,
+           ealpha = 0.5, size = 2, directed = TRUE, arrowsize = .5) +
+  scale_colour_brewer(palette = "Set1") +
+  theme_net() +
+  facet_wrap(~ day, nrow = 2, labeller = "label_both") +
+  theme(legend.position = "bottom",
+        panel.border = element_rect(fill = NA, colour = "grey60"))
 @
 
-<<email_ex_facet_ggnetwork, fig.height=4, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
+<<email_facet_ggnetwork, fig.height=4, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
 # source for ggnetwork
-em.day = subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
-em.day = lapply(unique(em.day$day), function(x) subset(em.day, day == x)[, 1:2 ])
-em.day = lapply(em.day, network, directed = TRUE)
+em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
+em.day <- lapply(unique(em.day$day), function(x) subset(em.day, day == x)[, 1:2 ])
+em.day <- lapply(em.day, network, directed = TRUE)
 for (i in 1:length(em.day)) {
-  em.day[[ i ]] %v% "curr_empl_type" = em.cet[ network.vertex.names(em.day[[ i ]]) ]
-  em.day[[ i ]] %n% "day" = unique(email$edges$day)[ i ]
+  em.day[[ i ]] %v% "curr_empl_type" <- em.cet[ network.vertex.names(em.day[[ i ]]) ]
+  em.day[[ i ]] %n% "day" <- unique(email$edges$day)[ i ]
 }
 
-g = list(length(em.day))
+g <- list(length(em.day))
 for (i in 1:length(em.day)) {
-  g[[ i ]] = ggplot(ggnetwork(em.day[[ i ]]), aes(x, y, xend = xend, yend = yend)) +
+  g[[ i ]] <- ggplot(ggnetwork(em.day[[ i ]]), aes(x, y, xend = xend, yend = yend)) +
     geom_edges(color = "grey50",
                arrow = arrow(length = unit(6, "pt"), type = "closed")) +
     geom_nodes(aes(color = curr_empl_type)) +
@@ -444,35 +440,33 @@ gridExtra::grid.arrange(grobs = g, nrow = 2)
 \begin{figure}
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
-\includegraphics[width=\textwidth]{figure/email_ex_facet_ggnet2-1.pdf}
+\includegraphics[width=\textwidth]{figure/email_facet_ggnet2-1.pdf}
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{geom\_net}
-\includegraphics[width=\textwidth]{figure/email_ex_facet-1.pdf}
+\includegraphics[width=\textwidth]{figure/email_facet_geom_net-1.pdf}
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork}
-\includegraphics[width=\textwidth]{figure/email_ex_facet_ggnetwork-1.pdf}
+\includegraphics[width=\textwidth]{figure/email_facet_ggnetwork-1.pdf}
 \end{subfigure}
 
-\caption{\label{fig:email_ex_facet} The same email network as in figure~\ref{fig.cap:email_ex} facetted by day of the week.}
+\caption{\label{fig:email_facet} The same email network as in figure~\ref{fig.cap:email} facetted by day of the week.}
 \end{figure}
 %
-This plot is shown in Figure~\ref{fig:email_ex_facet}. With the facetting, we can see that there are several days where one or more departments do not communicate with any of the other departments. There are only two days, 13 and 15, without any isolated department communications. Facetting is one of the major benefits of creating a geometry for networks in \pkg{ggplot2}.  Facetting quickly separates dense networks into separate subnetworks for easy visual comparison and  analyses.
+This plot is shown in Figure~\ref{fig:email_facet}. With the facetting, we can see that there are several days where one or more departments do not communicate with any of the other departments. There are only two days, 13 and 15, without any isolated department communications. Facetting is one of the major benefits of creating a geometry for networks in \pkg{ggplot2}.  Facetting quickly separates dense networks into separate subnetworks for easy visual comparison and  analyses.
 
 \subsection{\pkg{ggplot2} Theme Elements}
-This example comes from the \samp{theme()} help page in the \pkg{ggplot2} documentation \citep{ggplot}.  It is a directed network which shows the structure of the inheritance of theme options in the construction of a \pkg{ggplot2} plot.  There are 53 vertices and 36 edges in this network. Each vertex represents one possible theme option. There is an arrow from one theme option to another if the element represented by the \emph{to} vertex inherits its values from the \emph{from} vertex.  For example, the \samp{axis.ticks.x} option inherits its value from the \samp{axis.ticks} value, which in turn inherits its value from the \samp{line} option.  Thus, setting the \samp{line} option to a value such as \samp{element\_blank()} sets the entire inheritance tree to \samp{element\_blank()}, and no lines appear anywhere on the plot background. Finally, we note that the vertices with no edges were incorporated into the plot by adding their labels to the edges data frame in both the  \samp{from\_id} and \samp{to\_id} columns before passing the edges data frame to \samp{ggplot}.
-
-
+This example comes from the \samp{theme()} help page in the \pkg{ggplot2} documentation \citep{ggplot}.  It is a directed network which shows the structure of the inheritance of theme options in the construction of a \pkg{ggplot2} plot. There are 53 vertices and 36 edges in this network. Each vertex represents one possible theme option. There is an arrow from one theme option to another if the element represented by the \emph{to} vertex inherits its values from the \emph{from} vertex.  For example, the \samp{axis.ticks.x} option inherits its value from the \samp{axis.ticks} value, which in turn inherits its value from the \samp{line} option.  Thus, setting the \samp{line} option to a value such as \samp{element\_blank()} sets the entire inheritance tree to \samp{element\_blank()}, and no lines appear anywhere on the plot background. Finally, we note that the vertices with no edges were incorporated into the plot by adding their labels to the edges data frame in both the  \samp{from\_id} and \samp{to\_id} columns before passing the edges data frame to \samp{ggplot}.
 
 \begin{figure}
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
-<<theme_ex_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
-te.net = network(theme_elements$edges)
-te.net %v% "size" = 
+<<theme_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+te.net <- network(theme_elements$edges)
+te.net %v% "size" <-
   sqrt(10 * (sna::degree(te.net) + 1))
 
 ggnet2(te.net, label = TRUE, color = "white",
@@ -482,36 +476,34 @@ ggnet2(te.net, label = TRUE, color = "white",
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{geom\_net}
-<<theme_ex_ggnet, size="footnotesize", opts.label="codefig", echo=TRUE>>=
-# data step: merge nodes and edges and 
+<<theme_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+# data step: merge nodes and edges and
 # introduce a degree-out variable
 library(dplyr)
 TEnet <- merge(
-  theme_elements$edges, 
-  theme_elements$vertices, 
+  theme_elements$edges,
+  theme_elements$vertices,
   by.x = "parent", by.y = "name", all = TRUE)
-TEnet <- TEnet %>% group_by(parent) %>% 
-  mutate(degree = sqrt(10*n()+1))
+TEnet <- TEnet %>%
+  group_by(parent) %>%
+  mutate(degree = sqrt(10 * n() + 1))
 
 # create plot:
-ggplot(data = TEnet, 
+ggplot(data = TEnet,
        aes(from_id = parent, to_id = child)) +
   geom_net(
-    aes(fontsize=degree), directed = TRUE, 
-    label = TRUE, vjust = -.5, size = 3, 
+    aes(fontsize = degree), directed = TRUE,
+    label = TRUE, vjust = -.5, size = 3,
     ecolour = "grey70") +
-  theme_net() + xlim(c(-0.05, 1.05))
+  theme_net() +
+  xlim(c(-0.05, 1.05))
 @
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
-<<theme_ex_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
-te.net = network(theme_elements$edges)
-te.net %v% "size" = 
-  sqrt(10 * (sna::degree(te.net) + 1))
-
-ggplot(ggnetwork(te.net), 
+<<theme_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+ggplot(ggnetwork(te.net),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges() +
   geom_nodes(size = 12, color = "white") +
@@ -523,29 +515,28 @@ ggplot(ggnetwork(te.net),
 @
 \end{subfigure}
 
-\caption{\label{fig.cap:theme_ex} Inheritance structure of \pkg{ggplot2} theme elements. This is a recreation of the graph found at \protect\url{http://docs.ggplot2.org/current/theme.html}.}
+\caption{\label{fig.cap:theme} Inheritance structure of \pkg{ggplot2} theme elements. This is a recreation of the graph found at \protect\url{http://docs.ggplot2.org/current/theme.html}.}
 \end{figure}
 \afterpage{\clearpage}
 
-The inheritance structure is plotted in figure \ref{fig.cap:theme_ex}.  In this plot, it is easy to quickly determine the parent and child vertices. Using this plot made creation of the \samp{theme\_net} object used throughout these examples very simple. We just made set each of the major parent elements, \samp{text}, \samp{rect}, and \samp{line} to \samp{element\_blank()} and then set the aspect ratio equal to one.
+The inheritance structure is plotted in figure \ref{fig.cap:theme}.  In this plot, it is easy to quickly determine the parent and child vertices. Using this plot made creation of the \samp{theme\_net} object used throughout these examples very simple. We just made set each of the major parent elements, \samp{text}, \samp{rect}, and \samp{line} to \samp{element\_blank()} and then set the aspect ratio equal to one.
 
 \subsection{Mad Men Networks}
   The following code creates the network example given in the introduction. We changed the vertex size and edge color for all vertices and edges, included vertex labels, and colored the vertices according to the character's gender.
-<<print_ex, ref.label="madmen_ex_ggnet", eval=FALSE, echo=TRUE,cache=FALSE>>=
+<<print, ref.label="madmen_ggnet", eval=FALSE, echo=TRUE,cache=FALSE>>=
 @
 
 The code for the other two approaches follows below and the corresponding networks are shown in figure~\ref{fig:madmen-2}.
 
-<<madmen_ex_ggnet2, echo=TRUE, dependson='reading_data',  out.width='\\textwidth', fig.width=9, fig.height=9>>=
-# source for ggnet2
-plot(1:10, 1:10)
+<<madmen_ggnet2, echo=TRUE, out.width='\\textwidth', fig.width=9, fig.height=9>>=
+# TODO
+plot(1:10)
 @
 
-<<madmen_ex_ggnetwork, echo=TRUE,  out.width='\\textwidth', fig.width=9, fig.height=9>>=
-# source for ggnetwork
-rownames(madmen$vertices) = madmen$vertices$label
-mm.net = network(madmen$edges[, 1:2], directed = FALSE)
-mm.net %v% "Gender" = as.character(madmen$vertices[ network.vertex.names(mm.net), "Gender"])
+<<madmen_ggnetwork, echo=TRUE,  out.width='\\textwidth', fig.width=9, fig.height=9>>=
+rownames(madmen$vertices) <- madmen$vertices$label
+mm.net <- network(madmen$edges[, 1:2], directed = FALSE)
+mm.net %v% "Gender" <- as.character(madmen$vertices[ network.vertex.names(mm.net), "Gender"])
 
 ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
   geom_edges(color = "grey50") +
@@ -557,15 +548,14 @@ ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
   theme(legend.position = "bottom")
 @
 
-
 \begin{figure}[hbtp]
 \begin{subfigure}[t]{.495\textwidth}
 \caption{ggnet2}
-\includegraphics[width=\textwidth]{figure/madmen_ex_ggnet2-1.pdf}
+\includegraphics[width=\textwidth]{figure/madmen_ggnet2-1.pdf}
 \end{subfigure}
 \begin{subfigure}[t]{.495\textwidth}
 \caption{ggnetwork}
-\includegraphics[width=\textwidth]{figure/madmen_ex_ggnetwork-1.pdf}
+\includegraphics[width=\textwidth]{figure/madmen_ggnetwork-1.pdf}
 \end{subfigure}
 
 \caption{\label{fig:madmen-2} Graph of the characters in the show Mad Men who are linked by a romantic relationship, ggnet2 and ggnetwork implementation.}
@@ -582,90 +572,91 @@ ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
 \begin{figure}
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
-<<madmen2_ex_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
-rownames(mm.directed$vertices) = mm.directed$vertices$label
-mm.directed$vertices$Gender = 
+<<madmen2_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+rownames(mm.directed$vertices) <- mm.directed$vertices$label
+mm.directed$vertices$Gender <-
   as.character(mm.directed$vertices$Gender)
 
-mm.dir = network(mm.directed$edges, 
-                 directed = TRUE)
-mm.dir %v% "gender" = 
-  mm.directed$vertices[ 
+mm.dir <- network(mm.directed$edges,
+                  directed = TRUE)
+mm.dir %v% "gender" <-
+  mm.directed$vertices[
     network.vertex.names(mm.dir), "Gender" ]
 
 # gender color palette
-mm.col = c("female" = "#ff69b4", 
-           "male" = "#0099ff")
+mm.col <- c("f" = "#ff69b4",
+            "m" = "#0099ff")
 
 ggnet2(mm.dir, mode = "fruchtermanreingold", size = 3,
        color = mm.col[ mm.dir %v% "gender" ],
-       label = TRUE, 
+       label = TRUE,
        label.color = mm.col[ mm.dir %v% "gender" ],
-       hjust = -0.1, legend.position = "bottom", 
-       layout.exp = 0.15, arrow.size = 10)
+       hjust = -0.1, legend.position = "bottom",
+       layout.exp = 0.15, arrow.size = 7.5,
+       arrow.gap = 0.02)
 @
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{geom\_net}
-<<madmen2_ex_ggnet, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+<<madmen2_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE>>=
 MM2net <- merge(
-  mm.directed$edges, 
-  mm.directed$vertices, 
-  by.x="Name1", by.y="label", all=TRUE)
+  mm.directed$edges,
+  mm.directed$vertices,
+  by.x = "Name1", by.y = "label", all=TRUE)
 
-ggplot(data = MM2net, 
+ggplot(data = MM2net,
        aes(from_id = Name1, to_id = Name2)) +
   geom_net(
-    aes(colour=Gender),  directed = TRUE, 
-    label = TRUE, ecolour = "grey50", 
+    aes(colour=Gender),  directed = TRUE,
+    label = TRUE, ecolour = "grey50",
     linewidth = 0.5, size = 2.5, vjust = -.5,
     layout = 'fruchtermanreingold') +
   scale_colour_manual(
     values = c( "#FF69B4", "#0099ff")) +
-  theme_net() + xlim(c(-.1, 1.1)) + 
+  theme_net() + xlim(c(-.1, 1.1)) +
   theme(legend.position = "bottom")
 @
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork}
-<<madmen2_ex_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+<<madmen2_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
 ggplot(
-  ggnetwork(mm.dir, 
+  ggnetwork(mm.dir,
             layout = "fruchtermanreingold"),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges(
-    color = "grey50", 
-    arrow = arrow(length = unit(10, "pt"), 
+    color = "grey50",
+    arrow = arrow(length = unit(10, "pt"),
                   type = "closed")) +
-  geom_nodes(size = 3, 
+  geom_nodes(size = 3,
              color = mm.col[ mm.dir %v% "gender" ]) +
-  geom_nodetext(aes(label = vertex.names), 
-                color = mm.col[ mm.dir %v% "gender" ], 
+  geom_nodetext(aes(label = vertex.names),
+                color = mm.col[ mm.dir %v% "gender" ],
                 hjust = -0.1) +
   theme_blank() +
   theme(legend.position = "bottom")
 @
 \end{subfigure}
 
-\caption{\label{fig.cap:madmen2_ex} A directed network of relationships in Mad Men.}
+\caption{\label{fig.cap:madmen2} A directed network of relationships in Mad Men.}
 \end{figure}
-This network is shown in figure \ref{fig.cap:madmen2_ex}.  It is a lot more densely connected than the previous Mad Men example.  This network allows us to see much more of the drama in the show. For instance, we can see that Roger made advances towards Betty, his business partner's wife, which is much more scandalous than what appears in the first network.
+This network is shown in figure \ref{fig.cap:madmen2}.  It is a lot more densely connected than the previous Mad Men example.  This network allows us to see much more of the drama in the show. For instance, we can see that Roger made advances towards Betty, his business partner's wife, which is much more scandalous than what appears in the first network.
 
 \subsection{College Football}
 This next example comes from M.E.J. Newman's network data web page \citep{football}.  It is an undirected network consisting of all regular season college football games played between Division I schools in Fall of 2000.  There are 115 vertices and 613 edges: each vertex represents a school, and an edge represents a game played between two schools. There is an additional variable in the vertex data frame corresponding to the conference each team belongs to, and there is an additional variable in the edge data frame that is equal to one if the game occured between teams in the same conference or zero if the game occured between teams in different conferences.
 
-The network of football games is given in figure \ref{fig.cap:football_ex}. Here, we have changed the \samp{linetype} aesthetic to correspond to games that occur between teams in the same conference or different conferences.  These lines are dotted and solid, respectively. We have also assigned a different color to each conference, and the vertices and their labels are colored according to their conference. This coloring and changing of the linetypes make the structure of the game network easier to view.  There is one conference consisting of Navy, Notre Dame, Utah State, Central Florida, and Connecticut, which is spread out, whereas most other conferences' teams are all very close to each other because they play within conference much more than they play out of conference.  At the time, these five schools were all independents and did not have a home conference.  Without the coloring capability, we would not have been able to pick out that difference as easily.
+The network of football games is given in figure \ref{fig.cap:football}. Here, we have changed the \samp{linetype} aesthetic to correspond to games that occur between teams in the same conference or different conferences.  These lines are dotted and solid, respectively. We have also assigned a different color to each conference, and the vertices and their labels are colored according to their conference. This coloring and changing of the linetypes make the structure of the game network easier to view.  There is one conference consisting of Navy, Notre Dame, Utah State, Central Florida, and Connecticut, which is spread out, whereas most other conferences' teams are all very close to each other because they play within conference much more than they play out of conference.  At the time, these five schools were all independents and did not have a home conference.  Without the coloring capability, we would not have been able to pick out that difference as easily.
 \begin{figure}
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}\vspace{-.5cm}
-<<football_ex_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
-rownames(football$vertices) = football$vertices$label
+<<football_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+rownames(football$vertices) <- football$vertices$label
 
-fb.net = network(football$edges[, 1:2], directed = FALSE)
+fb.net <- network(football$edges[, 1:2], directed = FALSE)
 set.edge.attribute(fb.net, "same.conf", football$edges$same.conf)
-fb.net %v% "conf" = football$vertices[ network.vertex.names(fb.net), "value" ]
+fb.net %v% "conf" <- football$vertices[ network.vertex.names(fb.net), "value" ]
 
 ggnet2(fb.net, mode = "fruchtermanreingold",
        color = "conf", color.legend = "Conference", palette = "Paired",
@@ -675,94 +666,94 @@ ggnet2(fb.net, mode = "fruchtermanreingold",
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{geom\_net}\vspace{-.5cm}
-<<football_ex, size="footnotesize", fig.height=11, opts.label="codefig", echo=TRUE>>=
+<<football, size="footnotesize", fig.height=11, opts.label="codefig", echo=TRUE>>=
 # data step: merge vertices and edges
 # label independent schools
 ftnet <- merge(
-  football$edges, football$vertices, 
-  by.x="from", by.y="label", all=TRUE)
+  football$edges, football$vertices,
+  by.x = "from", by.y = "label", all = TRUE)
 
 sid <- ftnet$value == "Independents"
 ftnet$schools <- ""
 ftnet$schools[sid] <- ftnet$from[sid]
 
 # create data plot
-ggplot(data=ftnet, aes(from_id=from, to_id=to)) +
+ggplot(data = ftnet, aes(from_id = from, to_id = to)) +
   geom_net(
-    aes(colour = value, 
-        linetype = factor(same.conf == 1), 
+    aes(colour = value,
+        linetype = factor(same.conf == 1),
         label = schools),
     linewidth = 0.5,
-    size = 6, vjust = -0.75, alpha = 0.3, 
-    layout = 'fruchtermanreingold') + 
+    size = 6, vjust = -0.75, alpha = 0.3,
+    layout = 'fruchtermanreingold') +
   theme_net() +
-  theme(legend.position="bottom") + xlim(c(-0.05, 1.05)) +
-  scale_colour_brewer("Conference", palette="Paired")  +
-  scale_linetype_manual("Same Conference", values=c(2,1))
+  theme(legend.position = "bottom") + xlim(c(-0.05, 1.05)) +
+  scale_colour_brewer("Conference", palette = "Paired")  +
+  scale_linetype_manual("Same Conference", values = c(2,1))
 @
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork}\vspace{-.5cm}
-<<football_ex_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+<<football_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
 ggplot(
   ggnetwork(fb.net, layout = "fruchtermanreingold"),
   aes(x, y, xend = xend, yend = yend)) +
   geom_edges(
-    aes(linetype = as.logical(same.conf)), 
+    aes(linetype = as.logical(same.conf)),
     color = "grey50") +
   geom_nodes(aes(color = conf), size = 4) +
-  scale_color_brewer("Conference", 
+  scale_color_brewer("Conference",
                      palette = "Paired") +
   guides(linetype = FALSE) +
   theme_blank()
 @
 \end{subfigure}
-\caption{\label{fig.cap:football_ex} The network of regular season Division I college football games in the season of fall 2000. The vertices and their labels are colored by conference.}
+\caption{\label{fig.cap:football} The network of regular season Division I college football games in the season of fall 2000. The vertices and their labels are colored by conference.}
 \end{figure}
 \afterpage{\clearpage}
 
 \subsection{Les Mis\'{e}rables}
-This next network comes from \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book, and an edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.  
-This network is shown in figures~\ref{fig.cap:lesmis_ex:ggnet2},~\ref{fig.cap:lesmis_ex:ggnet}, and~\ref{fig.cap:lesmis_ex:ggnetwork}. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
+This next network comes from \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book, and an edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.
+This network is shown in figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
 
-<<lesmis_ex_ggnet2, echo=TRUE>>=
-# source for ggnet2
+<<lesmis_ggnet2, echo=TRUE>>=
+# plot with ggnet2
 ggnet2(lesmis$edges[, 1:2 ], mode = "kamadakawai", color = "white", label = TRUE,
        edge.size = lesmis$edges$degree / mean(lesmis$edges$degree),
        layout.exp = 0.25)
 @
 
-<<lesmis_ex_ggnet, echo=TRUE, fig.width=9.5>>=
-# source for geom_net
+<<lesmis_geom_net, echo=TRUE, fig.width=9.5>>=
+# plot with geom_net
 
 # data step: merge vertices and edges
-lesmisnet <- merge(lesmis$edges, lesmis$vertices, by.x="from", by.y="label", all=TRUE)
+lesmisnet <- merge(lesmis$edges, lesmis$vertices, by.x = "from", by.y = "label", all=TRUE)
 lesmisnet$degree[is.na(lesmisnet$degree)] <- 0
 
 # create data plot
-ggplot(data = lesmisnet, aes(from_id = from, to_id = to, 
+ggplot(data = lesmisnet, aes(from_id = from, to_id = to,
                              linewidth = degree/5 + 0.1 )) +
-  geom_net(colour = "grey30",  aes(size = degree, alpha=degree),
+  geom_net(colour = "grey30",  aes(size = degree, alpha = degree),
            ecolour = "grey60", vjust = -0.75,
            layout = 'fruchtermanreingold', label = TRUE) +
   theme_net() + scale_alpha(range=c(0.3, 1))
 @
 
 \begin{figure}
-\includegraphics[width=\textwidth]{figure/lesmis_ex_ggnet2-1.pdf}
-\caption{\label{fig.cap:lesmis_ex:ggnet2} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using ggnet2.}
+\includegraphics[width=\textwidth]{figure/lesmis_ggnet2-1.pdf}
+\caption{\label{fig.cap:lesmis:ggnet2} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using ggnet2.}
 \end{figure}
 %
 \begin{figure}
-\includegraphics[width=\textwidth]{figure/lesmis_ex_ggnet-1.pdf}
-\caption{\label{fig.cap:lesmis_ex:ggnet} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using geom\_net.}
+\includegraphics[width=\textwidth]{figure/lesmis_geom_net-1.pdf}
+\caption{\label{fig.cap:lesmis:ggnet} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using geom\_net.}
 \end{figure}
 %
 \begin{figure}
-%\includegraphics[width=\textwidth]{figure/lesmis_ex_ggnetwork-1.pdf}
+%\includegraphics[width=\textwidth]{figure/lesmis_ggnetwork-1.pdf}
 \hh{include ggnetwork example}
-\caption{\label{fig.cap:lesmis_ex:ggnetwork} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using ggnetwork.}
+\caption{\label{fig.cap:lesmis:ggnetwork} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using ggnetwork.}
 \end{figure}
 %
 \afterpage{\clearpage}
@@ -772,49 +763,49 @@ The data shows the second quartal trips in 2015 taken with bikes from the bike s
 While this bikesharing company is located in the heart of Washington D.C.\ they do have a set of bike stations just outside of Washington in  Rockville, MD and north of it.
 Each station is shown as a dot, lines between stations indicate that at least five trips were taken between these two stations; the wider the line, the more trips have been taken between stations. In order to reflect distance between stations, we use as an additional restriction that the fastest trip was at most ten minutes long.
 
-<<bikes_ex, echo=TRUE, fig.cap="Bikesharing in Rockville", warning=FALSE, fig.keep='all'>>=
-tripnet <- merge(bikes$trips, bikes$stations, by.x="Start.station", by.y="name", all=TRUE)
+<<bikes_geom_net, echo=TRUE, fig.cap="Bikesharing in Rockville", warning=FALSE, fig.keep='all'>>=
+tripnet <- merge(bikes$trips, bikes$stations, by.x = "Start.station", by.y = "name", all = TRUE)
 
 tripnet$Metro = FALSE
 idx <- grep("Metro", tripnet$Start.station)
 tripnet$Metro[idx] <- TRUE
 
-ggplot(aes(from_id=Start.station, to_id=End.station), data=tripnet) +
-  geom_net(aes(linewidth=n/15, colour=Metro), label=TRUE, vjust=-0.5) +
-  theme_net() + xlim(c(-0.1, 1.1)) +
-  scale_colour_manual("Metro Station", values=c("grey40", "darkorange")) +
-  theme(legend.position="bottom")
+ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
+  geom_net(aes(linewidth = n / 15, colour = Metro), label = TRUE, vjust = -0.5) +
+  theme_net() +
+  xlim(c(-0.1, 1.1)) +
+  scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
+  theme(legend.position = "bottom")
 # compare to https://secure.capitalbikeshare.com/map/
 
-ggplot(aes(from_id=Start.station, to_id=End.station),  data=tripnet) +
-  geom_net(layout=NULL, label=TRUE, vjust=-0.5,
-           aes(x=long, y=lat, linewidth=n/15, colour=Metro)) +
+ggplot(aes(from_id = Start.station, to_id = End.station),  data = tripnet) +
+  geom_net(layout = NULL, label = TRUE, vjust = -0.5,
+           aes(x = long, y = lat, linewidth = n / 15, colour = Metro)) +
   theme_net() +
-  scale_colour_manual("Metro Station", values=c("grey40", "darkorange")) +
-  theme(legend.position="bottom")
-
+  scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
+  theme(legend.position = "bottom")
 @
 
 \begin{figure}
 \centering
-\includegraphics[width=.49\textwidth]{figure/bikes_ex-1.pdf}
-\includegraphics[width=.49\textwidth]{figure/bikes_ex-2.pdf}
+\includegraphics[width=.49\textwidth]{figure/bikes_geom_net-1.pdf}
+\includegraphics[width=.49\textwidth]{figure/bikes_geom_net-2.pdf}
 \caption{\label{fig:bikes} Network of bike trips using a Kamada-Kawai layout (left) and a geographically true representation (right, \hh{XXX I would like to include a ggmap here, we need to wait until that package is fixed}). Metro stations are shown in orange. In the Kamada-Kawai layout based on the trips taken, metro stations take a much more central position than in the geographically true representation. }
 \end{figure}
 \afterpage{\clearpage}
 
 
 \subsection{Protein Interaction Network in Yeast}
-  This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, and there are 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}. These interactions and their associated proteins are plotted  in figure \ref{fig.cap:yeast_ex}.  We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \samp{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices.
+  This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, and there are 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}. These interactions and their associated proteins are plotted  in figure \ref{fig.cap:yeast}.  We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \samp{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices.
 
-<<yeast_ex_ggnet2, echo=TRUE, cache=FALSE>>=
+<<yeast_ggnet2, echo=TRUE, cache=FALSE>>=
 # plot with ggnet2
 ggnet2(network(protein$edges[,1:2]), size = 2, color = "magenta",
        mode = "random", layout.par = list(dist = "uniang"),
        edge.alpha = 0.05)
 @
 
-<<yeast_ex, echo=TRUE, cache=FALSE>>=
+<<yeast_geom_net, echo=TRUE, cache=FALSE>>=
 # plot with geom_net
 ggplot(data = protein$edges, aes(from_id = from, to_id = to)) +
   geom_net(alpha=0.25, ealpha = .05, size=2, colour = 'magenta',
@@ -828,14 +819,14 @@ ggplot(data = protein$edges, aes(from_id = from, to_id = to)) +
 \begin{figure}
 \begin{subfigure}[t]{.49\textwidth}
 \caption{ggnet2}
-\includegraphics[width=\textwidth]{figure/yeast_ex_ggnet2-1.pdf}
+\includegraphics[width=\textwidth]{figure/yeast_ggnet2-1.pdf}
 \end{subfigure}
 %
 \begin{subfigure}[t]{.49\textwidth}
 \caption{geom\_net}
-\includegraphics[width=\textwidth]{figure/yeast_ex-1.pdf}
+\includegraphics[width=\textwidth]{figure/yeast_geom_net-1.pdf}
 \end{subfigure}
-\caption{\label{fig.cap:yeast_ex} Protein-protein interaction network in \emph{S. cerevisiae}. The layout is random.}
+\caption{\label{fig.cap:yeast} Protein-protein interaction network in \emph{S. cerevisiae}. The layout is random.}
 \end{figure}
 \afterpage{\clearpage}
 
