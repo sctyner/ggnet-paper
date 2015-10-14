@@ -386,7 +386,7 @@ for (i in 1:length(em.day)) {
 g <- list(length(em.day))
 for (i in 1:length(em.day)) {
   g[[ i ]] <- ggnet2(em.day[[ i ]], size = 2, color = "curr_empl_type",
-                     palette = "Set1", arrow.size = 0, arrow.gap=0.01,
+                     palette = "Set1", arrow.size = 0, arrow.gap = 0.01,
                      edge.alpha = 0.1, legend.position = "none") +
     ggtitle(paste("Day", em.day[[ i ]] %n% "day")) +
     theme(panel.border = element_rect(color = "grey50", fill = NA))
@@ -425,9 +425,10 @@ for (i in 1:length(em.day)) {
 
 g <- list(length(em.day))
 for (i in 1:length(em.day)) {
-  g[[ i ]] <- ggplot(ggnetwork(em.day[[ i ]]), aes(x, y, xend = xend, yend = yend)) +
+  g[[ i ]] <- ggplot(ggnetwork(em.day[[ i ]], arrow.gap = 0.025),
+                     aes(x, y, xend = xend, yend = yend)) +
     geom_edges(color = "grey50",
-               arrow = arrow(length = unit(6, "pt"), type = "closed")) +
+               arrow = arrow(length = unit(3, "pt"), type = "closed")) +
     geom_nodes(aes(color = curr_empl_type)) +
     scale_colour_brewer(palette = "Set1") +
     theme_blank() +
@@ -666,7 +667,7 @@ ggnet2(fb.net, mode = "fruchtermanreingold",
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{geom\_net}\vspace{-.5cm}
-<<football, size="footnotesize", fig.height=11, opts.label="codefig", echo=TRUE>>=
+<<football_geom_net, size="footnotesize", fig.height=11, opts.label="codefig", echo=TRUE>>=
 # data step: merge vertices and edges
 # label independent schools
 ftnet <- merge(
