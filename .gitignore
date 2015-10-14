@@ -1,10 +1,14 @@
 .Rproj.user
 .Rhistory
 .RData
+
 test_references.*
 *.Rproj
+
 *.pdf
 *.bbl
 *.log
 *.brf
 *.tex
+*.toc
+*.gz
