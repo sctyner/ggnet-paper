@@ -3,10 +3,10 @@
 \author{by Sam Tyner, Fran\c{c}ois Briatte and  Heike Hofmann}
 
 \maketitle
-
+\sct{
 \abstract{
-\sct{This paper explores three new functionalities built on the \pkg{ggplot2} framework: \texttt{geom_net}, \texttt{ggnet2}, and \texttt{ggnetwork}.  We will show that together, these additions contribute significantly to the visualization of networks. }
-}
+This paper explores three new functionalities built on the \pkg{ggplot2} framework: \texttt{geom\_net}, \texttt{ggnet2}, and \texttt{ggnetwork}.  We will show that together, these additions contribute significantly to the visualization of networks.
+}}
 
 <<setup_knitr, echo=FALSE>>=
 library(knitr)
@@ -114,7 +114,7 @@ source("https://raw.githubusercontent.com/briatte/ggnet/master/ggnet2.R")
 % introductory section
 
 % Network analysis is important in many fields
-\fb{How about turning the introduction upside down, starting with the fact that many R users have also taken the time to learn the grammar of graphics on top of the R language, and that the R community might therefore benefit from making additional data types amenable to manipulation through that grammar? Once the rationale is clear, move on to the application, which is networks for us.}
+\fb{XXX How about turning the introduction upside down, starting with the fact that many R users have also taken the time to learn the grammar of graphics on top of the R language, and that the R community might therefore benefit from making additional data types amenable to manipulation through that grammar? Once the rationale is clear, move on to the application, which is networks for us.}
 \hh{XXX include at least one citation for each one of the examples:}
 \par There are many kinds of networks, and networks are extensively studied across many disciplines.  Many sociologists study social networks, and many biologists study protein networks. As different as these and the many other disciplines that study networks are, they all \hh{benefit from good network visualizations.}
 %need the ability to quickly and effectively visualize networks.
@@ -125,26 +125,25 @@ Coloring the vertices or edges in a graph is a quick way to visualize grouping a
 
 % Many network packages exist, but are not easy to use
 Many R packages already exist for network analysis and visualization such as \pkg{igraph} by \citet{igraph}, \pkg{sna} by \citet{sna}, and \pkg{network} by \citet{network.jss, network}.
-\hh{Unfortunately, there is not a standard format for network results, which requires fromusers detailed knowledge of each one of these packages to be able to make meaningful changes to the network, such as}
+\hh{Unfortunately, there is not a standard format for network results, which requires detailed knowledge from users of each one of these packages in order to make meaningful changes to the network visualization, such as}
 %but we have found these packages to have unintuitive or burdensome \hh{ XXX you're shooting sharp -- it might be better to describe that our approach is more customizable and more intuitive to use} methods for
-customizing the colors, sizes, etc of the vertices and edges of the network. For instance, the \pkg{igraph} package allows for coloring vertices by groups but the user has to assign the colors to each vertex individually as opposed to assigning color by a grouping factor variable.
+customizing the colors, sizes, etc. of the vertices and edges of the network. For instance, the \pkg{igraph} package allows for coloring vertices by groups but the user has to assign the colors to each vertex individually as opposed to assigning color by a grouping factor variable.
 
 % ggplot2 as an implementation framework
 %We found the current tools to be lacking in this ability, so
-We chose to fill this gap by adding network plotting capabilities to the popular and widely used R package \pkg{ggplot2}. Just to give an idea of the popularity and the wide-spread use of \pkg{ggplot2}, from January 1, 2015 to October 10, 2015, \pkg{ggplot2} was downloaded over 1.2 Million times \sct{from CRAN: more than 4,000 per day.} It has also been downloaded in 215 countries at least once, and in 21 of those countries, including China, Israel, and Colombia, it has been downloaded over 10,000 times\footnote{\pkg{ggplot2} usage statistics taken from \url{http://cran-logs.rstudio.com/}.}. This is the user base we are aiming at by making network visualizations a part of \pkg{ggplot2}.
+We chose to fill this gap by adding network plotting capabilities to the popular and widely used R package \pkg{ggplot2}. Just to give an idea of the popularity and the wide-spread use of \pkg{ggplot2}, from January 1, 2015 to October 10, 2015, \pkg{ggplot2} was downloaded over 1.2 Million times \sct{from CRAN: over 4,000 downloads per day.} It has also been downloaded in 215 countries at least once, and in 21 of those countries, including China, Israel, and Colombia, it has been downloaded over 10,000 times\footnote{\pkg{ggplot2} usage statistics taken from \url{http://cran-logs.rstudio.com/}.}. This is the user base we are aiming at by making network visualizations a part of \pkg{ggplot2}.
 
-\hh{Besides the wide-spread use of \pkg{ggplot2}, its design based on the Grammar of Graphics \citep{wilkinson:1999} makes it relatively easy to extend. Many extensions already exist:}
-\fb{
-%Perhaps we could stress that one of the benefits of learning the
+\hh{In addition to the wide-spread use of \pkg{ggplot2}, its design based on the Grammar of Graphics \citep{wilkinson:1999} makes it relatively easy to extend. Many extensions already exist:}
+% \fb{
+Perhaps we could stress that one of the benefits of learning the
 %``grammar of graphics" is the opportunity to use that grammar in many
-%different situations, e.g. with
-}
-\sct{mapping via the \pkg{ggmap} package by \citet{ggmap}, visualization of statistical models via the \pkg{ggfortify} package by \citet{fortify}, many helper functions in the \pkg{GGally} by \citep{ggally}, and \textit{Bioconductor} plotting via the \pkg{ggbio} by \citep{ggbio}, to name a few. Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization.}
+%different situations, e.g. with}
+\sct{mapping via the \pkg{ggmap} package by \citet{ggmap}, visualization of statistical models via the \pkg{ggfortify} package by \citet{ggfortify}, many helper functions in the \pkg{GGally} by \citep{ggally}, and \textit{Bioconductor} plotting via the \pkg{ggbio} by \citep{ggbio}, to name a few. Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization.}
 
 \sct{The most recent changes to \pkg{ggplot2} are aimed at
 facilitating extension of \pkg{ggplot2} in form of additional \texttt{geom} functions, which is exactly what we have done here.}
 
-\hh{There are two main approaches of making use of the \pkg{ggplot2} framework: (i) implement network visualizations using \pkg{ggplot2}, i.e. providing a wrapper for the user to visualize a network with \pkg{ggplot2} elements, and (ii) implement networks as internal layers of \pkg{ggplot2}.  For the second approach, two main implementations exist: one, which implements main parts of a network, such as nodes, edges and node labels as independent geoms. A second implementation wraps all network parts into a single geom. We will discuss all of these approaches in this paper. }
+\sct{There are two main approaches to making use of the \pkg{ggplot2} framework: (i) implement network visualizations using \pkg{ggplot2}, by providing a wrapper for the user to visualize a network with \pkg{ggplot2} elements, and (ii) implement network visualizations as internal layers in \pkg{ggplot2}.  For the second approach, two main implementations exist: one which implements the structures of a network, such as nodes, edges, and node labels as independent geoms and antoher which wraps all of these structures into a single geom. We will discuss all of these approaches in this paper. }
 
 % getting into more of the nitty-gritty details
 At its core, a network is simply a set of points connected in pairs by a set of lines \citep{newman}.  Here, we refer to the lines as edges and the points as vertices, although these are also called nodes.  These two seemingly simple sets of graphical objects, points and segments, are used to encode a huge variety and quantity of information across many fields of study. For instance, networks of scientific collaboration, a food web of marine animals, and American college football games are all covered in a paper on community detection in networks by \citet{football}.  \citet{networkfailures} examine node failure in interdependent networks like power grids.  Social networks, such as links between actors found on \url{www.imdb.com}, and neural networks, like the completely mapped neural network of the \textit{C. elegans} worm are also etensively studied \citep{smallworld}.  Networks vary widely in scope and complexity: the smallest network is simply an edge between two vertices, while one of the most commonly used and most complex networks, the world wide web, has billions of vertices (webpages) and billions of edges (hyperlinks) connecting them.  The edges in a network can  be directed or undirected: directed edges represent information travelling from one vertex to another, and switching the direction would change the structure of the network. The world wide web is an example of a directed network because one webpage may link to another, but not necessarily the other way around. Undirected edges are simply connections between vertices. In co-authorship networks nodes are authors connected by an edge, if they author an academic publication together. Co-authorship networks are examples of undirected networks because if two people author a paper together, it creates a connection between them that is bidirectional.
@@ -160,11 +159,11 @@ In the plot, we can see one central character who has many more relationships th
 # data step: merge edges and nodes
 MMnet <- merge(madmen$edges, madmen$vertices,
                by.x = "Name1", by.y = "label", all = TRUE)
-
+# SOMETHING IS WRONG WITH THIS EXAMPLE. 
 # create plot
-ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
-  geom_net(aes(colour = Gender), size = 4, label = TRUE, vjust = -0.6,
-           ecolour = "grey50") +
+ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) + geom_net()
+  geom_net(aes(colour = Gender), size = 4, label = TRUE, 
+           vjust = -0.6, ecolour = "grey50") +
   scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
   xlim(c(-0.05, 1.05)) +
   theme_net() +
@@ -190,8 +189,8 @@ ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
 \hh{Network analysis is usally working with two sources of information: one data set consisting of a description of the `players', represented as the nodes or vertices in the network, and another data set detailing the relationship between the players, the edge dataset.
 In order for this geometry to work, these two data sets need to be combined into a single dataset. For this, we are using the convention that all of the node information is merged into the edge data set using the `from' as the reference column. Generally, there will be some vertices that are sinks in the network, ie.\ they only show up in the `to' column. We can easily accommodate for these nodes by adding artificial edges in the data set, that have missing information for the `to' column.
 Fortunately, R provides functioniality that allows for an easy way of producing the required result: both \samp{merge} and \samp{join} can be used. In \samp{merge} the parameter \samp{all} needs to be set to \samp{TRUE}, in \samp{join}, the parameter setting has to be \samp{type='full'}, and \samp{all=TRUE}.
-
 }
+
 \hh{The formal requirement of  \samp{stat\_net} are two columns, called \samp{from\_id} and \samp{to\_id}. During this routine, columns \samp{x, y} and \samp{xend, yend} are calculated and used as a required input for \samp{geom\_net}.}
 
 Other variables may also be included for each edge, such as the edge weight or grouping variable.
@@ -624,7 +623,7 @@ ggplot(data = MM2net,
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork}
-<<madmen2_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+<<madmen2_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, dependson=madmen2_ggnet2>>=
 ggplot(
   ggnetwork(mm.dir,
             layout = "fruchtermanreingold"),
