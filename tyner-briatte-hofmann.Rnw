@@ -5,7 +5,7 @@
 \maketitle
 \sct{
 \abstract{
-This paper explores three new functionalities built on the \pkg{ggplot2} framework: \texttt{geom\_net}, \texttt{ggnet2}, and \texttt{ggnetwork}.  We will show that together, these additions contribute significantly to the visualization of networks.
+This paper explores three new functionalities built on the \pkg{ggplot2} framework: \texttt{geom\_net}, \texttt{ggnet2}, and \texttt{ggnetwork}. The goal of each one is to provide the user with the ability to apply the flexibility of \pkg{ggplot2} to the visualization of network or graph data.  We will show that these additions contribute significantly to the study of networks by making visualization of networks intuitive in the \pkg{ggplot2} structure.
 }}
 
 \hh{TODO list:
