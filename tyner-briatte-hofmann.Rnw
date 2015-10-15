@@ -256,7 +256,7 @@ several geoms to achieve similar results:
 
 The approach of \samp{ggnetwork} is to 'alias' some of the native geometries (or 'geoms') of the \pkg{ggplot2} package, an 'aliased' geom being a variant of another geom that is already present in the package. The \pkg{ggplot2} package contains several examples of aliased geoms, such as \samp{geom\_histogram}, which is a variant of \samp{geom\_bar} (see \citealt[p.~67, Table~4.6]{ggplot}).
 
-Following that logic, \samp{ggnetwork} adds four geometries to \pkg{ggplot2}:
+Following that logic, \samp{ggnetwork} adds four aliased geometries to \pkg{ggplot2}:
 
 \begin{itemize}
   \item \samp{geom\_nodes}, an alias to \samp{geom\_point};
@@ -267,22 +267,21 @@ Following that logic, \samp{ggnetwork} adds four geometries to \pkg{ggplot2}:
 
 The four geoms are used to plot nodes, edges, node labels and edge labels respectively. Two of the geoms that they alias, \samp{geom\_curve} and \samp{geom\_label}, are part of the new geometries introduced in \pkg{ggplot2} version 1.1.0.\footnote{See \url{https://github.com/hadley/ggplot2/blob/master/NEWS.md}.}
 
-Data-wise, \samp{ggnetwork} uses the same trick as \samp{geom\_net}: left-join
-the edge list and the nodal attributes, add self-loops to make sure
-that every node is plotted even if their degree is zero, and pass that
-data frame to \pkg{ggplot2}.
+To manage the edge, vertex, and other network characteristics, \samp{ggnetwork} uses the same trick as \samp{geom\_net} via a left-join of the edge list and the node attributes. Additionally, it adds self-loops to make sure that every node is plotted even if their degree is zero. The data frame created by \samp{ggnetwork} is then passed to \pkg{ggplot2}.
 }
 
-\hh{For the data-wise ... paragraph, are you talking about the package ggnetwork or the function ggnetwork? I was under the impression, that the ggnetwork package requires a data set with x, y, xend, yend, and, if labels are supposed to be shown, those, too. The function ggnetwork looks to me like a wrapper for network that produces a data set like just described from a network object. But that means that all of the information on colors or other aesthetics need to be part of that network object, which means that you are again, using the same tools as for ggnet2, i.e. this node and the edge operator. }
+\hh{XXX For the above paragraph, are you talking about the package ggnetwork or the function ggnetwork? I was under the impression, that the ggnetwork package requires a data set with x, y, xend, yend, and, if labels are supposed to be shown, those, too. The function ggnetwork looks to me like a wrapper for network that produces a data set like just described from a network object. But that means that all of the information on colors or other aesthetics need to be part of that network object, which means that you are again, using the same tools as for ggnet2, i.e. this node and the edge operator. }
 
+\sct{XXX This section could use some more detail about the arguments to the functions like the other two.  We should make sure that the readers of our paper can easily compare-contrast the 3 functionalities. Also, there has GOT to be another word we can use in addition to functionality. I'm getting tired of typing it! }
 
 \section{Examples}
 
-In this section, we demonstrate the current capabilities of \samp{ggnet2}, {geom\_net} and \samp{ggnetwork} in a series of side by side examples.
-For each of these examples, we are going to present the code necessary to produce the network, and discuss it in detail.
+In this section, we demonstrate the current capabilities of \samp{ggnet2}, \samp{geom\_net} and \samp{ggnetwork} in a series of side by side examples. \sct{While the output is similar for each method of network visualization, the code and implementations differ across the three methods.
+So, for each of these examples, we are going to present the code necessary to produce the network, and discuss each application in detail.}
 
 \subsection{Blood Donation}
-In this directed network, there are eight vertices and 27 edges.  The vertices represent the eight different blood types in humans that are most important for donation: the ABO blood types A, B, AB, and O, combined with the RhD positive (+) and negative (-) types. The edges are directed: a person whose blood type is that of a \emph{from} vertex can to donate blood to a person whose blood type is that of a corresponding \emph{to} vertex. In the example below, loops are removed because loops exist on every vertex in this example, as blood between two people of matching ABO and RhD type can always be exchanged.
+In this directed network, there are eight vertices and 27 edges.  The vertices represent the eight different blood types in humans that are most important for donation: the ABO blood types A, B, AB, and O, combined with the RhD positive (+) and negative (-) types. The edges are directed: a person whose blood type is that of a \emph{from} vertex can to donate blood to a person whose blood type is that of a corresponding \emph{to} vertex. \sct{XXX HH, should we leave the selfies in? I think they're fun and make a lot of sense in the blood ex. But we'd have to re-write this last sentence.} In the example below, loops are removed because loops exist on every vertex in this example, as blood between two people of matching ABO and RhD type can always be exchanged.
+
 
 <<blood_common>>=
 data(blood)
@@ -336,7 +335,7 @@ This network is shown in figure \ref{fig.cap:blood}.  Here, we have used the aes
 
 \subsection{Email Network}
 
-This email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a directed network of emails between company employees with 55 vertices and 9,063 edges. Each vertex is an employee of the company, and each edge is an email sent from one employee to one or more other employees. The arrow of the directed edge points to the recipient(s) of the email. The network contains two business weeks of emails across the entire company. In order to better visualize the structure of the communication network between employees, emails that were sent out to all employees are removed in the subsequent examples.
+This email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a directed network of emails between company employees with 55 vertices and 9,063 edges. Each vertex is an employee of the company, and each edge is an email sent from one employee to one or more other employees. The arrow of the directed edge points to the recipient(s) of the email. The network contains two business weeks of emails across the entire company. In order to better visualize the structure of the communication network between employees, emails that were sent out to all employees are removed. 
 
 \begin{figure}
 \begin{subfigure}[t]{\textwidth}
@@ -405,9 +404,10 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02),
 
 This network is plotted in figure \ref{fig.cap:email}.  There are six distinct clusters in this network which almost perfectly correspond to the six different types of employee in this company: administration, engineering, executive, facilities, information technology, and security.
 
-Additionally, the edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the value of the \samp{ealpha} aesthetic: more emails between two employees lead to darker edges.  The value is set to 0.1 in this example, so that ten or more emails between two employees result in a completely opaque edge. This pattern of heavy communication between employees of the same type is fairly unsurprising.
+Additionally, the edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the value of the \samp{ealpha} aesthetic: more emails between two employees lead to darker edges.  The value is set to 0.1 in this example, so that ten or more emails between two employees result in a completely opaque edge.  %This pattern of heavy communication between employees of the same type is fairly unsurprising.
+%SCT Let's not add things that make our cool visualizations sound less cool!
 
-To make this visualization more interesting and informative, we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows the different email networks associated with each day of the week.
+To make this visualization even more interesting and informative, we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows the different email networks associated with each day of the week.
 
 <<email_facet_ggnet2, fig.height=4, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
 em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
@@ -454,6 +454,7 @@ ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
 %% NOTE: the code below requires version >= 0.1.7 of ggnetwork
 %% devtools::install_github("briatte/ggnetwork")
 
+\sct{XXX I am not a fan of this paragraph. Again, we should appear united.}
 The faceting technique employed by \samp{ggnetwork} is close to that of \samp{geom\_net}, except it happens internally to the function. Passing an edge attribute to the \samp{by} argument will cause \samp{ggnetwork} to return a data frame in which the nodes have been 'panelized' according to that attribute. In that data frame, each node appears as many times as there are unique values to the edge attribute passed to \samp{by}, which will cause the node to appear in all facets of the plot. Furthermore, and unlike \samp{geom\_net}, he same set of coordinates is assigned to all instances (i.e. to all rows) of the same node, which causes the position of each node to be identical in all facets of the plot.
 
 <<email_facet_ggnetwork, fig.height=4, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
