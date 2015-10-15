@@ -11,10 +11,10 @@ This paper explores three new functionalities built on the \pkg{ggplot2} framewo
 \hh{TODO list:
 
 \begin{enumerate}
-\item the code in some of the examples goes beyond the page margin - we need to fix that. 
+\item the code in some of the examples goes beyond the page margin - we need to fix that.
 \item a couple of the examples don't have all three solutions yet.
 \item for the protein example it would probably be enough to just show the code for all implementations, but only one of the resulting donut rings.
-\item there's still some inconsistencies with the formatting. Everything that is working code should be in the framework \code{working code}, everything that is just a piece of text that should not be confused with regular text needs to go into the \samp{not regular text} environment. 
+\item there's still some inconsistencies with the formatting. Everything that is working code should be in the framework \code{working code}, everything that is just a piece of text that should not be confused with regular text needs to go into the \samp{not regular text} environment.
 \end{enumerate}}
 
 
@@ -118,7 +118,9 @@ library(ggnetwork)
 
 ## ggnet2
 source("https://raw.githubusercontent.com/briatte/ggnet/master/ggnet2.R")
-## TODO: should be a lightweight package
+## TODO: should be a lightweight package... any chance geom_net could come
+## in a package called geomnet or something like that, so that I can use
+## the name ggnet to package ggnet and ggnet2?
 @
 
 % introductory section
@@ -145,7 +147,7 @@ customizing the colors, sizes, etc. of the vertices and edges of the network. Fo
 
 % ggplot2 as an implementation framework
 %We found the current tools to be lacking in this ability, so
-We chose to fill this gap by adding network plotting capabilities to the popular and widely used R package \pkg{ggplot2}. Just to give an idea of the popularity and %the wide-spread use 
+We chose to fill this gap by adding network plotting capabilities to the popular and widely used R package \pkg{ggplot2}. Just to give an idea of the popularity and %the wide-spread use
 the large user base of \pkg{ggplot2}, from January 1, 2015 to October 10, 2015, \pkg{ggplot2} was downloaded over 1.2 Million times \sct{from CRAN: over 4,000 downloads per day.} It has also been downloaded in 215 countries at least once, and in 21 of those countries, including China, Israel, and Colombia, it has been downloaded over 10,000 times\footnote{\pkg{ggplot2} usage statistics taken from \url{http://cran-logs.rstudio.com/}.}. This is the audience we are aiming at by making network visualizations a part of \pkg{ggplot2}.
 
 In addition to the wide-spread use of \pkg{ggplot2}, its design based on the Grammar of Graphics \citep{wilkinson:1999} makes it relatively easy to extend. Many extensions already exist:
@@ -174,8 +176,8 @@ In the plot, we can see one central character who has many more relationships th
 MMnet <- merge(madmen$edges, madmen$vertices,
                by.x = "Name1", by.y = "label", all = TRUE)
 # create plot
-ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) + 
-  geom_net(aes(colour = Gender), size = 4, label = TRUE, 
+ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
+  geom_net(aes(colour = Gender), size = 4, label = TRUE,
            vjust = -0.6, ecolour = "grey50") +
   scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
   xlim(c(-0.05, 1.05)) +
@@ -193,16 +195,25 @@ ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
 \section{Three implementations of network visualizations}
 
 \subsection{ggnet2}
-\fb{ggnet2 is the most 'hacky' of the three implementations presented in this paper. The function takes a network object as input, and then recreates every necessary step internally to convert that object for use with \pkg{ggplot2}. This happens through the creation of two data frames, one for edges, another one for nodes, which are then passed to \pkg{ggplot2} All steps happen internally; as a consequence, while it uses the grammar of graphics to produce the plot, the function still works very much like the plotting functions of the \pkg{igraph} and \pkg{network} packages, i.e.\ through a long series of arguments that control either the aspect of the edges or the aspect of the nodes.}
+\fb{
 
-\hh{XXX Francois, could you go into more detail here? ggnet2 is part of the GGally package.
-node aesthetics, edge aesthetics, what kind of networks work as input ... is it restricted to output from the network package? e.g. the expectation from the user is really to be able to deal with a network call. 
-How you work with the networks to get additional information in is also interesting - you could also discuss the edge and node operators that you use. 
-The output that is produced is a ggplot2 object, which means that additional ggplot2 layers can be added on top, and themes or other scaling methods can be used. 
+The \samp{ggnet2} function is an improved version of the \samp{ggnet} function, which has been part of the \pkg{GGally} package since 20xx \citep{ggally}. Both functions can be downloaded as a small R package from \url{https://github.com/briatte/ggnet}, and a detailed introduction to the \samp{ggnet2} function is available from within the package as a vignette.%
+  \footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnet/}.}
 
-I wouldn't really call the approach `hacky' though - no matter what the function looks like on the inside, on the outside it is a pretty straightforward approach: network in, ggplot2 visualization object out. In that sense it is an approach very much aligned with other approaches in the GGally package.
-}
+The \samp{ggnet2} function is the most 'encapsulated' of the three implementations presented in this paper, insofar as it tries to offer as much network visualization functionalities as possible in a single function call. While the resulting object is a \pkg{ggplot2} object that can be further style with \pkg{ggplot2} scales and themes, the syntax of the \samp{ggnet2} function is idiosyncratic, with the aesthetics of the nodes being controlled by arguments such as \samp{node.alpha} or \samp{node.color}, and those of the edges being controlled by similar arguments starting with \samp{edge}. As a consequence, while \samp{ggnet2} applies the grammar of graphics to network objects, the function itself still works very much like the plotting functions of the \pkg{igraph} and \pkg{network} packages, i.e.\ through a long series of arguments that try to control every possible aspect of how the network should be represented.
 
+The \samp{ggnet2} function takes a single network object as input. That initial object might be an object of class \samp{network} (at the exception of hypergraphs or multiplex graphs), or any data structure coercible to an object of that class, such as an incidence matrix, an adjacency matrix or an edge list, and if the \pkg{intergraph} package is installed \citep{intergraph}, the function will also accept network objects of class \samp{igraph}. The function then applies every necessary step to convert that network object for use with \pkg{ggplot2}, which results in the creation of two data frames, one for edges and another one for nodes, that are then passed to \pkg{ggplot2} as arguments to segment and point geometries respectively. The long list of arguments that can be passed to the function offer some control over the aesthetics of these geometries, including through the addition of edge and/or node labels.
+
+In addition to arguments that allow to map particular values (or the values of network attributes) to the aesthetics of the plot, the \samp{ggnet2} function also supports a few network-specific options, such as the possibility to size the nodes in function of their degree, or the possibility to use the primary and secondary modes of a bipartite network as an aesthetic mapping for the nodes. As a result, the function is the sum of two different kinds of processes, the first of which translates a network object into a data frame suitable for plotting with \pkg{ggplot2}, and the second of which applies some network-related operations on that data frame (such as coloring the edges in function of the color of the nodes that they connect).
+
+% \hh{XXX Francois, could you go into more detail here?
+% node aesthetics, edge aesthetics, what kind of networks work as input ... is it restricted to output from the network package? e.g. the expectation from the user is really to be able to deal with a network call.
+% How you work with the networks to get additional information in is also interesting - you could also discuss the edge and node operators that you use.
+% The output that is produced is a ggplot2 object, which means that additional ggplot2 layers can be added on top, and themes or other scaling methods can be used.
+% I wouldn't really call the approach `hacky' though - no matter what the function looks like on the inside, on the outside it is a pretty straightforward approach: network in, ggplot2 visualization object out. In that sense it is an approach very much aligned with other approaches in the GGally package.
+% }
+
+\fb{Is that summary enough, or should I delve into the parameters and aesthetics? If I do, this is going to be a long paper, there are tons of arguments.}
 
 \subsection{ggnet: geom\_net}
 \subsubsection{Data Structure}
@@ -241,14 +252,20 @@ Note that the edge specific aesthetics, that overwrite node aesthetics, are curr
 a small package that mimicks the behaviour of \samp{geom\_net} by defining
 several geoms to achieve similar results:
 
-\url{https://briatte.github.io/ggnetwork/} 
+\url{https://briatte.github.io/ggnetwork/}
 
-The approach is to 'alias' some native geoms (an aliased geom is a
-variant of another geom; see Hadley's book p. 67, Table 4.6):
-\samp{geom\_nodes} is an alias to \samp{geom\_point}; \samp{geom\_edges} is an alias to
-\samp{geom\_segment}; and the two other geoms for labels are just aliases to
-\samp{geom\_text} (with some hacking for edge labels, because I draw a point
-below them to make the labels legible).
+The approach of \samp{ggnetwork} is to 'alias' some of the native geometries (or 'geoms') of the \pkg{ggplot2} package, an 'aliased' geom being a variant of another geom that is already present in the package. The \pkg{ggplot2} package contains several examples of aliased geoms, such as \samp{geom\_histogram}, which is a variant of \samp{geom\_bar} (see \citealt[p.~67, Table~4.6]{ggplot}).
+
+Following that logic, \samp{ggnetwork} adds four geometries to \pkg{ggplot2}:
+
+\begin{itemize}
+  \item \samp{geom\_nodes}, an alias to \samp{geom\_point};
+  \item \samp{geom\_edges}, an alias to either \samp{geom\_segment} or \samp{geom_curve};
+  \item \samp{geom\_nodetext}, an alias to \samp{geom\_text}; and
+  \item \samp{geom\_edgetext}, an alias to \samp{geom\_label}.
+\end{itemize}
+
+The four geoms are used to plot nodes, edges, node labels and edge labels respectively. Two of the geoms that they alias, \samp{geom_curve} and \samp{geom\_label}, are part of the new geometries introduced in \pkg{ggplot2} version 1.1.0.\footnote{See \url{https://github.com/hadley/ggplot2/blob/master/NEWS.md}.}
 
 Data-wise, \samp{ggnetwork} uses the same trick as \samp{geom\_net}: left-join
 the edge list and the nodal attributes, add self-loops to make sure
@@ -386,7 +403,8 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02),
 \end{figure}
 \afterpage{\clearpage}
 
-This network is plotted in figure \ref{fig.cap:email}.  There are six distinct clusters in this network which almost perfectly correspond to the six different types of employee in this company: administration, engineering, executive, facilities, information technology, and security. 
+This network is plotted in figure \ref{fig.cap:email}.  There are six distinct clusters in this network which almost perfectly correspond to the six different types of employee in this company: administration, engineering, executive, facilities, information technology, and security.
+
 Additionally, the edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the value of the \samp{ealpha} aesthetic: more emails between two employees lead to darker edges.  The value is set to 0.1 in this example, so that ten or more emails between two employees result in a completely opaque edge. This pattern of heavy communication between employees of the same type is fairly unsurprising.
 
 To make this visualization more interesting and informative, we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows the different email networks associated with each day of the week.
@@ -431,36 +449,35 @@ ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
         panel.border = element_rect(fill = NA, colour = "grey60"))
 @
 
-%% NOTE: the code used to create a "sequential data frame" might become an
-%% option to ggnetwork in the ggnetwork package
+%% NOTE: the code below requires version >= 0.1.7 of ggnetwork
+%% devtools::install_github("briatte/ggnetwork")
+
+The faceting technique employed by \samp{ggnetwork} is close to that of \samp{geom\_net}, except it happens internally to the function. Passing an edge attribute to the \samp{by} argument will cause \samp{ggnetwork} to return a data frame in which the nodes have been 'panelized' according to that attribute. In that data frame, each node appears as many times as there are unique values to the edge attribute passed to \samp{by}, which will cause the node to appear in all facets of the plot. Furthermore, and unlike \samp{geom\_net}, he same set of coordinates is assigned to all instances (i.e. to all rows) of the same node, which causes the position of each node to be identical in all facets of the plot.
 
 <<email_facet_ggnetwork, fig.height=4, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
 # plot with ggnetwork
 
-# data step 1: create a sequence of networks
-em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
-em.day <- lapply(unique(em.day$day), function(x) subset(em.day, day == x)[, 1:2 ])
-em.day <- lapply(em.day, network, directed = TRUE)
-for (i in 1:length(em.day)) {
-  em.day[[ i ]] %v% "curr_empl_type" <- em.cet[ network.vertex.names(em.day[[ i ]]) ]
-  em.day[[ i ]] %n% "t" <- unique(email$edges$day)[ i ]
-}
-# data step 2: convert sequence to a data frame
-em.day <- lapply(em.day, function(x) {
-  df <- ggnetwork(x, arrow.gap = 0.02)
-  df$day <- x %n% "t"
-  df
-})
-em.day <- dplyr::bind_rows(em.day)
+# create the network
+edges <- subset(email$edges, nrecipients < 54)
+edges <- edges[, c("From", "to", "day") ]
+em.net <- network(edges[, 1:2])
+set.edge.attribute(em.net, "day", edges[, 3])
+em.net %v% "curr_empl_type" <-
+  em.cet[ network.vertex.names(em.net) ]
 
 # create the plot
-ggplot(em.day, aes(x, y, xend = xend, yend = yend)) +
-    geom_edges(color = "grey50") +
-    geom_nodes(aes(color = curr_empl_type)) +
-    facet_wrap(~ day) +
-  scale_colour_brewer("Current employment type", palette = "Set1") +
-  theme_blank() +
+ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
+       aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(
+    alpha = 0.5, color = "grey50",
+    arrow = arrow(length = unit(5, "pt"),
+                  type = "closed")) +
+  geom_nodes(aes(color = curr_empl_type),
+             size = 4) +
+  scale_color_brewer("Employment Type",
+                     palette = "Set1") +
   facet_wrap(~ day, nrow = 2, labeller = "label_both") +
+  theme_blank() +
   theme(legend.position = "bottom")
 @
 
