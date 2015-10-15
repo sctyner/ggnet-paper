@@ -190,8 +190,7 @@ node aesthetics, edge aesthetics, what kind of networks work as input ... is it 
 How you work with the networks to get additional information in is also interesting - you could also discuss the edge and node operators that you use. 
 The output that is produced is a ggplot2 object, which means that additional ggplot2 layers can be added on top, and themes or other scaling methods can be used. 
 
-I wouldn't really call the approach `hacky' though - no matter what the function looks like on the inside, on the outside it is a pretty straightforward approach: network in, ggplot2 visualization object out. In that sense it is an approach very much aligned with other approaches in the GGally package, such as ggparcoord or gg
-
+I wouldn't really call the approach `hacky' though - no matter what the function looks like on the inside, on the outside it is a pretty straightforward approach: network in, ggplot2 visualization object out. In that sense it is an approach very much aligned with other approaches in the GGally package.
 }
 
 
@@ -228,25 +227,27 @@ Note that the edge specific aesthetics, that overwrite node aesthetics, are curr
 
 \subsection{ggnetwork: geom\_node and geom\_edge}
 
-\fb{`ggnetwork` is
-a small package that mimicks the behaviour of `geom\_net` by defining
+\fb{\samp{ggnetwork} is
+a small package that mimicks the behaviour of \samp{geom\_net} by defining
 several geoms to achieve similar results:
 
-\url{https://briatte.github.io/ggnetwork/}
+\url{https://briatte.github.io/ggnetwork/} 
 
 The approach is to 'alias' some native geoms (an aliased geom is a
 variant of another geom; see Hadley's book p. 67, Table 4.6):
-`geom\_nodes` is an alias to `geom\_point`; `geom\_edges` is an alias to
-`geom\_segment`; and the two other geoms for labels are just aliases to
-`geom\_text` (with some hacking for edge labels, because I draw a point
+\samp{geom\_nodes} is an alias to \samp{geom\_point}; \samp{geom\_edges} is an alias to
+\samp{geom\_segment}; and the two other geoms for labels are just aliases to
+\samp{geom\_text} (with some hacking for edge labels, because I draw a point
 below them to make the labels legible).
 
-Data-wise, `ggnetwork` uses the same trick as `geom\_net`: left-join
+Data-wise, \samp{ggnetwork} uses the same trick as \samp{geom\_net}: left-join
 the edge list and the nodal attributes, add self-loops to make sure
 that every node is plotted even if their degree is zero, and pass that
-data frame to `\pkg{ggplot2}`.
-
+data frame to \pkg{ggplot2}.
 }
+
+\hh{For the data-wise ... paragraph, are you talking about the package ggnetwork or the function ggnetwork? I was under the impression, that the ggnetwork package requires a data set with x, y, xend, yend, and, if labels are supposed to be shown, those, too. The function ggnetwork looks to me like a wrapper for network that produces a data set like just described from a network object. But that means that all of the information on colors or other aesthetics need to be part of that network object, which means that you are again, using the same tools as for ggnet2, i.e. this node and the edge operator. }
+
 
 \section{Examples}
 
