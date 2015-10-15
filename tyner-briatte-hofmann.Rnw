@@ -3,9 +3,9 @@
 \author{by Sam Tyner, Fran\c{c}ois Briatte and  Heike Hofmann}
 
 \maketitle
-\sct{
+\sct{ % I think I say ggplot2 too much! 
 \abstract{
-This paper explores three new functionalities built on the \pkg{ggplot2} framework: \texttt{geom\_net}, \texttt{ggnet2}, and \texttt{ggnetwork}. The goal of each one is to provide the user with the ability to apply the flexibility of \pkg{ggplot2} to the visualization of network or graph data.  We will show that these additions contribute significantly to the study of networks by making visualization of networks intuitive in the \pkg{ggplot2} structure.
+This paper explores three new functionalities built on the \pkg{ggplot2} framework: \samp{geom\_net}, \samp{ggnet2}, and \samp{ggnetwork}. The goal of each one is to provide the user with the ability to apply the flexibility of \pkg{ggplot2} to the visualization of network or graph data.  We will show that these additions contribute significantly to the study of networks by making visualization of networks intuitive in the \pkg{ggplot2} structure.
 }}
 
 \hh{TODO list:
@@ -154,7 +154,7 @@ In addition to the wide-spread use of \pkg{ggplot2}, its design based on the Gra
 mapping via the \pkg{ggmap} package by \citet{ggmap}, visualization of statistical models via the \pkg{ggfortify} package by \citet{ggfortify}, many helper functions in the \pkg{GGally} by \citep{ggally}, and \textit{Bioconductor} plotting via the \pkg{ggbio} by \citep{ggbio}, to name a few. Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization.
 
 The most recent changes to \pkg{ggplot2} are aimed at
-facilitating extension of \pkg{ggplot2} in form of additional \texttt{geom} functions, which is exactly what we have done here.
+facilitating extension of \pkg{ggplot2} in form of additional \samp{geom} functions, which is exactly what we have done here.
 
 There are two main approaches to making use of the \pkg{ggplot2} framework: (i) implement network visualizations using \pkg{ggplot2}, by providing a wrapper for the user to visualize a network with \pkg{ggplot2} elements, and (ii) implement network visualizations as internal layers in \pkg{ggplot2}.  For the second approach, two main implementations exist: one which implements the structures of a network, such as nodes, edges, and node labels as independent geoms and another which wraps all of these structures into a single geom. We will discuss all of these approaches in this paper. 
 
@@ -231,7 +231,7 @@ Other variables may also be included for each edge, such as the edge weight or g
 \hh{Parameters that are currently implemented are:
 \begin{itemize}
 \item {\bf layout:}
-the \samp{layout} parameter takes a character value corresponding to the possible layouts in the \pkg{sna} package that are available within the \texttt{gplot.layout.*()} family of functions.  The default layout is the Kamada-Kawai layout.  This is a force-directed layout for undirected networks \citep{kamadakawai}. There are, however, many other layouts possible (see \code{?sna::gplot.layout}).
+the \samp{layout} parameter takes a character value corresponding to the possible layouts in the \pkg{sna} package that are available within the \samp{gplot.layout.*()} family of functions.  The default layout is the Kamada-Kawai layout.  This is a force-directed layout for undirected networks \citep{kamadakawai}. There are, however, many other layouts possible (see \code{?sna::gplot.layout}).
 Corresponding to each layout, the parameter  \samp{layout.par} consists of a list of the parameters for the chosen layout. \samp{fiteach} is a Boolean, specifying, whether each panel's data should be fit separately (default) or whether the same layout should be used for all of the panels.
 \item {\bf nodes/vertices:} any of \pkg{ggplot2}'s aesthetics relating to points, i.e.\ aesthetics such as colour, size, shape, and alpha are available and used for specifying the appearance of nodes in the network.
 %
