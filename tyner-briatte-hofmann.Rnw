@@ -230,7 +230,7 @@ Other variables may also be included for each edge, such as the edge weight or g
 
 
 \subsubsection{Parameters and Aesthetics}
-Parameters that are currently implemented in \samp{geom_net} are:
+Parameters that are currently implemented in \samp{geom\_net} are:
 \begin{itemize}
 \item {\bf layout:}
 the \samp{layout} parameter takes a character value corresponding to the possible layouts in the \pkg{sna} package that are available within the \samp{gplot.layout.*()} family of functions.  The default layout is the Kamada-Kawai layout.  This is a force-directed layout for undirected networks \citep{kamadakawai}. There are, however, many other layouts possible (see \code{?sna::gplot.layout}).
@@ -280,7 +280,7 @@ In this section, we demonstrate the current capabilities of \samp{ggnet2}, \samp
 So, for each of these examples, we are going to present the code necessary to produce the network, and discuss each application in detail.}
 
 \subsection{Blood Donation}
-In this directed network, there are eight vertices and 27 edges.  The vertices represent the eight different blood types in humans that are most important for donation: the ABO blood types A, B, AB, and O, combined with the RhD positive (+) and negative (-) types. The edges are directed: a person whose blood type is that of a \emph{from} vertex can to donate blood to a person whose blood type is that of a corresponding \emph{to} vertex. \sct{XXX HH, should we leave the selfies in? I think they're fun and make a lot of sense in the blood ex. But we'd have to re-write this last sentence.} In the example below, loops are removed because loops exist on every vertex in this example, as blood between two people of matching ABO and RhD type can always be exchanged.
+In this directed network, there are eight vertices and 27 edges.  The vertices represent the eight different blood types in humans that are most important for donation: the ABO blood types A, B, AB, and O, combined with the RhD positive (+) and negative (-) types. The edges are directed: a person whose blood type is that of a \emph{from} vertex can to donate blood to a person whose blood type is that of a corresponding \emph{to} vertex. \sct{XXX HH, should we leave the selfies in? I think they're fun and make a lot of sense in the blood ex. But we'd have to re-write this last sentence.} \hh{Let's leave them in for this example - I'm still fiddling with how to best place the loops. } In the example below, loops \hh{XXX these are self-references, loops are more general - in a directed graph any path that leads back to the same node is called a loop. we need to be careful with the language.} are removed because loops exist on every vertex in this example, as blood between two people of matching ABO and RhD type can always be exchanged.
 
 
 <<blood_common>>=
@@ -299,7 +299,8 @@ ggnet2(network(blood$edges[, 1:2]), mode = "circle", size = 15,
 ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
   geom_net(colour = "darkred", layout = "circle", label = TRUE, size = 15,
            directed = TRUE, vjust = 0.5, labelcolour = "grey80",
-           arrowsize = 1.5, linewidth = 0.5, arrowgap = 0.05) +
+           arrowsize = 1.5, linewidth = 0.5, arrowgap = 0.05, 
+           selfies = TRUE, ecolour = "grey40") +
   theme_net()
 @
 
@@ -370,13 +371,14 @@ emailnet <- merge(
 
 ggplot(data = emailnet,
        aes(from_id = From, to_id = to)) +
-  geom_net(aes(colour= CurrentEmploymentType),
-           linewidth=0.5, ealpha=0.5, size=4,
-           directed=TRUE) +
+  geom_net(aes(colour= CurrentEmploymentType,
+               group = CurrentEmploymentType),
+           linewidth = 0.5, ealpha = 0.5, size = 4,
+           directed = TRUE, arrowsize = 0.5) +
   scale_colour_brewer("Employment Type",
-                      palette="Set1") +
+                      palette = "Set1") +
   theme_net() +
-  theme(legend.position="bottom")
+  theme(legend.position = "bottom")
 @
 \end{subfigure}
 %
@@ -441,9 +443,10 @@ emailnet <- merge(subset(email$edges, nrecipients < 54), employee,
 
 # creating the plot
 ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
-  geom_net(aes(colour = CurrentEmploymentType), fiteach = TRUE, 
-           linewidth = 0.5, ealpha = 0.5, size = 2, directed = TRUE, 
-           arrowsize = .5) +
+  geom_net(aes(colour = CurrentEmploymentType, 
+               group = CurrentEmploymentType), fiteach = TRUE, 
+           linewidth = 0.5, ealpha = 0.5, size = 1.5, directed = TRUE, 
+           arrowsize = .3) +
   scale_colour_brewer(palette = "Set1") +
   theme_net() +
   facet_wrap(~ day, nrow = 2, labeller = "label_both") +
@@ -455,7 +458,9 @@ ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
 %% devtools::install_github("briatte/ggnetwork")
 
 \sct{XXX I am not a fan of this paragraph. Again, we should appear united.}
-The faceting technique employed by \samp{ggnetwork} is close to that of \samp{geom\_net}, except it happens internally to the function. Passing an edge attribute to the \samp{by} argument will cause \samp{ggnetwork} to return a data frame in which the nodes have been 'panelized' according to that attribute. In that data frame, each node appears as many times as there are unique values to the edge attribute passed to \samp{by}, which will cause the node to appear in all facets of the plot. Furthermore, and unlike \samp{geom\_net}, he same set of coordinates is assigned to all instances (i.e. to all rows) of the same node, which causes the position of each node to be identical in all facets of the plot.
+\hh{Francois, I think this is the ggnetwork function again, right? I think it might be worthwhile to expand on the data management in the ggnetwork approach and include a MUCH more detailed discussion of what ggnetwork is really doing. That is your data step: you are pulling all of these things out of the network object, and `by' is the facetting command.}
+
+The facetting technique employed by \samp{ggnetwork} is close to that of \samp{geom\_net}, except it happens internally to the function. Passing an edge attribute to the \samp{by} argument will cause \samp{ggnetwork} to return a data frame in which the nodes have been 'panelized' according to that attribute. In that data frame, each node appears as many times as there are unique values to the edge attribute passed to \samp{by}, which will cause the node to appear in all facets of the plot. Furthermore, and unlike \hh{the default setting in} \samp{geom\_net}, the same set of coordinates is assigned to all instances (i.e. to all rows) of the same node, which causes the position of each node to be identical in all facets of the plot. \hh{Note that using a parameter setting of \code{fiteach = FALSE} results in all panels sharing the same layout.}
 
 <<email_facet_ggnetwork, fig.height=4, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
 # plot with ggnetwork
