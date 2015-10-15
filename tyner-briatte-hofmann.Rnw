@@ -115,7 +115,10 @@ source("https://raw.githubusercontent.com/briatte/ggnet/master/ggnet2.R")
 
 % Network analysis is important in many fields
 \fb{XXX How about turning the introduction upside down, starting with the fact that many R users have also taken the time to learn the grammar of graphics on top of the R language, and that the R community might therefore benefit from making additional data types amenable to manipulation through that grammar? Once the rationale is clear, move on to the application, which is networks for us.}
+\hh{I'm not so sure that many R users actually even know what the grammar of graphics is, but I would agree that lots of people use ggplot2. Generally the first thing mentioned in a paper takes the central position -- for this paper, that's network visualizations. ggplot2 is the means we use, but that doesn't mean it should get spot number one. }
 \sct{XXX }
+
+
 \hh{XXX include at least one citation for each one of the examples:}
 \par There are many kinds of networks, and networks are extensively studied across many disciplines.  Many sociologists study social networks, and many biologists study protein networks. As different as these and the many other disciplines that study networks are, they all \hh{benefit from good network visualizations.}
 %need the ability to quickly and effectively visualize networks.
@@ -132,9 +135,10 @@ customizing the colors, sizes, etc. of the vertices and edges of the network. Fo
 
 % ggplot2 as an implementation framework
 %We found the current tools to be lacking in this ability, so
-We chose to fill this gap by adding network plotting capabilities to the popular and widely used R package \pkg{ggplot2}. Just to give an idea of the popularity and the wide-spread use of \pkg{ggplot2}, from January 1, 2015 to October 10, 2015, \pkg{ggplot2} was downloaded over 1.2 Million times \sct{from CRAN: over 4,000 downloads per day.} It has also been downloaded in 215 countries at least once, and in 21 of those countries, including China, Israel, and Colombia, it has been downloaded over 10,000 times\footnote{\pkg{ggplot2} usage statistics taken from \url{http://cran-logs.rstudio.com/}.}. This is the user base we are aiming at by making network visualizations a part of \pkg{ggplot2}.
+We chose to fill this gap by adding network plotting capabilities to the popular and widely used R package \pkg{ggplot2}. Just to give an idea of the popularity and %the wide-spread use 
+the large user base of \pkg{ggplot2}, from January 1, 2015 to October 10, 2015, \pkg{ggplot2} was downloaded over 1.2 Million times \sct{from CRAN: over 4,000 downloads per day.} It has also been downloaded in 215 countries at least once, and in 21 of those countries, including China, Israel, and Colombia, it has been downloaded over 10,000 times\footnote{\pkg{ggplot2} usage statistics taken from \url{http://cran-logs.rstudio.com/}.}. This is the audience we are aiming at by making network visualizations a part of \pkg{ggplot2}.
 
-\hh{In addition to the wide-spread use of \pkg{ggplot2}, its design based on the Grammar of Graphics \citep{wilkinson:1999} makes it relatively easy to extend. Many extensions already exist:}
+In addition to the wide-spread use of \pkg{ggplot2}, its design based on the Grammar of Graphics \citep{wilkinson:1999} makes it relatively easy to extend. Many extensions already exist:
 % \fb{Perhaps we could stress that one of the benefits of learning the
 %``grammar of graphics" is the opportunity to use that grammar in many
 %different situations, e.g. with}
