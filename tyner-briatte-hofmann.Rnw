@@ -8,6 +8,16 @@
 This paper explores three new functionalities built on the \pkg{ggplot2} framework: \texttt{geom\_net}, \texttt{ggnet2}, and \texttt{ggnetwork}.  We will show that together, these additions contribute significantly to the visualization of networks.
 }}
 
+\hh{TODO list:
+
+\begin{enumerate}
+\item the code in some of the examples goes beyond the page margin - we need to fix that. 
+\item a couple of the examples don't have all three solutions yet.
+\item for the protein example it would probably be enough to just show the code for all implementations, but only one of the resulting donut rings.
+\item there's still some inconsistencies with the formatting. Everything that is working code should be in the framework \code{working code}, everything that is just a piece of text that should not be confused with regular text needs to go into the \samp{not regular text} environment. 
+\end{enumerate}}
+
+
 <<setup_knitr, echo=FALSE>>=
 library(knitr)
 opts_chunk$set(
@@ -20,7 +30,7 @@ opts_chunk$set(
 ## http://stackoverflow.com/questions/11030898/knitr-how-to-align-code-and-plot-side-by-side
 ## These two settings control text width in codefig vs. usual code blocks
 partWidth <- 35
-fullWidth <- 80
+fullWidth <- 60
 options(width = fullWidth)
 
 ##  (1) CHUNK HOOK FUNCTION
@@ -376,10 +386,10 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02),
 \end{figure}
 \afterpage{\clearpage}
 
-This network is plotted in figure \ref{fig.cap:email}.  There are six distinct clusters in this network which almost perfectly correspond to the six different types of employee in this company: administration, engineering, executive, facilities, information technology, and security. %Unfortunately, there is currently no legend to associate color with employment type. This will be remedied in the final version of our geometry.
+This network is plotted in figure \ref{fig.cap:email}.  There are six distinct clusters in this network which almost perfectly correspond to the six different types of employee in this company: administration, engineering, executive, facilities, information technology, and security. 
 Additionally, the edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the value of the \samp{ealpha} aesthetic: more emails between two employees lead to darker edges.  The value is set to 0.1 in this example, so that ten or more emails between two employees result in a completely opaque edge. This pattern of heavy communication between employees of the same type is fairly unsurprising.
 
-To make this visualization more interesting and informative, we facet the network by day: each panel in \ref{fig:email_facet} shows the different email networks associated with each day of the week.
+To make this visualization more interesting and informative, we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows the different email networks associated with each day of the week.
 
 <<email_facet_ggnet2, fig.height=4, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
 em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
@@ -401,7 +411,8 @@ for (i in 1:length(em.day)) {
 gridExtra::grid.arrange(grobs = g, nrow = 2)
 @
 
-<<email_facet_geom_net, fig.height=5, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
+<<email_facet_geom_net, fig.height=5, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
+# source for geom_net
 # data step: making sure that there is one entry for each person on each day
 employee <- data.frame(expand.grid(label = unique(email$nodes$label),
                                    day = unique(email$edges$day)))
