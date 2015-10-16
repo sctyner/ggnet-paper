@@ -424,7 +424,7 @@ To make this visualization even more interesting and informative, we facet the n
 
 \begin{figure}[hbtp]
 \caption{\label{tab:email_facet-ggnet2} ggnet2 code for the  email network facetted by day as shown in figure~\ref{fig:email_facet}. }
-<<email_facet_ggnet2, fig.height=4, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
+<<email_facet_ggnet2, fig.height=4, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
 em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
 em.day <- lapply(unique(em.day$day), function(x) subset(em.day, day == x)[, 1:2 ])
 em.day <- lapply(em.day, network, directed = TRUE)
@@ -447,8 +447,7 @@ gridExtra::grid.arrange(grobs = g, nrow = 2)
 
 \begin{figure}[hbtp]
 \caption{\label{tab:email_facet-geom_net} geom\_net code for the  email network facetted by day as shown in figure~\ref{fig:email_facet}. }
-<<email_facet_geom_net, fig.height=4.25, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
-# source for geom_net
+<<email_facet_geom_net, fig.height=4.5, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
 # data step: making sure that there is one entry for each person on each day
 employee <- data.frame(expand.grid(label = unique(email$nodes$label),
                                    day = unique(email$edges$day)))
@@ -477,16 +476,13 @@ ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
 %% NOTE: the code below requires version >= 0.1.7 of ggnetwork
 %% devtools::install_github("briatte/ggnetwork")
 
-<<email_facet_ggnetwork, fig.height=4, fig.width=8, fig.cap = 'All emails within a company over a two week period facetted by day of the month.',echo=TRUE, out.width='\\textwidth'>>=
-# plot with ggnetwork
-
-# create the network
+<<email_facet_ggnetwork, fig.height=4, fig.width=8,echo=TRUE, out.width='\\textwidth'>>=
+# create the network and aesthetics
 edges <- subset(email$edges, nrecipients < 54)
 edges <- edges[, c("From", "to", "day") ]
 em.net <- network(edges[, 1:2])
 set.edge.attribute(em.net, "day", edges[, 3])
-em.net %v% "curr_empl_type" <-
-  em.cet[ network.vertex.names(em.net) ]
+em.net %v% "curr_empl_type" <- em.cet[ network.vertex.names(em.net) ]
 
 # create the plot
 ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
@@ -596,9 +592,13 @@ ggplot(ggnetwork(te.net),
 The inheritance structure is plotted in figure \ref{fig.cap:theme}.  In this plot, it is easy to quickly determine the parent and child vertices. Using this plot made creation of the \samp{theme\_net} object used throughout these examples very simple. We just made set each of the major parent elements, \samp{text}, \samp{rect}, and \samp{line} to \samp{element\_blank()} and then set the aspect ratio equal to one.
 
 \subsection{Mad Men Networks}
-  The following code creates the network example given in the introduction. We changed the vertex size and edge color for all vertices and edges, included vertex labels, and colored the vertices according to the character's gender.
+  The following code creates the network example given in Figure~\ref{fig:madmen-1} in the introduction. We changed the vertex size and edge color for all vertices and edges, included vertex labels, and colored the vertices according to the character's gender.
+
+\begin{figure}[hbtp]
+\caption{Source code for visualizing the Mad Men network using geom\_net }
 <<print, ref.label="madmen_ggnet", eval=FALSE, echo=TRUE,cache=FALSE>>=
 @
+\end{figure}
 
 The code for the other two approaches follows below and the corresponding networks are shown in figure~\ref{fig:madmen-2}.
 
@@ -636,11 +636,7 @@ ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
 \end{figure}
 \afterpage{\clearpage}
 
- There is another Mad Men network included in the \samp{gcookbook} package \citep{madmen}. It is a directed network, also of romantic relationships between characters, but it also includes advances made by one character that were rejected by the other.  For example, Roger Sterling made advances toward Betty Draper, but Betty refused him, and so there is a directed edge going from Roger to Betty, but not from Betty to Roger.  If the advance is reciprocated, like between Sal Romano and the Bellhop, there are two directed edges between the two vertices.
-
-
-
-
+ There is another Mad Men network given in the \samp{gcookbook} package \citep{madmen}. It is a directed network, also of romantic relationships between characters, but it additionally includes all advances made by one character that were rejected by the other.  For example, Roger Sterling made advances toward Betty Draper, but Betty refused him,  so there is a directed edge going from Roger to Betty, but not from Betty to Roger.  If the advance is reciprocated, such as between Sal Romano and the Bellhop, there are two directed edges between the two vertices.
 
 
 \begin{figure}[hbtp]
@@ -794,8 +790,10 @@ ggplot(
 
 \subsection{Les Mis\'{e}rables}
 This next network comes from \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book, and an edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.
-This network is shown in figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
+This network is shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}; the corresponding code is shown in Figure~\ref{tab:lesmis}. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
 
+\begin{figure}[hbtp]
+\caption{\label{tab:lesmis}Code for the three approaches of visualizing the relationships between characters in Les Mis\'{e}rables as shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}.}
 <<lesmis_ggnet2, echo=TRUE>>=
 # plot with ggnet2
 ggnet2(lesmis$edges[, 1:2 ], mode = "kamadakawai", color = "white", label = TRUE,
@@ -805,7 +803,6 @@ ggnet2(lesmis$edges[, 1:2 ], mode = "kamadakawai", color = "white", label = TRUE
 
 <<lesmis_geom_net, echo=TRUE, fig.width=9.5>>=
 # plot with geom_net
-
 # data step: merge vertices and edges
 lesmisnet <- merge(lesmis$edges, lesmis$vertices, by.x = "from", 
                    by.y = "label", all=TRUE)
@@ -819,7 +816,8 @@ ggplot(data = lesmisnet, aes(from_id = from, to_id = to,
            layout = 'fruchtermanreingold', label = TRUE, vjust = -0.75) +
   theme_net() + scale_alpha(range=c(0.3, 1))
 @
-
+\end{figure}
+%
 \begin{figure}[hbtp]
 \includegraphics[width=\textwidth]{figure/lesmis_ggnet2-1.pdf}
 \caption{\label{fig.cap:lesmis:ggnet2} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using ggnet2.}
@@ -879,14 +877,14 @@ ggplot(aes(from_id = Start.station, to_id = End.station),  data = tripnet) +
 
 
 \subsection{Protein Interaction Network in Yeast}
-  This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, and there are 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}. These interactions and their associated proteins are plotted  in figure \ref{fig.cap:yeast}.  We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \samp{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices.
+  This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, with a total of 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}. These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}.  We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \samp{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices. Because all of the appraoches result in very similar figures, only one network is shown. The code for all three approaches is shown below:
 
-%<<yeast_ggnet2, echo=TRUE, cache=FALSE>>=
-%# plot with ggnet2
-%ggnet2(network(protein$edges[,1:2]), size = 2, color = "magenta",
-%       mode = "random", layout.par = list(dist = "uniang"),
-%       edge.alpha = 0.05)
-%@
+<<yeast_ggnet2, echo=TRUE, eval = FALSE, cache=FALSE>>=
+# plot with ggnet2
+ggnet2(network(protein$edges[,1:2]), size = 2, color = "magenta",
+      mode = "random", layout.par = list(dist = "uniang"),
+      edge.alpha = 0.05)
+@
 
 <<yeast_geom_net, echo=TRUE, cache=FALSE>>=
 # plot with geom_net
@@ -897,6 +895,11 @@ ggplot(data = protein$edges, aes(from_id = from, to_id = to)) +
   theme_net()
 @
 
+<<yeast_ggnetwork, echo=TRUE, eval = FALSE,  cache=FALSE>>=
+# plot with ggnetwork
+
+# TODO
+@
 
 
 \begin{figure}[hbtp]
@@ -906,7 +909,7 @@ ggplot(data = protein$edges, aes(from_id = from, to_id = to)) +
 %\end{subfigure}
 %
 %\begin{subfigure}[t]{.49\textwidth}
-\caption{geom\_net}
+%\caption{geom\_net}
 \includegraphics[width=\textwidth]{figure/yeast_geom_net-1.pdf}
 %\end{subfigure}
 \caption{\label{fig.cap:yeast} Protein-protein interaction network in \emph{S. cerevisiae}. The layout is random.}
