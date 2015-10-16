@@ -829,18 +829,18 @@ ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
 
 
 # compare to https://secure.capitalbikeshare.com/map/
-ggplot(aes(from_id = Start.station, to_id = End.station),  data = tripnet) +
-  geom_net(layout = NULL, label = TRUE, vjust = -0.5,
-           aes(x = long, y = lat, linewidth = n / 15, colour = Metro)) +
-  theme_net() +
-  scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
-  theme(legend.position = "bottom")
+# ggplot(aes(from_id = Start.station, to_id = End.station),  data = tripnet) +
+#   geom_net(layout = NULL, label = TRUE, vjust = -0.5,
+#            aes(x = long, y = lat, linewidth = n / 15, colour = Metro)) +
+#   theme_net() +
+#   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
+#   theme(legend.position = "bottom")
 @
 
 \begin{figure}
 \centering
 \includegraphics[width=.49\textwidth]{figure/bikes_geom_net-1.pdf}
-\includegraphics[width=.49\textwidth]{figure/bikes_geom_net-2.pdf}
+%\includegraphics[width=.49\textwidth]{figure/bikes_geom_net-2.pdf}
 \caption{\label{fig:bikes} Network of bike trips using a Kamada-Kawai layout (left) and a geographically true representation (right, \hh{XXX I would like to include a ggmap here, we need to wait until that package is fixed}). Metro stations are shown in orange. In the Kamada-Kawai layout based on the trips taken, metro stations take a much more central position than in the geographically true representation. }
 \end{figure}
 \afterpage{\clearpage}
