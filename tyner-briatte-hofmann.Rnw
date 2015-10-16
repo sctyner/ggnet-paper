@@ -102,6 +102,10 @@ codefig = list(codefig=TRUE, fig.show = "hide",
 <<load_packages, results='hide'>>=
 ## ggplot2
 library(ggplot2) # needs to be version ≥ 1.0.1.9003
+## plyr
+library(plyr)
+## dplyr
+library(dplyr)
 
 ## geom_net
 if (!require(ggnet, quietly = TRUE)) {
@@ -531,7 +535,6 @@ ggnet2(te.net, label = TRUE, color = "white",
 <<theme_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE>>=
 # data step: merge nodes and edges and
 # introduce a degree-out variable
-library(dplyr)
 TEnet <- merge(
   theme_elements$edges,
   theme_elements$vertices,
@@ -636,8 +639,8 @@ mm.dir %v% "gender" <-
     network.vertex.names(mm.dir), "Gender" ]
 
 # gender color palette
-mm.col <- c("female" = "#ff69b4",
-            "male" = "#0099ff")
+mm.col <- c("f" = "#ff69b4",
+            "m" = "#0099ff")
 
 ggnet2(mm.dir, mode = "fruchtermanreingold", size = 3,
        color = mm.col[ mm.dir %v% "gender" ],
@@ -721,6 +724,7 @@ ggnet2(fb.net, mode = "fruchtermanreingold",
 <<football_geom_net, size="footnotesize", fig.height=11, opts.label="codefig", echo=TRUE>>=
 # data step: merge vertices and edges
 # label independent schools
+data(football)
 ftnet <- merge(
   football$edges, football$vertices,
   by.x = "from", by.y = "label", all = TRUE)
@@ -748,16 +752,19 @@ ggplot(data = ftnet, aes(from_id = from, to_id = to)) +
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork}\vspace{-.5cm}
+%%%%%%%%%%%%%
+% SCT # out of conf. games connected by dotted lines, not the other way around
 <<football_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
 ggplot(
   ggnetwork(fb.net, layout = "fruchtermanreingold"),
   aes(x, y, xend = xend, yend = yend)) +
   geom_edges(
-    aes(linetype = as.logical(same.conf)),
+    aes(linetype = as.factor(same.conf)),
     color = "grey50") +
   geom_nodes(aes(color = conf), size = 4) +
   scale_color_brewer("Conference",
                      palette = "Paired") +
+    scale_linetype_manual(values = c(2,1)) + 
   guides(linetype = FALSE) +
   theme_blank()
 @
@@ -835,18 +842,18 @@ ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
 
 
 # compare to https://secure.capitalbikeshare.com/map/
-# ggplot(aes(from_id = Start.station, to_id = End.station),  data = tripnet) +
-#   geom_net(layout = NULL, label = TRUE, vjust = -0.5,
-#            aes(x = long, y = lat, linewidth = n / 15, colour = Metro)) +
-#   theme_net() +
-#   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
-#   theme(legend.position = "bottom")
+ggplot(aes(from_id = Start.station, to_id = End.station),  data = tripnet) +
+  geom_net(layout = NULL, label = TRUE, vjust = -0.5,
+           aes(x = long, y = lat, linewidth = n / 15, colour = Metro)) +
+  theme_net() +
+  scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
+  theme(legend.position = "bottom")
 @
 
 \begin{figure}
 \centering
 \includegraphics[width=.49\textwidth]{figure/bikes_geom_net-1.pdf}
-%\includegraphics[width=.49\textwidth]{figure/bikes_geom_net-2.pdf}
+\includegraphics[width=.49\textwidth]{figure/bikes_geom_net-2.pdf}
 \caption{\label{fig:bikes} Network of bike trips using a Kamada-Kawai layout (left) and a geographically true representation (right, \hh{XXX I would like to include a ggmap here, we need to wait until that package is fixed}). Metro stations are shown in orange. In the Kamada-Kawai layout based on the trips taken, metro stations take a much more central position than in the geographically true representation. }
 \end{figure}
 \afterpage{\clearpage}
@@ -855,12 +862,12 @@ ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
 \subsection{Protein Interaction Network in Yeast}
   This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, and there are 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}. These interactions and their associated proteins are plotted  in figure \ref{fig.cap:yeast}.  We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \samp{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices.
 
-<<yeast_ggnet2, echo=TRUE, cache=FALSE>>=
-# plot with ggnet2
-ggnet2(network(protein$edges[,1:2]), size = 2, color = "magenta",
-       mode = "random", layout.par = list(dist = "uniang"),
-       edge.alpha = 0.05)
-@
+%<<yeast_ggnet2, echo=TRUE, cache=FALSE>>=
+%# plot with ggnet2
+%ggnet2(network(protein$edges[,1:2]), size = 2, color = "magenta",
+%       mode = "random", layout.par = list(dist = "uniang"),
+%       edge.alpha = 0.05)
+%@
 
 <<yeast_geom_net, echo=TRUE, cache=FALSE>>=
 # plot with geom_net
@@ -874,15 +881,15 @@ ggplot(data = protein$edges, aes(from_id = from, to_id = to)) +
 
 
 \begin{figure}
-\begin{subfigure}[t]{.49\textwidth}
-\caption{ggnet2}
-\includegraphics[width=\textwidth]{figure/yeast_ggnet2-1.pdf}
-\end{subfigure}
+% \begin{subfigure}[t]{.49\textwidth}
+% \caption{ggnet2}
+% \includegraphics[width=\textwidth]{figure/yeast_ggnet2-1.pdf}
+%\end{subfigure}
 %
-\begin{subfigure}[t]{.49\textwidth}
+%\begin{subfigure}[t]{.49\textwidth}
 \caption{geom\_net}
 \includegraphics[width=\textwidth]{figure/yeast_geom_net-1.pdf}
-\end{subfigure}
+%\end{subfigure}
 \caption{\label{fig.cap:yeast} Protein-protein interaction network in \emph{S. cerevisiae}. The layout is random.}
 \end{figure}
 \afterpage{\clearpage}
