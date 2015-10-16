@@ -435,7 +435,7 @@ for (i in 1:length(em.day)) {
 gridExtra::grid.arrange(grobs = g, nrow = 2)
 @
 
-<<email_facet_geom_net, fig.height=5, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
+<<email_facet_geom_net, fig.height=4.25, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
 # source for geom_net
 # data step: making sure that there is one entry for each person on each day
 employee <- data.frame(expand.grid(label = unique(email$nodes$label),
@@ -455,7 +455,8 @@ ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
   theme_net() +
   facet_wrap(~ day, nrow = 2, labeller = "label_both") +
   theme(legend.position = "bottom",
-        panel.border = element_rect(fill = NA, colour = "grey60"))
+        panel.border = element_rect(fill = NA, colour = "grey60"),
+        plot.margin = unit(c(0,0,0,0),"mm"))
 @
 
 %% NOTE: the code below requires version >= 0.1.7 of ggnetwork
