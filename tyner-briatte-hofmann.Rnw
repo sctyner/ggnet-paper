@@ -415,9 +415,9 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02),
 This email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a directed network of emails between company employees with 55 vertices and 9,063 edges. Each vertex is an employee of the company, and each edge is an email sent from one employee to one or more other employees. The arrow of the directed edge points to the recipient(s) of the email. The network contains two business weeks of emails across the entire company. In order to better visualize the structure of the communication network between employees, emails that were sent out to all employees are removed. 
 
 
-This network is plotted in figure \ref{fig.cap:email}.  There are six distinct clusters in this network which almost perfectly correspond to the six different types of employee in this company: administration, engineering, executive, facilities, information technology, and security.
+This network is plotted in figure \ref{fig.cap:email}.  There are six distinct clusters in this network which almost perfectly correspond to the six different types of employees in this company: administration, engineering, executive, facilities, information technology, and security.
 
-Additionally, the edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the value of the \samp{ealpha} aesthetic: more emails between two employees lead to darker edges.  The value is set to 0.1 in this example, so that ten or more emails between two employees result in a completely opaque edge.  %This pattern of heavy communication between employees of the same type is fairly unsurprising.
+Additionally, the edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the value of the \samp{ealpha} aesthetic: more emails between two employees lead to darker edges.  The value is set to 0.1 in this example, so that ten or more emails between two employees result in a completely opaque edge. \hh{Additionally, edges between employees within the same employment type are colored in the same color as the corresponding nodes, while edges between employees from different types are plotted using a shade of grey. In almost all of the layouts, Security gets a central role in the email network of the company. Interestingly, one of the executives only communicates with a single person in Facilities. One of the IT personnel is also less connected to the rest of IT group and communicates more often with Security.} %This pattern of heavy communication between employees of the same type is fairly unsurprising.
 %SCT Let's not add things that make our cool visualizations sound less cool!
 
 To make this visualization even more interesting and informative, we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows the different email networks associated with each day of the week.
@@ -460,8 +460,7 @@ emailnet <- merge(subset(email$edges, nrecipients < 54), employee,
 ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
   geom_net(aes(colour = CurrentEmploymentType, 
                group = CurrentEmploymentType), fiteach = TRUE, 
-           linewidth = 0.5, ealpha = 0.5, size = 1.5, directed = TRUE, 
-           arrowsize = .3) +
+           linewidth = 0.5, ealpha = 0.5, size = 1.5) +
   scale_colour_brewer(palette = "Set1") +
   theme_net() +
   facet_wrap(~ day, nrow = 2, labeller = "label_both") +
