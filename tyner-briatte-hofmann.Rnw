@@ -593,11 +593,8 @@ The inheritance structure is plotted in figure \ref{fig.cap:theme}.  In this plo
 \subsection{Mad Men Networks}
   The following code creates the network example given in Figure~\ref{fig:madmen-1} in the introduction. We changed the vertex size and edge color for all vertices and edges, included vertex labels, and colored the vertices according to the character's gender.
 
-\begin{figure}[hbtp]
-\caption{Source code for visualizing the Mad Men network using geom\_net }
 <<print, ref.label="madmen_ggnet", eval=FALSE, echo=TRUE,cache=FALSE>>=
 @
-\end{figure}
 
 The code for the other two approaches follows below and the corresponding networks are shown in figure~\ref{fig:madmen-2}.
 
