@@ -5,7 +5,7 @@
 \maketitle
 \sct{ % I think I say ggplot2 too much!
 \abstract{
-This paper explores three new functionalities built on the \pkg{ggplot2} framework: \samp{geom\_net}, \samp{ggnet2}, and \samp{ggnetwork}. The goal of each one is to provide the user with the ability to apply the flexibility of \pkg{ggplot2} to the visualization of network or graph data.  We will show that these additions contribute significantly to the study of networks by making visualization of networks intuitive in the \pkg{ggplot2} structure.
+This paper explores three different techniques to visualize networks by building on the `grammar of graphics' framework implemented in the \pkg{ggplot2} package. The goal of each technique is to provide the user with the ability to apply the flexibility of \pkg{ggplot2} to the visualization of network data, including through the mapping of network attributes to specific plot aesthetics. We will show that these additions contribute significantly to the study of networks by making visualization of networks intuitive in the \pkg{ggplot2} structure.
 }}
 
 \hh{TODO list:
@@ -18,6 +18,9 @@ This paper explores three new functionalities built on the \pkg{ggplot2} framewo
 \item there's still some inconsistencies with the formatting. Everything that is working code should be in the framework \code{working code}, everything that is just a piece of text that should not be confused with regular text needs to go into the \samp{not regular text} environment.
 \end{enumerate}}
 
+\fb{Question re:formatting, the R Journal instruction s(and the sample articles I have reas from it) seem to use the 'code' TeX tag for ``objects, functions and arguments'' [1], as well as for classes (which should be quoted [1]). I have used that formatting in the two subsections I have worked on, ggnet2 and ggnetwork, in the 'Implementations' section.
+
+[1]: \url{https://journal.r-project.org/share/author-guide.pdf}}
 
 <<setup_knitr, echo=FALSE>>=
 library(knitr)
@@ -95,16 +98,16 @@ knit_hooks[["set"]](chunk = codefigChunkHook)
 ## set all of those options simply by typing opts.label="codefig".
 
 opts_template[["set"]](
-codefig = list(codefig=TRUE, fig.show = "hide",
+codefig = list(codefig = TRUE, fig.show = "hide",
                r.opts = list(width = partWidth),
                tidy.opts = list(width.cutoff = partWidth)))
 @
 
+\fb{\textbf{Code note:} the \texttt{load\_packages} code chunk does not seem to require loading \texttt{plyr}. The only use of it is internal to \texttt{StatNet}, so it should just be properly imported there. Loading both \texttt{plyr} and \texttt{dplyr} is best avoided when possible.}
+
 <<load_packages, results='hide'>>=
 ## ggplot2
 library(ggplot2) # needs to be version ≥ 1.0.1.9003
-## plyr
-library(plyr)
 ## dplyr
 library(dplyr)
 
@@ -113,7 +116,8 @@ if (!require(ggnet, quietly = TRUE)) {
   devtools::install_github("sctyner/ggnet")
 }
 library(ggnet)
-## TODO: I would recommend renaming the repo to e.g. geom-net for clarity (Fr.)
+## TODO: FB: I would recommend renaming the repo to e.g. geomnet for clarity
+## please see https://github.com/sctyner/ggnet-paper/issues/3 as well as TODO below
 
 ## ggnetwork
 if (!require(ggnetwork, quietly = TRUE)) {
@@ -137,7 +141,7 @@ source("https://raw.githubusercontent.com/briatte/ggnet/master/ggnet2.R")
 % \hh{I'm not so sure that many R users actually even know what the grammar of graphics is, but I would agree that lots of people use ggplot2. Generally the first thing mentioned in a paper takes the central position -- for this paper, that's network visualizations. ggplot2 is the means we use, but that doesn't mean it should get spot number one. }
 
 %\hh{XXX include at least one citation for each one of the examples:}
-\par There are many kinds of networks, and networks are extensively studied across many disciplines.  Social network analysis is a prominent subfield of sociology, and the study of biological networks, such as protein-protein interaction networks or metabolic networks, is a notable subfield of biology \citet{prell2011social, junker2008analysis}. Though these two disciplines and the many others that study networks are extremely different, they all benefit from good network visualization methods.
+\par There are many kinds of networks, and networks are extensively studied across many disciplines \citep{watts2004ars}. Social network analysis is a longstanding and prominent subfield of sociology , and the study of biological networks, such as protein-protein interaction networks or metabolic networks, is a notable subfield of biology \citet{prell2011social, junker2008analysis}. Though these two disciplines and the many others that study networks are extremely different, they all benefit from good network visualization methods.
 
 % Visualization of networks helps with analysis
 Coloring the vertices or edges in a graph is a quick way to visualize grouping and can help with pattern or cluster detection. The vertices in a network and the edges between them compose the structure of a network, and being able to discover patterns among them visually is a key part of network analysis. Viewing multiple layouts of the same network can also help reveal patterns or clusters that would not be discovered when only viewing one layout or analyzing only its underlying adjacency matrix.
@@ -147,27 +151,49 @@ Many R packages already exist for network analysis and visualization such as \pk
 
 % ggplot2 as an implementation framework
 %We found the current tools to be lacking in this ability, so
-In this paper, our objective is to test the possibility to bring network plotting capabilities to the popular and widely used R package \pkg{ggplot2}. Just to give an idea of the popularity and %the wide-spread use
-the large user base of \pkg{ggplot2}, from January 1, 2015 to October 10, 2015, \pkg{ggplot2} was downloaded over 1.2 Million times from CRAN: over 4,000 downloads per day. It has also been downloaded in 215 countries at least once, and in 21 of those countries, including China, Israel, and Colombia, it has been downloaded over 10,000 times\footnote{\pkg{ggplot2} usage statistics taken from \url{http://cran-logs.rstudio.com/}.}. This is the audience we are aiming at by making network visualizations a part of \pkg{ggplot2}.
+In this paper, our objective is to test the possibility to bring network plotting capabilities to the popular and widely used \pkg{ggplot2} package \citep{wickham}. Designed as an implementation of the 'grammar of graphics' proposed by \citet{wilkinson:1999}, the \pkg{ggplot2} package has become extremely popular among R users,%
+  %
+  \footnote{In order to give an indication of how massively large the user base of \pkg{ggplot2} is, we looked at its usage statistics from January 1, 2015 to October 10, 2015 (see \url{http://cran-logs.rstudio.com/}). Over that period, the \pkg{ggplot2} package was downloaded over 1.2 million times from CRAN, which amounts to over 4,000 downloads per day. The package has been downloaded at least once in 215 countries, and in 21 of those countries, including China, Israel, and Colombia, it has been downloaded over 10,000 times.} %
+  %
+  to the point that it has even inspired a port of its syntax to the Python programming language (a rare achievement for an R package).%
+  %
+  \footnote{See \url{http://ggplot.yhathq.com/}.} %
+  %
+  This is the audience we are aiming at by making network visualizations a part of \pkg{ggplot2}.
 
-In addition to the wide-spread use of \pkg{ggplot2}, its design based on the Grammar of Graphics \citep{wilkinson:1999} makes it relatively easy to extend. Many extensions already exist:
+Because the syntax that it implements is extendable to many different kinds of plots, the \pkg{ggplot2} package has inspired many packages that build on it, including
 % \fb{Perhaps we could stress that one of the benefits of learning the
 %``grammar of graphics" is the opportunity to use that grammar in many
 %different situations, e.g. with}
-mapping via the \pkg{ggmap} package by \citet{ggmap}, visualization of statistical models via the \pkg{ggfortify} package by \citet{ggfortify}, many helper functions in the \pkg{GGally} by \citep{ggally}, and \textit{Bioconductor} plotting in the \pkg{ggbio} package by \citep{ggbio}, to name a few. Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization.
+the \pkg{ggmap} package by \citet{ggmap} for spatial visualization, the \pkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the \pkg{GGally} by \citet{ggally}, or the \pkg{ggbio} package by \citet{ggbio} for \textit{Bioconductor} plotting, to name a only few. Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization. Out efforts are supported by the most recent changes to the \pkg{ggplot2} package \hh{(version 1.1.?, released mid November 2015)}, which aim at
+facilitating its extension through additional geometries (or 'geoms').%
+  %
+  % this URL should be replaced with the CRAN one when ggplot2 1.1.0 gets there
+  \footnote{See \url{https://github.com/hadley/ggplot2/blob/master/NEWS.md} for the full list of changes in \pkg{ggplot2} 1.1.0, as well as the new package vignette, ``Extending ggplot2'', which explains how the internal \code{ggproto} system of object-oriented programming can be used to create new geoms.} %
+  %
 
-The most recent changes to \pkg{ggplot2} \hh{(version 1.1.?, released mid November 2015)} are aimed at
-facilitating extension of \pkg{ggplot2} in form of additional \samp{geom} functionality, which is exactly what we have done here.
+\fb{Not sure I understand 'Bioconductor plotting'.}
 
-There are two main approaches to making use of the \pkg{ggplot2} framework: (i) implement network visualizations using \pkg{ggplot2}, by providing a wrapper for the user to visualize a network with \pkg{ggplot2} elements, and (ii) implement network visualizations as internal layers in \pkg{ggplot2}.  For the second approach, two main implementations exist: one which implements the structures of a network, such as nodes, edges, and node labels as independent geoms and another which wraps all of these structures into a single geom. We will discuss all of these approaches in this paper.
+In the remainder of this paper, we present three different approaches to network visualization with \pkg{ggplot2}. Section~\ref{sec:background} introduces the basic terminology of networks and illustrates their ubiquity in natural and social life. Section~\ref{sec:implementations} then discusses the logic behind each of the three approaches that we offer. Section~\ref{sec:examples} extends that discussion through several examples ranging from simple to complex networks, for which we provide the code corresponding to each approach alongside its graphical results.
+
+% ==============================================================================
+%
+\section{A quick primer to network structures}%
+\label{sec:background}
+%
+% ==============================================================================
+
+
+\fb{How about having this block as a separate 'Background' section? Would allow readers familiar with networks to skip it and go directly to the implementations. I have read through the text and tried to make it simpler where possible.}
 
 % getting into more of the nitty-gritty details
-At its core, a network is simply a set of points connected in pairs by a set of lines \citep{newman}.  Here, we refer to the lines as edges and the points as vertices, \sct{but these \hh{XXX these ... nodes or edges? repeat references by name to reduce any ambiguity. } are also called connections or ties and nodes or actors, respectively}.  These two seemingly simple sets of graphical objects, points and segments, are used to encode a huge variety and quantity of information across many fields of study. For instance, networks of scientific collaboration, a food web of marine animals, and American college football games are all covered in a paper on community detection in networks by \citet{football}.  \citet{networkfailures} examine node failure in interdependent networks like power grids.  Social networks, such as links between actors found on \url{www.imdb.com}, and neural networks, like the completely mapped neural network of the \textit{C. elegans} worm are also etensively studied \citep{smallworld}.  Networks vary widely in scope and complexity: the smallest network is simply an edge between two vertices, while one of the most commonly used and most complex networks, the world wide web, has billions of vertices (webpages) and billions of edges (hyperlinks) connecting them.  The edges in a network can  be directed or undirected: directed edges represent information travelling from one vertex to another, and switching the direction would change the structure of the network. The world wide web is an example of a directed network because hyperlinks connect one webpage to another, but not necessarily the other way around. Undirected edges are simply connections between vertices. Co-authorship networks are examples of undirected networks: nodes are authors connected by an edge if they have authored an academic publication together.
+At its core, a network is simply a set of points connected in pairs by a set of lines \citep{newman}. Here, we refer to the lines as edges (or ties) and the points as nodes (or vertices). These two seemingly simple sets of graphical objects, points and segments, are used to encode a huge variety and quantity of information across many fields of study. For instance, networks of scientific collaboration, a food web of marine animals, and American college football games are all covered in a paper on community detection in networks by \citet{football}.  \citet{networkfailures} examine node failure in interdependent networks like power grids.  Social networks, such as links between actors found on \url{http://www.imdb.com/}, and neural networks, like the completely mapped neural network of the \textit{C. elegans} worm are also extensively studied \citep{smallworld}.
 
-\par A social network is a network that everyone is a part of in one way or another.  We do not necessarily refer here to social media like Facebook or LinkedIn, but rather to the connections we form with other people. To demonstrate the functionality of our tools for plotting networks, we have chosen an example of a social network from the popular television show Mad Men.  This network, compiled by \citet{madmen}, is made up of 52 vertices and 87 edges. Each vertex represents a character on the show, and there is an edge between every two characters who have had a romantic relationship.
+Networks vary widely in scope and complexity: the smallest network is simply an edge between two vertices, while one of the most commonly used and most complex networks, the world wide web, has billions of vertices (Web pages) and billions of edges (hyperlinks) connecting them. The edges in a network can  be directed or undirected: directed edges represent information travelling from one vertex to another, and switching the direction would change the structure of the network. The World Wide Web is an example of a directed network because hyperlinks connect one Web page to another, but not necessarily the other way around. Undirected edges are simply connections between vertices. Co-authorship networks are examples of undirected networks: nodes are authors connected by an edge if they have authored an academic publication together.
 
-Figure~\ref{fig.cap:madmen} shows this network.
-In the plot, we can see one central character who has many more relationships than any other character. This vertex represents the main character of the show, Don Draper, who is quite the ``ladies' man."  This example shows just how ubiquitous networks are.
+A social network is a network that everyone is a part of in one way or another. We do not necessarily refer here to social media like Facebook or LinkedIn, but rather to the connections we form with other people. To demonstrate the functionality of our tools for plotting networks, we have chosen an example of a social network from the popular television show \emph{Mad Men}. This network, which was compiled by \citet{madmen}, is made up of 52 vertices and 87 edges. Each vertex represents a character on the show, and there is an edge between every two characters who have had a romantic relationship.
+
+Figure~\ref{fig.cap:madmen} shows this network. In the plot, we can see one central character who has many more relationships than any other character. This vertex represents the main character of the show, Don Draper, who is quite the ``ladies' man.''  This example shows just how ubiquitous networks are.
 
 \begin{figure}[hbtp]
 \centering
@@ -190,26 +216,54 @@ ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
 \afterpage{\clearpage}
 
 
-In the next section we discuss the motivation and ideas behind each one of the three approaches we provide. This will be followed by an extensive discussion of network examples, in which we will provide side by side code and examples of each implementation.
+% ==============================================================================
+%
+\section{Three implementations of network visualizations}%
+\label{sec:implementations}
+%
+% ==============================================================================
 
-\section{Three implementations of network visualizations}
 
-\subsection{ggnet2}
+There are two main approaches to making use of the \pkg{ggplot2} framework: (i) implement network visualizations using \pkg{ggplot2}, by providing a wrapper for the user to visualize a network with \pkg{ggplot2} elements, and (ii) implement network visualizations as internal layers in \pkg{ggplot2}.  For the second approach, two main implementations exist: one which implements the structures of a network, such as nodes, edges, and node labels as independent geoms and another which wraps all of these structures into a single geom. We will discuss all of these approaches in this paper.
 
-The \samp{ggnet2} function is an improved version of the \samp{ggnet} function, which has been part of the \pkg{GGally} package since 20xx \citep{ggally}. Both functions can be downloaded as a small R package from \url{https://github.com/briatte/ggnet}, and a detailed introduction to the \samp{ggnet2} function is available from within the package as a vignette.%
-  \footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnet/}.}
+\fb{Paragraph above comes from the introduction. Feels to me it fits better here.}
 
-\sct{XXX I made some minor changes to the language of this section.}
 
-The \samp{ggnet2} function %is the most 'encapsulated' of the three implementations presented in this paper, insofar as it
+\subsection{ggnet2} % ==========================================================
+
+The \code{ggnet2} function is an improved version of the \code{ggnet} function, which has been part of the \pkg{GGally} package since 2013 \citep{ggally}. Both functions can be installed as a small R package from \url{https://github.com/briatte/ggnet}, and a detailed introduction to the \code{ggnet2} function is available from within the package as a vignette.%
+  %
+  \footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnet/}.}%
+
+% \sct{XXX I made some minor changes to the language of this section.}
+% FB - noted
+
+The \code{ggnet2} function %is the most 'encapsulated' of the three implementations presented in this paper, insofar as it
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
 %SCT - I think we should stay away from superlatives ('most', 'best', etc.) when dicussing the three functionalities. It would be best for us to be a united force in front of the reviewers.
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-tries to offer as much network visualization functionalities as possible in a single function call. While the resulting object is a \pkg{ggplot2} object that can be further styled with \pkg{ggplot2} scales and themes, the syntax of the \samp{ggnet2} function is easily understood by the user: the aesthetics of the nodes are controlled by arguments such as \samp{node.alpha} or \samp{node.color}, and those of the edges are controlled by similar arguments starting with \samp{edge}. As a consequence, while \samp{ggnet2} applies the grammar of graphics to network objects, the function itself still works very much like the plotting functions of the \pkg{igraph} and \pkg{network} packages: a long series of arguments are used to control every possible aspect of how the network should be visualized.
+% FB - I'm fine with that, although I was trying to describe something about the
+% function (the fact that its syntax strays further away from ggplot2 than geom_net
+% or ggnetwork does).
+%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
+tries to offer as much network visualization functionalities as possible in a single function call. While the resulting object is a \pkg{ggplot2} object that can be further styled with \pkg{ggplot2} scales and themes, the syntax of the \code{ggnet2} function is easily understood by the user: the aesthetics of the nodes are controlled by arguments such as \code{node.alpha} or \code{node.color}, and those of the edges are controlled by similarly named arguments starting with \samp{edge}. As a consequence, while \code{ggnet2} applies the grammar of graphics to network objects, the function itself still works very much like the plotting functions of the \pkg{igraph} and \pkg{network} packages: a long series of arguments are used to control every possible aspect of how the network should be visualized.
 
-The \samp{ggnet2} function takes a single network object as input. This initial object might be an object of class \samp{network} (with the exception of hypergraphs or multiplex graphs), or any data structure coercible to an object of that class, such as an incidence matrix, an adjacency matrix, or an edge list. Additionally, if the \pkg{intergraph} package \citep{intergraph} is installed, the function will also accept network objects of class \samp{igraph}. The function then applies every necessary step \hh{could you give a tiny summary of what `every step' encompasses?} to convert that network object for use with \pkg{ggplot2}, which results in the creation of two data frames, one for edges and another one for nodes, that are then passed to \pkg{ggplot2} as arguments to segment and point geometries respectively. The long list of arguments that can be passed to the function offers some control over the aesthetics of these geometries, including through the addition of edge and/or node labels. Each of these arguments allows the user to map the values of network attributes or global values to the aesthetics of the plot.
+The \code{ggnet2} function takes a single network object as input. This initial object might be an object of class \code{"network"} (with the exception of hypergraphs or multiplex graphs), or any data structure coercible to an object of that class, such as an incidence matrix, an adjacency matrix, or an edge list. Additionally, if the \pkg{intergraph} package \citep{intergraph} is installed, the function will also accept a network object of class \code{"igraph"}. The function will internally convert that object to two data frames, one for edges and another one for nodes, before passing them to \pkg{ggplot2} as arguments to segment and point geometries respectively.%
+  %
+  \footnote{The two data frames that \code{ggnet2} generates for edges and nodes contain the same information as those generated by \pkg{ggplot2} to plot segments and points respectively.}%
 
-Additionally, the \samp{ggnet2} function also supports a few network-specific options, such as sizing the nodes via a function of their degree, or using the primary and secondary modes \sct{XXX nodes?} of a bipartite network as an aesthetic mapping for the nodes. \sct{XXX this is unclear to me. Re-phrase?} As a result, the function combines two different kinds of processes: (i) it translates a network object into a data frame suitable for plotting with \pkg{ggplot2}, and (ii) it applies some network-related \sct{aesthetic} operations to that data frame, such as coloring the edges in function of the color of the nodes that they connect. \hh{the `some network-related operations' could use a bit more detail, I think. what kind of operations are you referring to? is it aesthetics as Sam suggests? Giving an example would help.}
+The long list of arguments that can be passed to the \code{ggnet2} function offers extensive control over the aesthetics of the plot that it returns, including through the addition of edge and/or node labels. Arguments such as \code{node.shape} or \code{edge.lty}, which respectively control the shape of the nodes and the linetype of the edges, can take either a global value, such as \samp{15} (for \code{node.shape}) or \samp{dashed} (for \code{edge.lty}), a vector of global values, or the name of an edge or vertex attribute, in which case the values of that attribute are used as the mapping aesthetic.
+
+The \code{ggnet2} function also provides a few network-specific options, such as sizing the nodes as a function of their (unweighted) degree, or using the primary and secondary modes of a bipartite network as an aesthetic mapping for the nodes.%
+  %
+  % added to answer Sam's comment about clarity/rephrasing
+  \footnote{Bipartite (or 'two-mode') networks are networks with two different kinds of nodes and where all ties are formed between these two kinds. Affiliation networks, which represent the ties between individuals and the groups to which they belong, are examples of such networks (see \citealt[p.~53-54 and p.~123-127]{newman}).}%
+  %
+  As a result, the function combines two different kinds of processes: (i) it translates a network object into a data frame suitable for plotting with \pkg{ggplot2}, and (ii) it applies some network-related aesthetic operations to that data frame, such as coloring the edges in function of the color of the nodes that they connect.
+
+\hh{the `some network-related operations' could use a bit more detail, I think. what kind of operations are you referring to? is it aesthetics as Sam suggests? Giving an example would help.}
+
+\fb{The paragraph cites three examples: sizing nodes as a function of their degree, using the mode of the nodes as an aesthetic, and coloring the edges based on nodal attribute similarity. And Sam is right, these are network-related \emph{aesthetic} operations, so I have kept her edit in place.}
 
 % \hh{XXX Francois, could you go into more detail here?
 % node aesthetics, edge aesthetics, what kind of networks work as input ... is it restricted to output from the network package? e.g. the expectation from the user is really to be able to deal with a network call.
@@ -217,12 +271,18 @@ Additionally, the \samp{ggnet2} function also supports a few network-specific op
 % The output that is produced is a ggplot2 object, which means that additional ggplot2 layers can be added on top, and themes or other scaling methods can be used.
 % }
 
-\fb{XXX Is that summary enough, or should I delve into the parameters and aesthetics? If I do, this is going to be a long paper, there are tons of arguments.}
+% \fb{XXX Is that summary enough, or should I delve into the parameters and aesthetics? If I do, this is going to be a long paper, there are tons of arguments.}
 \hh{XXX I know that there are a lot of arguments - they are not all similarly important, though. And there is a system ... maybe you could go into a few more parameters when you explain the system above?}
+\fb{I have added some details on the system: see the node.shape and edge.lty paragraph.}
 
 
-\subsection{ggnet: geom\_net}
+\subsection{ggnet: geom\_net} % ================================================
+
+%% FB: I believe it would be helpful to rename the geom_net repo into geomnet or
+%% something like that: see https://github.com/sctyner/ggnet-paper/issues/3
+
 \subsubsection{Data Structure}
+
 Visualizing networks with a single layer as done in \samp{geom\_net} is similar to the implementation of other, native \pkg{ggplot2} geoms, such as, for example, \samp{geom\_smooth}. When using \samp{geom\_smooth}, the user does not need to know about any of the internals of the loess function, and similarly, when using \samp{geom\_net}, the user is not expected to know about the internals of the layout algorithm, but only needs to specify the essential elements necessary for calculating a layout. On the other hand, if users are comfortable with network analysis, the whole apparatus of layout methods provided by the \pkg{sna} package is available to them through the parameters \samp{layout} and \samp{layout.par}.
 %
 Network analysis is usally working with two sources of information: one data set consisting of a description of the actors, represented as the vertices in the network, and another data set detailing the relationship between these actors, the edge dataset. We assume the vertices are labelled using an `id' column and \hh{XXX the next sentence is not clear yet XXX how about: Edges are described as connection between vertices via their respective `id' labels in a `from' and a `to' column.} that the edges are described by the vertices they connect via a `from' column and a `to' column whose entries are the vertex `ids'. In order for this geometry to work, these two data sets need to be combined into a single data frame. For this, we are using the convention that all of the vertex information is merged into the edge data set using the `from' as the reference column \hh{in a full join operations:}. Generally, there will be some vertices that are sinks in the network because they only show up in the `to' column. We can easily accommodate for these by adding artificial edges in the data set that have missing information for the `to' column.
@@ -233,9 +293,10 @@ The formal requirements of \samp{stat\_net} are two columns, called \samp{from\_
 
 Other variables may also be included for each edge, such as the edge weight, in-degree, out-degree or grouping variable.
 
-
 \subsubsection{Parameters and Aesthetics}
+
 Parameters that are currently implemented in \samp{geom\_net} are:
+
 \begin{itemize}
 \item {\bf layout:}
 the \samp{layout} parameter takes a character value corresponding to the possible layouts in the \pkg{sna} package that are available within the \samp{gplot.layout.*()} family of functions.  The default layout is the Kamada-Kawai layout.  This is a force-directed layout for undirected networks \citep{kamadakawai}. There are, however, many other layouts possible (see \code{?sna::gplot.layout}).
@@ -252,36 +313,52 @@ Note that the edge specific aesthetics that overwrite node aesthetics are curren
 \item {\bf labels:}  \samp{label} can be used as either a logical parameter or as a data variable, in which case it is assumed that the associated variable consists of the character strings to be used for labeling the nodes. Again, if \samp{colour} is specified for the nodes, the same values are used for the labels, unless \samp{ labelcolour} is specified. Other parameter values, such as \samp{vjust} and \samp{hjust} help in adjusting labels relative to the nodes. The parameters work in the same fashion as in native \pkg{ggplot2} geoms.
 \end{itemize}
 
+\subsection{ggnetwork} % =======================================================
 
-\subsection{ggnetwork: geom\_node and geom\_edge}
+\pkg{ggnetwork} is a small R package that mimicks the behaviour of \code{geom\_net} by defining several geoms to achieve similar results. The package can be installed from \url{https://github.com/briatte/ggnetwork} and is fully documented in the package vignette.%
+  %
+  \footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnetwork/}.}%
 
-\fb{\samp{ggnetwork} is
-a small package that mimicks the behaviour of \samp{geom\_net} by defining
-several geoms to achieve similar results:
+The approach taken by the \pkg{ggnetwork} package is to 'alias' some of the native geoms of the \pkg{ggplot2} package, an 'aliased' geom being a variant of an already existing one. The \pkg{ggplot2} package contains several examples of aliased geoms, such as \code{geom\_histogram}, which is a variant of \code{geom\_bar} (see \citealt[p.~67, Table~4.6]{ggplot}).
 
-\url{https://briatte.github.io/ggnetwork/}
-
-The approach of \samp{ggnetwork} is to 'alias' some of the native geometries (or 'geoms') of the \pkg{ggplot2} package, an 'aliased' geom being a variant of another geom that is already present in the package. The \pkg{ggplot2} package contains several examples of aliased geoms, such as \samp{geom\_histogram}, which is a variant of \samp{geom\_bar} (see \citealt[p.~67, Table~4.6]{ggplot}).
-
-Following that logic, \samp{ggnetwork} adds four aliased geometries to \pkg{ggplot2}:
+Following that logic, the \pkg{ggnetwork} package adds four aliased geometries to \pkg{ggplot2}:
 
 \begin{itemize}
-  \item \samp{geom\_nodes}, an alias to \samp{geom\_point};
-  \item \samp{geom\_edges}, an alias to either \samp{geom\_segment} or \samp{geom\_curve};
-  \item \samp{geom\_nodetext}, an alias to \samp{geom\_text}; and
-  \item \samp{geom\_edgetext}, an alias to \samp{geom\_label}.
+  \item \code{geom\_nodes}, an alias to \code{geom\_point};
+  \item \code{geom\_edges}, an alias to either \code{geom\_segment} or \code{geom\_curve};
+  \item \code{geom\_nodetext}, an alias to \code{geom\_text}; and
+  \item \code{geom\_edgetext}, an alias to \code{geom\_label}.
 \end{itemize}
 
-The four geoms are used to plot nodes, edges, node labels and edge labels respectively. Two of the geoms that they alias, \samp{geom\_curve} and \samp{geom\_label}, are part of the new geometries introduced in \pkg{ggplot2} version 1.1.0.\footnote{See \url{https://github.com/hadley/ggplot2/blob/master/NEWS.md}.}
+The four geoms are used to plot nodes, edges, node labels and edge labels respectively. Two of the geoms that they alias, \code{geom\_curve} and \code{geom\_label}, are part of the new geometries introduced in \pkg{ggplot2} version 1.1.0.
 
-To manage the edge, vertex, and other network characteristics, \samp{ggnetwork} uses the same trick as \samp{geom\_net} via a left-join of the edge list and the node attributes. Additionally, it adds self-loops to make sure that every node is plotted even if their degree is zero. The data frame created by \samp{ggnetwork} is then passed to \pkg{ggplot2}.
-}
+Just like the \code{ggnet2} function, the \pkg{ggnetwork} package takes a single network object as input, which might again be an object of class \code{"network"} or some data structure coercible to that class, or an object of class \code{"igraph"} when the \pkg{intergraph} package is installed. This object is passed to the \code{data} argument of the \code{ggplot} function after being converted to a data frame by the `workhorse' function of the \pkg{ggnetwork} package, which is also called \code{ggnetwork}.
+
+%% TODO: replace geom_net with name of package below
+The \code{ggnetwork} function uses the same technique as \code{geom\_net} to produce that data frame. It starts by computing the \samp{x} and samp{y} coordinates of all nodes in the network with respect to its \code{layout} argument, which defaults to the Frutcherman-Reingold placement algorithm. It then extracts the edge list of the network, to which it adds the coordinates of the sender and receiver nodes as well as all edge-level attributes. The result is a data frame with as many rows as there are edges in the network, and where the \samp{x}, \samp{y}, \samp{xend} and \samp{yend} hold the coordinates of the network edges.
+
+At that stage, the \code{ggnetwork} function performs a left-join of that `augmented' edge list with the vertex-level attributes of the sender nodes, and further adds one self-loop per node, in order to ensure that every node is plotted even when their degree is zero---that is, even if the node is not connected to any other node of the network, and is therefore absent of the edge list. The data frame created by this process contains one row per edge as well as one additional row per node, and features all edge-level and vertex-level attributes initially present in the network.%
+  %
+  \footnote{One limitation of that process is that it requires some reserved variable names (\samp{x}, \samp{y}, \samp{xend} and \samp{yend}), which should not also be present as edge-level or vertex-level attributes (otherwise the function will simply break). Similarly, if an edge attribute and a vertex attribute have the same name, like \samp{"na"}, they will be renamed to \samp{"na.x"} (for the edge-level attribute) and \samp{"na.y"} (for the vertex-level attribute) by \code{ggnetwork}.} %
+
+The \code{ggnetwork} function also accepts the \code{arrow.gap}, which will slightly shorten the edges of directed networks in order to avoid the overplotting of edge arrows and nodes, and the \code{by} argument, which is meant for use with plot facets. Both arguments are illustrated in the remainder of this paper.
 
 \hh{XXX For the above paragraph, are you talking about the package ggnetwork or the function ggnetwork? I was under the impression, that the ggnetwork package requires a data set with x, y, xend, yend, and, if labels are supposed to be shown, those, too. The function ggnetwork looks to me like a wrapper for network that produces a data set like just described from a network object. But that means that all of the information on colors or other aesthetics need to be part of that network object, which means that you are again, using the same tools as for ggnet2, i.e. this node and the edge operator. }
 
+\fb{The distinction should be clear now.}
+
 \sct{XXX This section could use some more detail about the arguments to the functions like the other two.  We should make sure that the readers of our paper can easily compare-contrast the 3 functionalities. Also, there has GOT to be another word we can use in addition to functionality. I'm getting tired of typing it! }
 
-\section{Examples}
+\fb{I have added some details on how ggnetwork works.\\
+Re: synonyms, 'capabilitie', 'features', 'options'?}
+
+% ==============================================================================
+%
+\section{Examples}%
+\label{sec:examples}
+%
+% ==============================================================================
+
 
 In this section, we demonstrate the current capabilities of \samp{ggnet2}, \samp{geom\_net} and \samp{ggnetwork} in a series of side by side examples. \sct{While the output is similar for each method of network visualization, the code and implementations differ across the three methods.
 So, for each of these examples, we are going to present the code necessary to produce the network, and discuss each application in detail.}
