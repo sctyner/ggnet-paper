@@ -630,7 +630,7 @@ ggnet2(te.net, label = TRUE, color = "white",
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{geom\_net}
-<<theme_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+<<theme_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE, fig.width=7, fig.height = 7>>=
 # data step: merge nodes and edges and
 # introduce a degree-out variable
 TEnet <- merge(
@@ -647,7 +647,8 @@ ggplot(data = TEnet,
   geom_net(
     aes(fontsize = degree), directed = TRUE,
     label = TRUE, vjust = -.5, size = 3,
-    ecolour = "grey70") +
+    ecolour = "grey70", arrowsize = 0.5, 
+    linewidth = 0.5) +
   theme_net() +
   xlim(c(-0.05, 1.05))
 @
