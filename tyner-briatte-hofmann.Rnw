@@ -1,5 +1,5 @@
 % !TeX root = RJwrapper.tex
-\title{Network Visualizations in \CRANpkg{ggplot2}}
+\title{Network Visualizations in \pkg{ggplot2}}
 \author{by Sam Tyner, Fran\c{c}ois Briatte and  Heike Hofmann}
 
 \maketitle
@@ -11,25 +11,26 @@ This paper explores three different techniques to visualize networks by building
 \hh{TODO list:
 
 \begin{enumerate}
-\item the code in all of the examples should go into figures (I tried tables, but then pieces of different examples get mixed up), so that we can refer to the code properly
+\item Francois, could you add your affiliation at the end of the document?
 \item the code in some of the examples goes beyond the page margin - we need to fix that.
 \item a couple of the examples don't have all three solutions yet.
 \item for the protein example it would probably be enough to just show the code for all implementations, but only one of the resulting donut rings.
-\item there's still some inconsistencies with the formatting. Everything that is working code should be in the framework \code{working code}, everything that is just a piece of text that should not be confused with regular text needs to go into the \samp{not regular text} environment.
+\item there's still some inconsistencies with the formatting. Everything that is working code, and a s Francois pointed out, objects, functions, and arguments should be in the framework \code{working code}, everything that is a literal piece of text that should not be confused with regular text needs to go into the \samp{not regular text} environment.
+\item could we keep to the convention to use \code{CRANpkg} for the first mentioning of a package on CRAN (because it includes a hyperlink to CRAN) and \code{pkg} afterwards (same with the bioconductor package we have). Abstract and title doesn't count as first mentioning ...
 \end{enumerate}}
 
-\fb{Question re:formatting, the R Journal instruction s(and the sample articles I have reas from it) seem to use the 'code' TeX tag for ``objects, functions and arguments'' [1], as well as for classes (which should be quoted [1]). I have used that formatting in the two subsections I have worked on, ggnet2 and ggnetwork, in the 'Implementations' section.
-
-[1]: \url{https://journal.r-project.org/share/author-guide.pdf}
-
-\hh{thanks for pointing this out! I was working off an old set of guidelines, where the objects, functions, and arguments weren't spelled out so nicely! }
-}
+% \fb{Question re:formatting, the R Journal instruction s(and the sample articles I have reas from it) seem to use the 'code' TeX tag for ``objects, functions and arguments'' [1], as well as for classes (which should be quoted [1]). I have used that formatting in the two subsections I have worked on, ggnet2 and ggnetwork, in the 'Implementations' section.
+% 
+% [1]: \url{https://journal.r-project.org/share/author-guide.pdf}
+% 
+% \hh{thanks for pointing this out! I was working off an old set of guidelines, where the objects, functions, and arguments weren't spelled out so nicely! }
+%}
 
 <<setup_knitr, echo=FALSE>>=
 library(knitr)
 opts_chunk$set(
   tidy = FALSE, echo = FALSE, cache = FALSE, eval = TRUE,
-  message = FALSE, warning = FALSE, highlight = FALSE, background = '#FFFFFF',
+  message = FALSE, warning = FALSE, highlight = FALSE, background = '#DDDDDD',
   fig.height = 8, fig.width = 8, fig.align = 'center', fig.show = 'hide'
 )
 
@@ -106,7 +107,8 @@ codefig = list(codefig = TRUE, fig.show = "hide",
                tidy.opts = list(width.cutoff = partWidth)))
 @
 
-\fb{\textbf{Code note:} the \texttt{load\_packages} code chunk does not seem to require loading \texttt{plyr}. The only use of it is internal to \texttt{StatNet}, so it should just be properly imported there. Loading both \texttt{plyr} and \texttt{dplyr} is best avoided when possible.}
+% \fb{\textbf{Code note:} the \texttt{load\_packages} code chunk does not seem to require loading \texttt{plyr}. The only use of it is internal to \texttt{StatNet}, so it should just be properly imported there. Loading both \texttt{plyr} and \texttt{dplyr} is best avoided when possible.}
+% HH I guess that was an old left-over
 
 <<load_packages, results='hide'>>=
 ## ggplot2
@@ -150,7 +152,7 @@ source("https://raw.githubusercontent.com/briatte/ggnet/master/ggnet2.R")
 Coloring the vertices or edges in a graph is a quick way to visualize grouping and can help with pattern or cluster detection. The vertices in a network and the edges between them compose the structure of a network, and being able to discover patterns among them visually is a key part of network analysis. Viewing multiple layouts of the same network can also help reveal patterns or clusters that would not be discovered when only viewing one layout or analyzing only its underlying adjacency matrix.
 
 % Many network packages exist, but are not easy to use
-Many R packages already exist for network analysis and visualization such as \pkg{igraph} by \citet{igraph}, \pkg{sna} by \citet{sna}, and \pkg{network} by \citet{network.jss, network}. Unfortunately, there is no standard format for network visualization across these packages, which requires detailed knowledge from users of each one of these packages in order to make meaningful changes to the network visualization. Customizing the colors, sizes, etc. of the vertices and edges of the network is done ``by hand'' and differently in each of these packages. For instance, the \pkg{igraph} package allows for coloring vertices by groups but the user has to assign the colors to each vertex individually as opposed to assigning color by a grouping factor variable.
+Many R packages already exist for network analysis and visualization such as \CRANpkg{igraph} by \citet{igraph}, \CRANpkg{sna} by \citet{sna}, and \CRANpkg{network} by \citet{network.jss, network}. Unfortunately, there is no standard format for network visualization across these packages, which requires detailed knowledge from users of each one of these packages in order to make meaningful changes to the network visualization. Customizing the colors, sizes, etc. of the vertices and edges of the network is done ``by hand'' and differently in each of these packages. For instance, the \pkg{igraph} package allows for coloring vertices by groups but the user has to assign the colors to each vertex individually as opposed to assigning color by a grouping factor variable.
 
 % ggplot2 as an implementation framework
 %We found the current tools to be lacking in this ability, so
@@ -168,8 +170,8 @@ Because the syntax that it implements is extendable to many different kinds of p
 % \fb{Perhaps we could stress that one of the benefits of learning the
 %``grammar of graphics" is the opportunity to use that grammar in many
 %different situations, e.g. with}
-the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRANpkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the \CRANpkg{GGally} by \citet{ggally}, or the \BIOpkg{ggbio} Bioconductor package by \citet{ggbio}, which provides graphics for biological data, to name a only few. Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization. Out efforts are supported by the most recent changes to the \pkg{ggplot2} package (version 1.1.0, released mid November 2015), which aim at
-facilitating its extension through additional geometries (or `geoms').%
+the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRANpkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the package \CRANpkg{GGally} by \citet{ggally}, or the \BIOpkg{ggbio} Bioconductor package by \citet{ggbio}, which provides graphics for biological data, to name a only few. Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization. Out efforts are supported by the most recent changes to \pkg{ggplot2} (version 1.1.0, released mid November 2015), which aim at
+facilitating its extension through additional geometries (or \samp{geoms}).%
   %
   % this URL should be replaced with the CRAN one when ggplot2 1.1.0 gets there
   \footnote{See \url{https://github.com/hadley/ggplot2/blob/master/NEWS.md} for the full list of changes in \pkg{ggplot2} 1.1.0, as well as the new package vignette, ``Extending ggplot2'', which explains how the internal \code{ggproto} system of object-oriented programming can be used to create new geoms.} %
@@ -177,7 +179,7 @@ facilitating its extension through additional geometries (or `geoms').%
 
 %\fb{Not sure I understand 'Bioconductor plotting'.} - HH: I hope my changes clarify it.
 
-In the remainder of this paper, we present three different approaches to network visualization with \pkg{ggplot2}. Section~\ref{sec:background} introduces the basic terminology of networks and illustrates their ubiquity in natural and social life. Section~\ref{sec:implementations} then discusses the logic behind each of the three approaches that we offer. Section~\ref{sec:examples} extends that discussion through several examples ranging from simple to complex networks, for which we provide the code corresponding to each approach alongside its graphical results.
+In the remainder of this paper, we present three different approaches to network visualization with \pkg{ggplot2}. Section~\ref{sec:background} introduces the basic terminology of networks and illustrates their ubiquity in natural and social life. Section~\ref{sec:implementations} then discusses the logic behind each of the three approaches that we offer. Section~\ref{sec:examples} extends that discussion through several examples ranging from simple to complex networks, for which we provide the code corresponding to each approach alongside its graphical result.
 
 % ==============================================================================
 %
@@ -247,13 +249,21 @@ The \code{ggnet2} function %is the most 'encapsulated' of the three implementati
 % function (the fact that its syntax strays further away from ggplot2 than geom_net
 % or ggnetwork does).
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-tries to offer as much network visualization functionalities as possible in a single function call. While the resulting object is a \pkg{ggplot2} object that can be further styled with \pkg{ggplot2} scales and themes, the syntax of the \code{ggnet2} function is easily understood by the user: the aesthetics of the nodes are controlled by arguments such as \code{node.alpha} or \code{node.color}, and those of the edges are controlled by similarly named arguments starting with \samp{edge}. As a consequence, while \code{ggnet2} applies the grammar of graphics to network objects, the function itself still works very much like the plotting functions of the \pkg{igraph} and \pkg{network} packages: a long series of arguments are used to control every possible aspect of how the network should be visualized.
+\hh{offers in a single function call a large range of network visualization functionality}.
+%% `as much as possible' ... I'm sure there's alwasy a bit more possible by adding yet another piece of functionality. let's avoid that phrase
+%tries to offer as much network visualization functionalities as possible in a single function call. 
+While the resulting object is a \pkg{ggplot2} object that can be further styled with \pkg{ggplot2} scales and themes, the syntax of the \code{ggnet2} function is \hh{designed to be} easily understood by the user:
+%% sorry to be so picky, but I'd rather not take for granted what users understand.
+the aesthetics \hh{relating to} the nodes are controlled by arguments such as \code{node.alpha} or \code{node.color}, while those relating to the edges are controlled by %similarly named
+arguments starting with \samp{edge}. As a consequence,  \code{ggnet2} applies the grammar of graphics to network objects, but the function itself still works very much like the plotting functions of the \pkg{igraph} and \pkg{network} packages: a long series of arguments is used to control every possible aspect of how the network should be visualized.
 
-The \code{ggnet2} function takes a single network object as input. This initial object might be an object of class \code{"network"} (with the exception of hypergraphs or multiplex graphs), or any data structure coercible to an object of that class, such as an incidence matrix, an adjacency matrix, or an edge list. Additionally, if the \pkg{intergraph} package \citep{intergraph} is installed, the function will also accept a network object of class \code{"igraph"}. The function will internally convert that object to two data frames, one for edges and another one for nodes, before passing them to \pkg{ggplot2} as arguments to segment and point geometries respectively.%
+The \code{ggnet2} function takes a single network object as input. This initial object might be an object of class \code{network} (with the exception of hypergraphs or multiplex graphs), or any data structure coercible to an object of that class, such as an incidence matrix, an adjacency matrix, or an edge list. Additionally, if the \CRANpkg{intergraph} package \citep{intergraph} is installed, the function  also accepts a network object of class \code{igraph}. Internally, the function  converts the network object to two data frames, one for edges and another one for nodes, and then passes them to \pkg{ggplot2} as arguments to segment and point geometries respectively.%
   %
-  \footnote{The two data frames that \code{ggnet2} generates for edges and nodes contain the same information as those generated by \pkg{ggplot2} to plot segments and points respectively.}%
+  \footnote{The two data frames that \code{ggnet2} generates for edges and nodes contain the same information as those generated by \pkg{ggplot2} to plot segments and points respectively. \hh{XXX this is relevant information - could we include this in the actual text rather than a footnote? }}%
 
-The long list of arguments that can be passed to the \code{ggnet2} function offers extensive control over the aesthetics of the plot that it returns, including through the addition of edge and/or node labels. Arguments such as \code{node.shape} or \code{edge.lty}, which respectively control the shape of the nodes and the linetype of the edges, can take either a global value, such as \samp{15} (for \code{node.shape}) or \samp{dashed} (for \code{edge.lty}), a vector of global values, or the name of an edge or vertex attribute, in which case the values of that attribute are used as the mapping aesthetic.
+The long list of arguments that can be passed to the \code{ggnet2} function offers extensive control over the aesthetics of the plot that it returns, including %through 
+the addition of edge and/or node labels and their respective aesthetics. 
+Arguments such as \code{node.shape} or \code{edge.lty}, which respectively control the shape of the nodes and the linetype of the edges, can take either a global value, such as \samp{15} (for \code{node.shape}) or \samp{dashed} (for \code{edge.lty}), a vector of global values, or the name of an edge or vertex attribute, in which case the values of that attribute are used as the mapping aesthetic.
 
 The \code{ggnet2} function also provides a few network-specific options, such as sizing the nodes as a function of their (unweighted) degree, or using the primary and secondary modes of a bipartite network as an aesthetic mapping for the nodes.%
   %
@@ -677,7 +687,7 @@ ggplot(ggnetwork(te.net),
 The inheritance structure is plotted in figure \ref{fig.cap:theme}.  In this plot, it is easy to quickly determine the parent and child vertices. Using this plot made creation of the \code{theme\_net} object used throughout these examples very simple. We just made set each of the major parent elements, \code{text}, \code{rect}, and \code{line} to \code{element\_blank()} and then set the aspect ratio equal to one.
 
 \subsection{Mad Men Networks}
-  The following code creates the network example given in Figure~\ref{fig:madmen-1} in the introduction. We changed the vertex size and edge color for all vertices and edges, included vertex labels, and colored the vertices according to the character's gender.
+  The following code creates the network example given in Figure~\ref{fig.cap:madmen} in the introduction. We changed the vertex size and edge color for all vertices and edges, included vertex labels, and colored the vertices according to the character's gender.
 
 <<madmen_prepare, echo=TRUE>>=
 # create undirected network
