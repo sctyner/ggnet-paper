@@ -464,18 +464,19 @@ ggnet2(em.net, color = "curr_empl_type",
 \caption{geom\_net}
 <<email_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
 emailnet <- merge(
-  subset(email$edges, nrecipients < 54), email$nodes,
+  subset(email$edges, nrecipients < 54), 
+  email$nodes,
   by.x="From", by.y="label", all=TRUE)
 
 ggplot(data = emailnet,
        aes(from_id = From, to_id = to)) +
-  geom_net(aes(colour= CurrentEmploymentType,
-               group = CurrentEmploymentType,
-               linewidth = 2*(...samegroup../8+.125)),
-           ealpha = 0.2, size = 4, directed = TRUE,
-           arrowsize = 0.75) +
-  scale_colour_brewer("Employment Type",
-                      palette = "Set1") +
+  geom_net(
+    aes(colour = CurrentEmploymentType,
+        group = CurrentEmploymentType,
+        linewidth = 2*(...samegroup../8+.125)),
+    ealpha = 0.2, size = 4, 
+    directed = TRUE, arrowsize = 0.75) +
+  scale_colour_brewer("Employment Type", palette = "Set1") +
   theme_net() +
   theme(legend.position = "bottom")
 @
@@ -832,32 +833,30 @@ ggnet2(fb.net, mode = "fruchtermanreingold",
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{geom\_net}\vspace{-.5cm}
-<<football_geom_net, size="footnotesize", fig.height=11, opts.label="codefig", echo=TRUE>>=
+<<football_geom_net, size="footnotesize", fig.height=10, opts.label="codefig", echo=TRUE>>=
 # data step: merge vertices and edges
-# label independent schools
-data(football)
 ftnet <- merge(
   football$edges, football$vertices,
   by.x = "from", by.y = "label", all = TRUE)
 
-sid <- ftnet$value == "Independents"
-ftnet$schools <- ""
-ftnet$schools[sid] <- ftnet$from[sid]
+# label independent schools
+ftnet$schools <- ifelse(
+  ftnet$value == "Independents", ftnet$from, "")
 
 # create data plot
-ggplot(data = ftnet, aes(from_id = from, to_id = to)) +
+ggplot(data = ftnet, 
+       aes(from_id = from, to_id = to)) +
   geom_net(
     aes(colour = value, group = value,
-        linetype = factor(same.conf == 1),
+        linetype = factor(same.conf != 1),
         label = schools),
     linewidth = 0.5,
-    size = 6, vjust = -0.75, alpha = 0.3,
+    size = 4, vjust = -0.75, alpha = 0.3,
     layout = 'fruchtermanreingold') +
   theme_net() +
-  theme(legend.position = "bottom") + xlim(c(-0.05, 1.05)) +
+  theme(legend.position = "bottom") + 
   scale_colour_brewer("Conference", palette = "Paired")  +
-  scale_linetype_manual(
-    "Same Conference", values = c(2,1))
+  guides(linetype = FALSE)
 @
 \end{subfigure}
 %
@@ -953,7 +952,7 @@ The data shows the second quartal trips in 2015 taken with bikes from the bike s
 While this bikesharing company is located in the heart of Washington D.C.\ they do have a set of bike stations just outside of Washington in  Rockville, MD and north of it.
 Each station is shown as a dot, lines between stations indicate that at least five trips were taken between these two stations; the wider the line, the more trips have been taken between stations. In order to reflect distance between stations, we use as an additional restriction that the fastest trip was at most ten minutes long.
 
-<<bikes_geom_net, echo=TRUE, fig.cap="Bikesharing in Rockville", warning=FALSE, fig.keep='all'>>=
+<<bikes_geom_net, echo=TRUE, warning=FALSE, fig.keep='all'>>=
 tripnet <- merge(bikes$trips, bikes$stations, by.x = "Start.station",
                  by.y = "name", all = TRUE)
 
