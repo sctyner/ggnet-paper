@@ -1,5 +1,5 @@
 % !TeX root = RJwrapper.tex
-\title{Network Visualizations in \CRANpkg{ggplot2}}
+\title{Network Visualizations in \pkg{ggplot2}}
 \author{by Sam Tyner, Fran\c{c}ois Briatte and  Heike Hofmann}
 
 \maketitle
@@ -11,19 +11,20 @@ This paper explores three different techniques to visualize networks by building
 \hh{TODO list:
 
 \begin{enumerate}
-\item the code in all of the examples should go into figures (I tried tables, but then pieces of different examples get mixed up), so that we can refer to the code properly
+\item Francois, could you add your affiliation at the end of the document?
 \item the code in some of the examples goes beyond the page margin - we need to fix that.
 \item a couple of the examples don't have all three solutions yet.
 \item for the protein example it would probably be enough to just show the code for all implementations, but only one of the resulting donut rings.
-\item there's still some inconsistencies with the formatting. Everything that is working code should be in the framework \code{working code}, everything that is just a piece of text that should not be confused with regular text needs to go into the \samp{not regular text} environment.
+\item there's still some inconsistencies with the formatting. Everything that is working code, and a s Francois pointed out, objects, functions, and arguments should be in the framework \code{working code}, everything that is a literal piece of text that should not be confused with regular text needs to go into the \samp{not regular text} environment.
+\item coudl we keep to the convention to use \code{CRANpkg} for the first mentioning of a package on CRAN (because it includes a hyperlink to CRAN) and \code{pkg} afterwards (same with the bioconductor package we have). Abstract and title doesn't count as first mentioning ...
 \end{enumerate}}
 
-\fb{Question re:formatting, the R Journal instruction s(and the sample articles I have reas from it) seem to use the 'code' TeX tag for ``objects, functions and arguments'' [1], as well as for classes (which should be quoted [1]). I have used that formatting in the two subsections I have worked on, ggnet2 and ggnetwork, in the 'Implementations' section.
-
-[1]: \url{https://journal.r-project.org/share/author-guide.pdf}
-
-\hh{thanks for pointing this out! I was working off an old set of guidelines, where the objects, functions, and arguments weren't spelled out so nicely! }
-}
+% \fb{Question re:formatting, the R Journal instruction s(and the sample articles I have reas from it) seem to use the 'code' TeX tag for ``objects, functions and arguments'' [1], as well as for classes (which should be quoted [1]). I have used that formatting in the two subsections I have worked on, ggnet2 and ggnetwork, in the 'Implementations' section.
+% 
+% [1]: \url{https://journal.r-project.org/share/author-guide.pdf}
+% 
+% \hh{thanks for pointing this out! I was working off an old set of guidelines, where the objects, functions, and arguments weren't spelled out so nicely! }
+%}
 
 <<setup_knitr, echo=FALSE>>=
 library(knitr)
@@ -106,7 +107,8 @@ codefig = list(codefig = TRUE, fig.show = "hide",
                tidy.opts = list(width.cutoff = partWidth)))
 @
 
-\fb{\textbf{Code note:} the \texttt{load\_packages} code chunk does not seem to require loading \texttt{plyr}. The only use of it is internal to \texttt{StatNet}, so it should just be properly imported there. Loading both \texttt{plyr} and \texttt{dplyr} is best avoided when possible.}
+% \fb{\textbf{Code note:} the \texttt{load\_packages} code chunk does not seem to require loading \texttt{plyr}. The only use of it is internal to \texttt{StatNet}, so it should just be properly imported there. Loading both \texttt{plyr} and \texttt{dplyr} is best avoided when possible.}
+% HH I guess that was an old left-over
 
 <<load_packages, results='hide'>>=
 ## ggplot2
@@ -150,7 +152,7 @@ source("https://raw.githubusercontent.com/briatte/ggnet/master/ggnet2.R")
 Coloring the vertices or edges in a graph is a quick way to visualize grouping and can help with pattern or cluster detection. The vertices in a network and the edges between them compose the structure of a network, and being able to discover patterns among them visually is a key part of network analysis. Viewing multiple layouts of the same network can also help reveal patterns or clusters that would not be discovered when only viewing one layout or analyzing only its underlying adjacency matrix.
 
 % Many network packages exist, but are not easy to use
-Many R packages already exist for network analysis and visualization such as \pkg{igraph} by \citet{igraph}, \pkg{sna} by \citet{sna}, and \pkg{network} by \citet{network.jss, network}. Unfortunately, there is no standard format for network visualization across these packages, which requires detailed knowledge from users of each one of these packages in order to make meaningful changes to the network visualization. Customizing the colors, sizes, etc. of the vertices and edges of the network is done ``by hand'' and differently in each of these packages. For instance, the \pkg{igraph} package allows for coloring vertices by groups but the user has to assign the colors to each vertex individually as opposed to assigning color by a grouping factor variable.
+Many R packages already exist for network analysis and visualization such as \CRANpkg{igraph} by \citet{igraph}, \CRANpkg{sna} by \citet{sna}, and \CRANpkg{network} by \citet{network.jss, network}. Unfortunately, there is no standard format for network visualization across these packages, which requires detailed knowledge from users of each one of these packages in order to make meaningful changes to the network visualization. Customizing the colors, sizes, etc. of the vertices and edges of the network is done ``by hand'' and differently in each of these packages. For instance, the \pkg{igraph} package allows for coloring vertices by groups but the user has to assign the colors to each vertex individually as opposed to assigning color by a grouping factor variable.
 
 % ggplot2 as an implementation framework
 %We found the current tools to be lacking in this ability, so
@@ -168,7 +170,7 @@ Because the syntax that it implements is extendable to many different kinds of p
 % \fb{Perhaps we could stress that one of the benefits of learning the
 %``grammar of graphics" is the opportunity to use that grammar in many
 %different situations, e.g. with}
-the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRANpkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the \CRANpkg{GGally} by \citet{ggally}, or the \BIOpkg{ggbio} Bioconductor package by \citet{ggbio}, which provides graphics for biological data, to name a only few. Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization. Out efforts are supported by the most recent changes to the \pkg{ggplot2} package (version 1.1.0, released mid November 2015), which aim at
+the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRANpkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the package \CRANpkg{GGally} by \citet{ggally}, or the \BIOpkg{ggbio} Bioconductor package by \citet{ggbio}, which provides graphics for biological data, to name a only few. Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization. Out efforts are supported by the most recent changes to \pkg{ggplot2} (version 1.1.0, released mid November 2015), which aim at
 facilitating its extension through additional geometries (or `geoms').%
   %
   % this URL should be replaced with the CRAN one when ggplot2 1.1.0 gets there
