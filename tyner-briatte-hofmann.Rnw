@@ -30,7 +30,7 @@ This paper explores three different techniques to visualize networks by building
 library(knitr)
 opts_chunk$set(
   tidy = FALSE, echo = FALSE, cache = FALSE, eval = TRUE,
-  message = FALSE, warning = FALSE, highlight = FALSE, background = '#FFFFFF',
+  message = FALSE, warning = FALSE, highlight = FALSE, background = '#DDDDDD',
   fig.height = 8, fig.width = 8, fig.align = 'center', fig.show = 'hide'
 )
 
@@ -687,7 +687,7 @@ ggplot(ggnetwork(te.net),
 The inheritance structure is plotted in figure \ref{fig.cap:theme}.  In this plot, it is easy to quickly determine the parent and child vertices. Using this plot made creation of the \code{theme\_net} object used throughout these examples very simple. We just made set each of the major parent elements, \code{text}, \code{rect}, and \code{line} to \code{element\_blank()} and then set the aspect ratio equal to one.
 
 \subsection{Mad Men Networks}
-  The following code creates the network example given in Figure~\ref{fig:madmen-1} in the introduction. We changed the vertex size and edge color for all vertices and edges, included vertex labels, and colored the vertices according to the character's gender.
+  The following code creates the network example given in Figure~\ref{fig.cap:madmen} in the introduction. We changed the vertex size and edge color for all vertices and edges, included vertex labels, and colored the vertices according to the character's gender.
 
 <<madmen_prepare, echo=TRUE>>=
 # create undirected network
