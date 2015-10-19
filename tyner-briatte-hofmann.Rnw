@@ -211,7 +211,7 @@ ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
            vjust = -0.6, ecolour = "grey50") +
   scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
   xlim(c(-0.05, 1.05)) +
-  theme_net() +
+  #theme_net() +
   theme(legend.position = "bottom")
 @
 \includegraphics[width=\textwidth]{figure/madmen_geom_net-1.pdf}
@@ -387,8 +387,8 @@ ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
   geom_net(colour = "darkred", layout = "circle", label = TRUE, size = 15,
            directed = TRUE, vjust = 0.5, labelcolour = "grey80",
            arrowsize = 1.5, linewidth = 0.5, arrowgap = 0.05,
-           selfies = TRUE, ecolour = "grey40") +
-  theme_net()
+           selfies = TRUE, ecolour = "grey40") #+
+  #theme_net()
 @
 
 <<blood_ggnetwork, echo=TRUE, fig.width=6, fig.height=6>>=
@@ -466,7 +466,7 @@ ggplot(data = emailnet,
            arrowsize = 0.75) +
   scale_colour_brewer("Employment Type",
                       palette = "Set1") +
-  theme_net() +
+ # theme_net() +
   theme(legend.position = "bottom")
 @
 \end{subfigure}
@@ -546,7 +546,7 @@ ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
                linewidth=2*(...samegroup../8+.125)),
            fiteach = TRUE, ealpha = 0.5, size = 1.5) +
   scale_colour_brewer(palette = "Set1") +
-  theme_net() +
+  #theme_net() +
   facet_wrap(~ day, nrow = 2, labeller = "label_both") +
   theme(legend.position = "bottom",
         panel.border = element_rect(fill = NA, colour = "grey60"),
@@ -650,7 +650,7 @@ ggplot(data = TEnet,
     label = TRUE, vjust = -.5, size = 3,
     ecolour = "grey70", arrowsize = 0.5, 
     linewidth = 0.5) +
-  theme_net() +
+  #theme_net() +
   xlim(c(-0.05, 1.05))
 @
 \end{subfigure}
@@ -688,7 +688,7 @@ mm.net %v% "gender" <- as.character(
   madmen$vertices[ network.vertex.names(mm.net), "Gender"]
 )
 # gender color palette
-mm.col <- c("female" = "#ff69b4", "male" = "#0099ff")
+mm.col <- c("f" = "#ff69b4", "m" = "#0099ff")
 @
 
 <<print, ref.label="madmen_ggnet", eval=FALSE, echo=TRUE,cache=FALSE>>=
@@ -770,7 +770,7 @@ ggplot(data = MM2net,
     layout = "fruchtermanreingold") +
   scale_colour_manual(values = mm.col) +
   xlim(c(-0.1, 1.1)) +
-  theme_net() +
+  # theme_net() +
   theme(legend.position = "bottom")
 @
 \end{subfigure}
@@ -843,7 +843,7 @@ ggplot(data = ftnet, aes(from_id = from, to_id = to)) +
     linewidth = 0.5,
     size = 6, vjust = -0.75, alpha = 0.3,
     layout = 'fruchtermanreingold') +
-  theme_net() +
+  #theme_net() +
   theme(legend.position = "bottom") + xlim(c(-0.05, 1.05)) +
   scale_colour_brewer("Conference", palette = "Paired")  +
   scale_linetype_manual(
@@ -902,8 +902,8 @@ ggplot(data = lesmisnet, aes(from_id = from, to_id = to,
   geom_net(aes(size = degree, alpha = degree),
            colour = "grey30", ecolour = "grey60",
            layout = "fruchtermanreingold", label = TRUE, vjust = -0.75) +
-  scale_alpha(range = c(0.3, 1)) +
-  theme_net()
+  scale_alpha(range = c(0.3, 1))# +
+  #theme_net()
 @
 
 %% not sure I understand the aesth. mapping used above, so not using alpha below
@@ -954,7 +954,7 @@ tripnet$Metro[idx] <- TRUE
 ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
   geom_net(aes(linewidth = n / 15, colour = Metro),
            label = TRUE, vjust = -0.5) +
-  theme_net() +
+  #theme_net() +
   xlim(c(-0.1, 1.1)) +
   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
   theme(legend.position = "bottom")
@@ -964,7 +964,7 @@ ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
 ggplot(aes(from_id = Start.station, to_id = End.station),  data = tripnet) +
   geom_net(layout = NULL, label = TRUE, vjust = -0.5,
            aes(x = long, y = lat, linewidth = n / 15, colour = Metro)) +
-  theme_net() +
+  #theme_net() +
   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
   theme(legend.position = "bottom")
 @
@@ -993,8 +993,8 @@ ggnet2(network(protein$edges[,1:2]), size = 2, color = "magenta",
 ggplot(data = protein$edges, aes(from_id = from, to_id = to)) +
   geom_net(alpha = 0.25, ealpha = 0.05, size = 2, colour = "magenta",
            ecolour = "grey70", linewidth = 0.5,
-           layout = "random", layout.par = list(dist = "uniang")) +
-  theme_net()
+           layout = "random", layout.par = list(dist = "uniang")) #+
+  #theme_net()
 @
 
 <<yeast_ggnetwork, echo=TRUE, eval = FALSE,  cache=FALSE>>=
