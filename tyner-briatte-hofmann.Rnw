@@ -1,5 +1,5 @@
 % !TeX root = RJwrapper.tex
-\title{Network Visualizations in \pkg{ggplot2}}
+\title{Network Visualizations in \CRANpkg{ggplot2}}
 \author{by Sam Tyner, Fran\c{c}ois Briatte and  Heike Hofmann}
 
 \maketitle
@@ -154,28 +154,28 @@ Many R packages already exist for network analysis and visualization such as \pk
 
 % ggplot2 as an implementation framework
 %We found the current tools to be lacking in this ability, so
-In this paper, our objective is to test the possibility to bring network plotting capabilities to the popular and widely used \pkg{ggplot2} package \citep{wickham}. Designed as an implementation of the 'grammar of graphics' proposed by \citet{wilkinson:1999}, the \pkg{ggplot2} package has become extremely popular among R users,%
+In this paper, our objective is to test the possibility to bring network plotting capabilities to the popular and widely used \CRANpkg{ggplot2} package \citep{ggplot2}. Designed as an implementation of the `grammar of graphics' proposed by \citet{wilkinson:1999}, the \pkg{ggplot2} package has become extremely popular among R users,%
   %
   \footnote{In order to give an indication of how massively large the user base of \pkg{ggplot2} is, we looked at its usage statistics from January 1, 2015 to October 10, 2015 (see \url{http://cran-logs.rstudio.com/}). Over that period, the \pkg{ggplot2} package was downloaded over 1.2 million times from CRAN, which amounts to over 4,000 downloads per day. The package has been downloaded at least once in 215 countries, and in 21 of those countries, including China, Israel, and Colombia, it has been downloaded over 10,000 times.} %
   %
-  to the point that it has even inspired a port of its syntax to the Python programming language (a rare achievement for an R package).%
+  to the point that it has even inspired a port of its syntax to the Python programming language, which is a rare achievement for an R package.%
   %
   \footnote{See \url{http://ggplot.yhathq.com/}.} %
   %
   This is the audience we are aiming at by making network visualizations a part of \pkg{ggplot2}.
 
-Because the syntax that it implements is extendable to many different kinds of plots, the \pkg{ggplot2} package has inspired many packages that build on it, including
+Because the syntax that it implements is extendable to many different kinds of plots, the \pkg{ggplot2} package has inspired \hh{XXX too much inspiration XXX} many packages that build on it, including
 % \fb{Perhaps we could stress that one of the benefits of learning the
 %``grammar of graphics" is the opportunity to use that grammar in many
 %different situations, e.g. with}
-the \pkg{ggmap} package by \citet{ggmap} for spatial visualization, the \pkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the \pkg{GGally} by \citet{ggally}, or the \pkg{ggbio} package by \citet{ggbio} for \textit{Bioconductor} plotting, to name a only few. Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization. Out efforts are supported by the most recent changes to the \pkg{ggplot2} package \hh{(version 1.1.?, released mid November 2015)}, which aim at
-facilitating its extension through additional geometries (or 'geoms').%
+the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRANpkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the \CRANpkg{GGally} by \citet{ggally}, or the \BIOpkg{ggbio} Bioconductor package by \citet{ggbio}, which provides graphics for biological data, to name a only few. Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization. Out efforts are supported by the most recent changes to the \pkg{ggplot2} package (version 1.1.0, released mid November 2015), which aim at
+facilitating its extension through additional geometries (or `geoms').%
   %
   % this URL should be replaced with the CRAN one when ggplot2 1.1.0 gets there
   \footnote{See \url{https://github.com/hadley/ggplot2/blob/master/NEWS.md} for the full list of changes in \pkg{ggplot2} 1.1.0, as well as the new package vignette, ``Extending ggplot2'', which explains how the internal \code{ggproto} system of object-oriented programming can be used to create new geoms.} %
   %
 
-\fb{Not sure I understand 'Bioconductor plotting'.}
+%\fb{Not sure I understand 'Bioconductor plotting'.} - HH: I hope my changes clarify it.
 
 In the remainder of this paper, we present three different approaches to network visualization with \pkg{ggplot2}. Section~\ref{sec:background} introduces the basic terminology of networks and illustrates their ubiquity in natural and social life. Section~\ref{sec:implementations} then discusses the logic behind each of the three approaches that we offer. Section~\ref{sec:examples} extends that discussion through several examples ranging from simple to complex networks, for which we provide the code corresponding to each approach alongside its graphical results.
 
@@ -188,6 +188,7 @@ In the remainder of this paper, we present three different approaches to network
 
 
 \fb{How about having this block as a separate 'Background' section? Would allow readers familiar with networks to skip it and go directly to the implementations. I have read through the text and tried to make it simpler where possible.}
+\hh{I'm fine with having a separate background section. }
 
 % getting into more of the nitty-gritty details
 At its core, a network is simply a set of points connected in pairs by a set of lines \citep{newman}. Here, we refer to the lines as edges (or ties) and the points as nodes (or vertices). These two seemingly simple sets of graphical objects, points and segments, are used to encode a huge variety and quantity of information across many fields of study. For instance, networks of scientific collaboration, a food web of marine animals, and American college football games are all covered in a paper on community detection in networks by \citet{football}.  \citet{networkfailures} examine node failure in interdependent networks like power grids.  Social networks, such as links between actors found on \url{http://www.imdb.com/}, and neural networks, like the completely mapped neural network of the \textit{C. elegans} worm are also extensively studied \citep{smallworld}.
@@ -229,17 +230,14 @@ ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
 
 There are two main approaches to making use of the \pkg{ggplot2} framework: (i) implement network visualizations using \pkg{ggplot2}, by providing a wrapper for the user to visualize a network with \pkg{ggplot2} elements, and (ii) implement network visualizations as internal layers in \pkg{ggplot2}.  For the second approach, two main implementations exist: one which implements the structures of a network, such as nodes, edges, and node labels as independent geoms and another which wraps all of these structures into a single geom. We will discuss all of these approaches in this paper.
 
-\fb{Paragraph above comes from the introduction. Feels to me it fits better here.}
+%\fb{Paragraph above comes from the introduction. Feels to me it fits better here.}
 
 
 \subsection{ggnet2} % ==========================================================
 
-The \code{ggnet2} function is an improved version of the \code{ggnet} function, which has been part of the \pkg{GGally} package since 2013 \citep{ggally}. Both functions can be installed as a small R package from \url{https://github.com/briatte/ggnet}, and a detailed introduction to the \code{ggnet2} function is available from within the package as a vignette.%
+The \code{ggnet2} function is an improved version of the \code{ggnet} function, which has been part of the \pkg{GGally} package since 2013 \citep{ggally}. Both functions can be separately installed in form of a small R package from \url{https://github.com/briatte/ggnet}, and a detailed introduction to the \code{ggnet2} function is available from within the package as a vignette.%
   %
   \footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnet/}.}%
-
-% \sct{XXX I made some minor changes to the language of this section.}
-% FB - noted
 
 The \code{ggnet2} function %is the most 'encapsulated' of the three implementations presented in this paper, insofar as it
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
