@@ -703,7 +703,14 @@ The inheritance structure is plotted in figure \ref{fig.cap:theme}.  In this plo
 \subsection{Mad Men Networks}
   The following code creates the network example given in Figure~\ref{fig.cap:madmen} in the introduction. We changed the vertex size and edge color for all vertices and edges, included vertex labels, and colored the vertices according to the character's gender.
 
+<<print, ref.label="madmen_geom_net", eval=FALSE, echo=TRUE,cache=FALSE>>=
+@
+
+
+The code for the other two approaches follows below and the corresponding networks are shown in figure~\ref{fig:madmen-2}.
+
 <<madmen_prepare, echo=TRUE>>=
+# data step for both ggnet2 and ggnetwork
 # create undirected network
 mm.net <- network(madmen$edges[, 1:2], directed = FALSE)
 # gender vertex attribute
@@ -715,10 +722,6 @@ mm.net %v% "gender" <- as.character(
 mm.col <- c("female" = "#ff69b4", "male" = "#0099ff")
 @
 
-<<print, ref.label="madmen_ggnet", eval=FALSE, echo=TRUE,cache=FALSE>>=
-@
-
-The code for the other two approaches follows below and the corresponding networks are shown in figure~\ref{fig:madmen-2}.
 
 <<madmen_ggnet2, echo=TRUE, out.width='\\textwidth', fig.width=9, fig.height=9>>=
 ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
@@ -753,7 +756,10 @@ ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
 
  There is another Mad Men network given in the \pkg{gcookbook} package \citep{madmen}. It is a directed network, also of romantic relationships between characters, but it additionally includes all advances made by one character that were rejected by the other.  For example, Roger Sterling made advances toward Betty Draper, but Betty refused him,  so there is a directed edge going from Roger to Betty, but not from Betty to Roger.  If the advance is reciprocated, such as between Sal Romano and the Bellhop, there are two directed edges between the two vertices.
 
+
+\begin{figure}
 <<madmen2_prepare, echo = TRUE>>=
+# data step for ggnet2 and ggnetwork
 # create directed network
 mm.dir <- network(mm.directed$edges, directed = TRUE)
 # gender vertex attribute
@@ -762,11 +768,15 @@ mm.dir %v% "gender" <- as.character(
   mm.directed$vertices[ network.vertex.names(mm.dir), "Gender" ]
 )
 @
+\caption{\label{mm2:datastep} Data preparation for the directed network of the  Mad Men example in Figures~\ref{mm2:ggnet2} and~\ref{mm2:ggnetwork}.}
 
+\end{figure}
 \begin{figure}[hbtp]
 \begin{subfigure}[t]{\textwidth}
-\caption{ggnet2}
+\caption{ggnet2\label{mm2:ggnet2}}
 <<madmen2_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+# see fig.11 for data prep 
+
 ggnet2(mm.dir, mode = "fruchtermanreingold", size = 3,
        color = mm.col[ mm.dir %v% "gender" ],
        label = TRUE,
@@ -800,8 +810,10 @@ ggplot(data = MM2net,
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
-\caption{ggnetwork}
+\caption{ggnetwork \label{mm2:ggnetwork}}
 <<madmen2_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, dependson="madmen2_ggnet2">>=
+# see fig.11 for data prep 
+
 ggplot(
   ggnetwork(mm.dir,
             layout = "fruchtermanreingold"),
