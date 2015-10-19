@@ -204,6 +204,7 @@ Figure~\ref{fig.cap:madmen} shows this network. In the plot, we can see one cent
 \begin{figure}[hbtp]
 \centering
 <<madmen_geom_net, out.width='\\textwidth', fig.width=9, fig.height=9.5>>=
+# code for geom_net
 # data step: merge edges and nodes
 MMnet <- merge(madmen$edges, madmen$vertices,
                by.x = "Name1", by.y = "label", all = TRUE)
@@ -365,7 +366,15 @@ At that stage, the \code{ggnetwork} function performs a left-join of that `augme
   %
   \footnote{One limitation of this process is that it requires some reserved variable names (\code{x}, \code{y}, \code{xend} and \code{yend}), which should not also be present as edge-level or vertex-level attributes (otherwise the function will simply break). Similarly, if an edge attribute and a vertex attribute have the same name, like \samp{"name"}, they will be renamed to \samp{"name.x"} (for the edge-level attribute) and \samp{"name.y"} (for the vertex-level attribute) by \code{ggnetwork}. \hh{XXX -- \samp{"na"} is an unfortunate choice of name - it is easily confused with \code{NA}. I hope you're OK with my renaming this to ``name". }} %
 
-The \code{ggnetwork} function also accepts the \hh{arguments} \code{arrow.gap} and  \code{by}. \code{arrow.gap} slightly shortens the edges of directed networks in order to avoid  overplotting of edge arrows and nodes. The argument \code{by} is meant for use with plot facets. Both arguments are illustrated in the remainder of this paper.
+The \code{ggnetwork} function also accepts the \hh{arguments} \code{arrow.gap} and  \code{by}. \code{arrow.gap} slightly shortens the edges of directed networks in order to avoid  overplotting of edge arrows and nodes. The argument \code{by} is meant for use with plot facets. 
+%% HH: just moved the paragraph here
+The facetting technique employed by \code{ggnetwork} 
+%is close to that of \code{geom\_net}, except it 
+happens internally to the function. Passing an edge attribute to the \code{by} argument will cause \code{ggnetwork} to return a data frame in which the nodes have been 'panelized' according to that attribute.
+\hh{XXX it don't quite understand what you mean by panelizing. Is that what you are describing below? ... then I would suggest to link to the two sentences using a phrase like `in the sense, that in the resulting data frame ...'}
+In that data frame, each node appears as many times as there are unique values to the edge attribute passed to \code{by}, which will cause the node to appear in all facets of the plot.
+
+Both the \code{arrow.gap} and the \code{by} argument are further illustrated in the remainder of this paper.
 
 % \hh{XXX For the above paragraph, are you talking about the package ggnetwork or the function ggnetwork? I was under the impression, that the ggnetwork package requires a data set with x, y, xend, yend, and, if labels are supposed to be shown, those, too. The function ggnetwork looks to me like a wrapper for network that produces a data set like just described from a network object. But that means that all of the information on colors or other aesthetics need to be part of that network object, which means that you are again, using the same tools as for ggnet2, i.e. this node and the edge operator. }
 % 
@@ -533,10 +542,12 @@ To make this visualization even more interesting and informative, we facet the n
 \caption{\label{tab:email_facet-ggnet2} ggnet2 code for the  email network facetted by day as shown in figure~\ref{fig:email_facet}. }
 <<email_facet_ggnet2, fig.height=4, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
 em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
-em.day <- lapply(unique(em.day$day), function(x) subset(em.day, day == x)[, 1:2 ])
+em.day <- lapply(unique(em.day$day), 
+                 function(x) subset(em.day, day == x)[, 1:2 ])
 em.day <- lapply(em.day, network, directed = TRUE)
 for (i in 1:length(em.day)) {
-  em.day[[ i ]] %v% "curr_empl_type" <- em.cet[ network.vertex.names(em.day[[ i ]]) ]
+  em.day[[ i ]] %v% "curr_empl_type" <- 
+    em.cet[ network.vertex.names(em.day[[ i ]]) ]
   em.day[[ i ]] %n% "day" <- unique(email$edges$day)[ i ]
 }
 
@@ -609,10 +620,11 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
 @
 \end{figure}
 
-\sct{XXX I am not a fan of this paragraph. Again, we should appear united.}
-\hh{Francois, I think this is the ggnetwork function again, right? I think it might be worthwhile to expand on the data management in the ggnetwork approach and include a MUCH more detailed discussion of what ggnetwork is really doing. That is your data step: you are pulling all of these things out of the network object, and `by' is the facetting command.}
+%\sct{XXX I am not a fan of this paragraph. Again, we should appear united.}
 
-The facetting technique employed by \code{ggnetwork} is close to that of \code{geom\_net}, except it happens internally to the function. Passing an edge attribute to the \code{by} argument will cause \code{ggnetwork} to return a data frame in which the nodes have been 'panelized' according to that attribute. In that data frame, each node appears as many times as there are unique values to the edge attribute passed to \code{by}, which will cause the node to appear in all facets of the plot. Furthermore, and unlike \hh{the default setting in} \code{geom\_net}, the same set of coordinates is assigned to all instances (i.e. to all rows) of the same node, which causes the position of each node to be identical in all facets of the plot. \hh{Note that using a parameter setting of \code{fiteach = FALSE} in \code{geom\_net} results in all panels sharing the same layout.}
+\hh{Note that the main difference in the visualizations stems from whether \emph{one} layout is used across all panels (as for the \code{ggnetwork} example) or whether individual layouts are fit to each of the subsets (as for the \code{ggnet2} and the \code{geom\_net} examples).  }
+% Furthermore, and unlike \hh{the default setting in} \code{geom\_net}, the same set of coordinates is assigned to all instances (i.e. to all rows) of the same node, which causes the position of each node to be identical in all facets of the plot. 
+\hh{In \code{geom\_net} this is controlled via the argument \code{fiteach}. By default  \code{fiteach = TRUE}, but \code{fiteach = FALSE} results in all panels sharing the same layout.}
 
 
 \begin{figure}[hbt]
@@ -733,7 +745,8 @@ ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
 ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
   geom_edges(color = "grey50") +
   geom_nodes(aes(colour = gender), size = 4) +
-  geom_nodetext(aes(colour = gender, label = vertex.names), size = 4, vjust = -0.6) +
+  geom_nodetext(aes(colour = gender, label = vertex.names), 
+                size = 4, vjust = -0.6) +
   scale_colour_manual(values = mm.col) +
   xlim(c(-0.05, 1.05)) +
   theme_blank() +
@@ -775,15 +788,17 @@ mm.dir %v% "gender" <- as.character(
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2\label{mm2:ggnet2}}
 <<madmen2_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
-# see fig.11 for data prep 
+# see fig.11 for data preparation 
 
-ggnet2(mm.dir, mode = "fruchtermanreingold", size = 3,
-       color = mm.col[ mm.dir %v% "gender" ],
-       label = TRUE,
-       label.color = mm.col[ mm.dir %v% "gender" ],
-       hjust = -0.1, legend.position = "bottom",
-       layout.exp = 0.15, arrow.size = 7.5,
-       arrow.gap = 0.02)
+ggnet2(
+  mm.dir, mode = "fruchtermanreingold", size = 3,
+  color = mm.col[ mm.dir %v% "gender" ],
+  label = TRUE,
+  label.color = mm.col[ mm.dir %v% "gender" ],
+  hjust = -0.1, legend.position = "bottom",
+  layout.exp = 0.15, arrow.size = 7.5,
+  arrow.gap = 0.02
+)
 @
 \end{subfigure}
 %
@@ -812,7 +827,7 @@ ggplot(data = MM2net,
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork \label{mm2:ggnetwork}}
 <<madmen2_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, dependson="madmen2_ggnet2">>=
-# see fig.11 for data prep 
+# see fig.11 for data preparation 
 
 ggplot(
   ggnetwork(mm.dir,
@@ -844,14 +859,22 @@ The network of football games is given in figure \ref{fig.cap:football}. Here, w
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}\vspace{-.5cm}
 <<football_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
-rownames(football$vertices) <- football$vertices$label
+rownames(football$vertices) <- 
+  football$vertices$label
 
-fb.net <- network(football$edges[, 1:2], directed = FALSE)
-set.edge.attribute(fb.net, "same.conf", football$edges$same.conf)
-fb.net %v% "conf" <- football$vertices[ network.vertex.names(fb.net), "value" ]
+fb.net <- network(football$edges[, 1:2], 
+                  directed = FALSE)
+set.edge.attribute(
+  fb.net, "same.conf", 
+  football$edges$same.conf)
+fb.net %v% "conf" <- 
+  football$vertices[ 
+    network.vertex.names(fb.net), "value" 
+    ]
 
 ggnet2(fb.net, mode = "fruchtermanreingold",
-       color = "conf", color.legend = "Conference", palette = "Paired",
+       color = "conf",  palette = "Paired",
+       color.legend = "Conference",
        edge.color = c("color", "grey75"))
 @
 \end{subfigure}
