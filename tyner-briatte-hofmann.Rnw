@@ -30,7 +30,7 @@ This paper explores three different techniques to visualize networks by building
 library(knitr)
 opts_chunk$set(
   tidy = FALSE, echo = FALSE, cache = FALSE, eval = TRUE,
-  message = FALSE, warning = FALSE, highlight = FALSE, background = '#DDDDDD',
+  message = FALSE, warning = FALSE, highlight = FALSE, background = '#FFFFFF',
   fig.height = 8, fig.width = 8, fig.align = 'center', fig.show = 'hide'
 )
 
@@ -1079,8 +1079,14 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 
 \section{Summary}
 
+\hh{XXX We need to come up with a discussion. Let's get started with with some bullet points:}
+\begin{enumerate}
+\item \hh{this is a personal comment, and we don't have to include it in the final summary: I think that this discussion between the three of us helped to make each one of the approaches better. 
+Partly, because we had some `Annie' thing going on (I can do anything you can do), e.g.\ the edge coloring in ggnet2 and ggnetwork really forced some discussion on how to best implement edge coloring in geom\_net, and which resulted  in the idea of the inside group/between group distinction.  It also seems that the whole geom idea spurred the ggnetwork approach in the first place ...
 
-This file is only a basic article template. For full details of \emph{The R Journal} style and information on how to prepare your article for submission, see the \href{http://journal.r-project.org/share/author-guide.pdf}{Instructions for Authors}.
+Partly, because trying to differentiate between the approaches helped to focus on what each approach is best at.}
+\end{enumerate}
+
 
 \bibliography{tyner-briatte-hofmann}
 
