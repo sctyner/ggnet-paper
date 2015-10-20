@@ -12,11 +12,12 @@ This paper explores three different techniques to visualize networks by building
 
 \begin{enumerate}
 \item Francois, could you add your affiliation at the end of the document?
-\item the code in some of the examples goes beyond the page margin - we need to fix that.
+%\item the code in some of the examples goes beyond the page margin - we need to fix that. %% Done HH
+\item Should we feature curves in one of the examples?
 \item a couple of the examples don't have all three solutions yet.
-\item for the protein example it would probably be enough to just show the code for all implementations, but only one of the resulting donut rings.
-\item there's still some inconsistencies with the formatting. Everything that is working code, and a s Francois pointed out, objects, functions, and arguments should be in the framework \code{working code}, everything that is a literal piece of text that should not be confused with regular text needs to go into the \samp{not regular text} environment.
-\item could we keep to the convention to use \code{CRANpkg} for the first mentioning of a package on CRAN (because it includes a hyperlink to CRAN) and \code{pkg} afterwards (same with the bioconductor package we have). Abstract and title doesn't count as first mentioning ...
+%\item for the protein example it would probably be enough to just show the code for all implementations, but only one of the resulting donut rings.
+%\item there's still some inconsistencies with the formatting. Everything that is working code, and a s Francois pointed out, objects, functions, and arguments should be in the framework \code{working code}, everything that is a literal piece of text that should not be confused with regular text needs to go into the \samp{not regular text} environment.
+\item could we keep to the convention to use \code{CRANpkg} for the first mentioning of a package on CRAN (because it includes a hyperlink to CRAN) and \code{pkg} afterwards (same with the bioconductor package we have). Abstract and title don't count as first mentioning ...
 \end{enumerate}}
 
 % \fb{Question re:formatting, the R Journal instruction s(and the sample articles I have reas from it) seem to use the 'code' TeX tag for ``objects, functions and arguments'' [1], as well as for classes (which should be quoted [1]). I have used that formatting in the two subsections I have worked on, ggnet2 and ggnetwork, in the 'Implementations' section.
@@ -1082,9 +1083,18 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 \hh{XXX We need to come up with a discussion. Let's get started with with some bullet points:}
 \begin{enumerate}
 \item \hh{this is a personal comment, and we don't have to include it in the final summary: I think that this discussion between the three of us helped to make each one of the approaches better. 
-Partly, because we had some `Annie' thing going on (I can do anything you can do), e.g.\ the edge coloring in ggnet2 and ggnetwork really forced some discussion on how to best implement edge coloring in geom\_net, and which resulted  in the idea of the inside group/between group distinction.  It also seems that the whole geom idea spurred the ggnetwork approach in the first place ...
+Partly, because we had some `Annie' thing going on (I can do anything you can do), e.g.\ the edge coloring in ggnet2 and ggnetwork really forced some discussion on how to best implement edge coloring in geom\_net, which resulted  in the idea of the inside group/between group distinction using the \code{group} attribute. From one of your earlier comments, it sounded like that the whole geom idea of geom\_net spurred the ggnetwork approach in the first place ... Other things that made it into each one of our approaches are the gaps for the arrows and the curves. 
+Another improvement that I see is that, trying to differentiate between the approaches helped to focus on what each approach is best at. 
+}
+\item \hh{Should we make recommendations as to what type of user would be happier with either one of the approaches?
+I would think that the users of ggnet2 and ggnetwork are pretty well-versed with networks, and are looking at ggplot2 for  high-quality visualizations that also covers their other visualization needs. Data management and attribute handling is done through network operators on nodes and edges. These users might actually be attracted to ggplot2 because of the additional features open to them.
 
-Partly, because trying to differentiate between the approaches helped to focus on what each approach is best at.}
+Out of these two approaches, ggnetwork is more flexible and allows, eg a re-ordering of layers to emphasize one over the other. On the flip side of the flexibility lies, of course, that the user has to specify every single part of the network.  
+
+The geom\_net approach does not require any knowledge of networks from the user, so the audience would be people who are already familiar with ggplot2 and some of the other `Hadley'-verse, who find themselves dealing with data with a network structure. Data management skills are basic, some familiarity with the split-apply-combine paradigm, for example in form of plyr or dplyr, would be good to make full use of the features.
+
+I would like to think that both approaches are valid and necessary.
+}
 \end{enumerate}
 
 
