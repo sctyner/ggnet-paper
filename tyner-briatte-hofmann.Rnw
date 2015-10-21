@@ -475,16 +475,6 @@ emailnet <- merge(
 
 ggplot(data = emailnet,
        aes(from_id = From, to_id = to)) +
-<<<<<<< HEAD
-  geom_net(aes(colour= CurrentEmploymentType,
-               group = CurrentEmploymentType,
-               linewidth = 2*(...samegroup../8+.125)),
-           ealpha = 0.2, size = 4, directed = TRUE,
-           arrowsize = 0.75) +
-  scale_colour_brewer("Employment Type",
-                      palette = "Set1") +
- theme_net() +
-=======
   geom_net(
     aes(colour = CurrentEmploymentType,
         group = CurrentEmploymentType,
@@ -493,7 +483,6 @@ ggplot(data = emailnet,
     directed = TRUE, arrowsize = 0.75) +
   scale_colour_brewer("Employment Type", palette = "Set1") +
   theme_net() +
->>>>>>> 7255722524e4a0177e2b7a2892cb559c5545c91e
   theme(legend.position = "bottom")
 @
 \end{subfigure}
