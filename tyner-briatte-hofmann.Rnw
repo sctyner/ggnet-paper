@@ -238,9 +238,6 @@ passed to the \code{ggnet2} function offers extensive control over the aesthetic
 the addition of edge and/or node labels and their respective aesthetics.
 Arguments such as \code{node.shape} or \code{edge.lty}, which  control the shape of the nodes and the linetype of the edges, respectively, can take either a global value, such as \samp{15} (for \code{node.shape}) or \samp{dashed} (for \code{edge.lty}), a vector of global values, or the name of an edge or vertex attribute, in which case the values of that attribute are used as the mapping aesthetic.
 
-\hh{XXX could you discuss in more detail, how these attributes get into the network object? I think the \%v\% and \%n\% are really cool, and deserve some discussion, even if they are part of the network package.  }
-\fb{Attempt to do so in paragraph below.}
-
 This last functionality builds on one of the strengths of the \pkg{network} class, which can store meta-information on network edges and nodes as attributes that are then accessible to the user through the \code{\%e\%} and \code{\%v\%} operators respectively.%
   %
   \footnote{See \citet[p.~22-24]{network}. The equivalent operators in the \pkg{igraph} package are called \code{E} and \code{V}.} %
@@ -253,23 +250,6 @@ The \code{ggnet2} function also provides a few network-specific options, such as
   \footnote{Bipartite (or 'two-mode') networks are networks with two different kinds of nodes and where all ties are formed between these two kinds. Affiliation networks, which represent the ties between individuals and the groups to which they belong, are examples of such networks (see \citealt[p.~53-54 and p.~123-127]{newman}).}%
   %
   As a result, the function combines two different kinds of processes: (i) it translates a network object into a data frame suitable for plotting with \pkg{ggplot2}, and (ii) it applies some network-related aesthetic operations to that data frame, such as coloring the edges in function of the color of the nodes that they connect.
-
-%%% \hh{XXX Thanks for answering most of my questions! }
-%%% you're welcome :)
-
-% \hh{the `some network-related operations' could use a bit more detail, I think. what kind of operations are you referring to? is it aesthetics as Sam suggests? Giving an example would help.}
-%
-% \fb{The paragraph cites three examples: sizing nodes as a function of their degree, using the mode of the nodes as an aesthetic, and coloring the edges based on nodal attribute similarity. And Sam is right, these are network-related \emph{aesthetic} operations, so I have kept her edit in place.}
-
-% \hh{XXX Francois, could you go into more detail here?
-% node aesthetics, edge aesthetics, what kind of networks work as input ... is it restricted to output from the network package? e.g. the expectation from the user is really to be able to deal with a network call.
-% How you work with the networks to get additional information in is also interesting - you could also discuss the edge and node operators that you use.
-% The output that is produced is a ggplot2 object, which means that additional ggplot2 layers can be added on top, and themes or other scaling methods can be used.
-% }
-
-% \fb{XXX Is that summary enough, or should I delve into the parameters and aesthetics? If I do, this is going to be a long paper, there are tons of arguments.}
-% \hh{XXX I know that there are a lot of arguments - they are not all similarly important, though. And there is a system ... maybe you could go into a few more parameters when you explain the system above?}
-% \fb{I have added some details on the system: see the node.shape and edge.lty paragraph.}
 
 
 \subsection{ggnet: geom\_net} % ================================================
@@ -326,10 +306,6 @@ Following that logic, the \pkg{ggnetwork} package adds four aliased geometries t
   \item \code{geom\_edgetext}, an alias to \code{geom\_label}.
 \end{itemize}
 
-\hh{XXX could you go a bit into the changes that you have made to each of the geoms? The main difference would be in the parameters that you allow for these geoms, right? geom\_edges obviously has to have a curvature argument to be able to decide between segments and curves. }
-
-\fb{Paragraph below now contains a few sentences to make these changes clear.}
-
 The four geoms are used to plot nodes, edges, node labels and edge labels, respectively. Two of the geoms that they alias, \code{geom\_curve} and \code{geom\_label}, are part of the new geometries introduced in \pkg{ggplot2} version 1.1.0. All four geoms behave exactly like those that they alias, and take exactly the same arguments. The only exception to that rule is the special case of \code{geom\_edges}, which accepts both the arguments of \code{geom\_segment} and those of \code{geom\_curve}; if its \code{curvature} argument is set to anything but \code{0} (the default), then \code{geom\_edges} behaves exactly like \code{geom\_curve}; otherwise, it behaves exactly like \code{geom\_segment}.
 
 Just like the \code{ggnet2} function, the \pkg{ggnetwork} package takes a single network object as input, which might again be an object of class \code{"network"} or some data structure coercible to that class, or an object of class \code{"igraph"} when the \pkg{intergraph} package is installed. This object is passed to the \code{data} argument of the \code{ggplot} function after being converted to a data frame by the `workhorse' function of the \pkg{ggnetwork} package, which is also called \code{ggnetwork}.
@@ -345,25 +321,19 @@ starts by computing the \code{x} and \code{y} coordinates of all nodes in the ne
 
 At that stage, the \code{ggnetwork} function performs a left-join of that `augmented' edge list with the vertex-level attributes of the sender nodes, and further adds one self-loop per node, in order to ensure that every node is plotted even when their degree is zero---that is, even if the node is not connected to any other node of the network, and is therefore absent from the edge list. The data frame created by this process contains one row per edge as well as one additional row per node, and features all edge-level and vertex-level attributes initially present in the network.%
   %
-  \footnote{One limitation of this process is that it requires some reserved variable names (\code{x}, \code{y}, \code{xend} and \code{yend}), which should not also be present as edge-level or vertex-level attributes (otherwise the function will simply break). Similarly, if an edge attribute and a vertex attribute have the same name, like \samp{"name"}, they will be renamed to \samp{name.x} (for the edge-level attribute) and \samp{name.y} (for the vertex-level attribute) by \code{ggnetwork}.} %
+  \footnote{One limitation of this process is that it requires some reserved variable names (\code{x}, \code{y}, \code{xend} and \code{yend}), which should not also be present as edge-level or vertex-level attributes (otherwise the function will simply break). Similarly, if an edge attribute and a vertex attribute have the same name, like  \samp{"na"}, \hh{the flag for missing nodes and edges which is introduced by the \pkg{network} package as an attribute in both the nodes and edges}, they will be renamed to \samp{na.x} (for the edge-level attribute) and \samp{na.y} (for the vertex-level attribute) by \code{ggnetwork}.} %
 
 %% \hh{XXX -- \samp{"na"} is an unfortunate choice of name - it is easily confused with \code{NA}. I hope you're OK with my renaming this to ``name". }
 %% FB: I'm fine with the renaming here, but I did not choose "na" by mistake: every object of class network carries a vertex attribute called 'na' and an edge attribute called 'na'. Both are used to flag missing (unobserved) data in network objects (see Butts' JSS article on the network package). Every data frame returned by ggnetwork therefore contains a column named na.x (indicating unobserved edges) and another one named na.y, indicating unobserved nodes.
+%% HH: so my hunch with missing values was right, I just didn't interpret it right - I reverted the column names to `na', but added more details.
 
 The \code{ggnetwork} function also accepts the arguments \code{arrow.gap} and \code{by}. \code{arrow.gap} slightly shortens the edges of directed networks in order to avoid overplotting edge arrows and nodes, whereas the argument \code{by} is meant for use with plot facets. Passing an edge attribute to the \code{by} argument will cause \code{ggnetwork} to return a data frame in which each node appears as many times as there are unique values to the edge attribute passed to \code{by}, using the same coordinates for all occurrences. If that same edge attribute is also passed to either \code{facet\_wrap} or \code{facet\_grid}, then each edge of the network will show in only one facet of the plot, while all nodes will appear in all facets at the same position, thus making the facets of the plot comparable to each other, and allowing the user to visualize edge formation as a function of a specific edge attribute (generally some kind of temporal attribute).
 
-\fb{Paragraph above re-written to explain what 'panelized' meant in previous write-up.}
+%\fb{Paragraph above re-written to explain what 'panelized' meant in previous write-up.}
 
 Both the \code{arrow.gap} and the \code{by} arguments are further illustrated in the remainder of this paper.
 
-% \hh{XXX For the above paragraph, are you talking about the package ggnetwork or the function ggnetwork? I was under the impression, that the ggnetwork package requires a data set with x, y, xend, yend, and, if labels are supposed to be shown, those, too. The function ggnetwork looks to me like a wrapper for network that produces a data set like just described from a network object. But that means that all of the information on colors or other aesthetics need to be part of that network object, which means that you are again, using the same tools as for ggnet2, i.e. this node and the edge operator. }
-%
-% \fb{The distinction should be clear now.}
-%
-% \sct{XXX This section could use some more detail about the arguments to the functions like the other two.  We should make sure that the readers of our paper can easily compare-contrast the 3 functionalities. Also, there has GOT to be another word we can use in addition to functionality. I'm getting tired of typing it! }
-%
-% \fb{I have added some details on how ggnetwork works.\\
-% Re: synonyms, 'capabilitie', 'features', 'options'?}
+
 
 % ==============================================================================
 %
