@@ -3,32 +3,20 @@
 \author{by Sam Tyner, Fran\c{c}ois Briatte and  Heike Hofmann}
 
 \maketitle
-\sct{ % I think I say ggplot2 too much!
 \abstract{
 This paper explores three different techniques to visualize networks by building on the `grammar of graphics' framework implemented in the \pkg{ggplot2} package. The goal of each technique is to provide the user with the ability to apply the flexibility of \pkg{ggplot2} to the visualization of network data, including through the mapping of network attributes to specific plot aesthetics. We will show that these additions contribute significantly to the study of networks by making visualization of networks intuitive in the \pkg{ggplot2} structure.
-}}
+}
 
 \hh{TODO list:
 
 \begin{enumerate}
-%% \item Francois, could you add your affiliation at the end of the document?
-%% FB: done
-%\item the code in some of the examples goes beyond the page margin - we need to fix that. %% Done HH
 \item Should we feature curves in one of the examples?\\
 \fb{I've used curves in the \texttt{email\_ggnetwork} example.}
 \item a couple of the examples don't have all three solutions yet.
-%\item for the protein example it would probably be enough to just show the code for all implementations, but only one of the resulting donut rings.
-%\item there's still some inconsistencies with the formatting. Everything that is working code, and a s Francois pointed out, objects, functions, and arguments should be in the framework \code{working code}, everything that is a literal piece of text that should not be confused with regular text needs to go into the \samp{not regular text} environment.
 \item could we keep to the convention to use \code{CRANpkg} for the first mentioning of a package on CRAN (because it includes a hyperlink to CRAN) and \code{pkg} afterwards (same with the bioconductor package we have). Abstract and title don't count as first mentioning ...\\
 \fb{Works for me.}
 \end{enumerate}}
 
-% \fb{Question re:formatting, the R Journal instruction s(and the sample articles I have reas from it) seem to use the 'code' TeX tag for ``objects, functions and arguments'' [1], as well as for classes (which should be quoted [1]). I have used that formatting in the two subsections I have worked on, ggnet2 and ggnetwork, in the 'Implementations' section.
-%
-% [1]: \url{https://journal.r-project.org/share/author-guide.pdf}
-%
-% \hh{thanks for pointing this out! I was working off an old set of guidelines, where the objects, functions, and arguments weren't spelled out so nicely! }
-%}
 
 <<setup_knitr, echo=FALSE>>=
 library(knitr)
@@ -111,8 +99,6 @@ codefig = list(codefig = TRUE, fig.show = "hide",
                tidy.opts = list(width.cutoff = partWidth)))
 @
 
-% \fb{\textbf{Code note:} the \texttt{load\_packages} code chunk does not seem to require loading \texttt{plyr}. The only use of it is internal to \texttt{StatNet}, so it should just be properly imported there. Loading both \texttt{plyr} and \texttt{dplyr} is best avoided when possible.}
-% HH I guess that was an old left-over
 
 <<load_packages, results='hide'>>=
 ## ggplot2
@@ -142,14 +128,6 @@ source("https://raw.githubusercontent.com/briatte/ggnet/master/ggnet2.R")
 @
 
 % introductory section
-
-% Network analysis is important in many fields
-
-%% -- noted
-% \fb{XXX How about turning the introduction upside down, starting with the fact that many R users have also taken the time to learn the grammar of graphics on top of the R language, and that the R community might therefore benefit from making additional data types amenable to manipulation through that grammar? Once the rationale is clear, move on to the application, which is networks for us.}
-% \hh{I'm not so sure that many R users actually even know what the grammar of graphics is, but I would agree that lots of people use ggplot2. Generally the first thing mentioned in a paper takes the central position -- for this paper, that's network visualizations. ggplot2 is the means we use, but that doesn't mean it should get spot number one. }
-
-%\hh{XXX include at least one citation for each one of the examples:}
 \par There are many kinds of networks, and networks are extensively studied across many disciplines \citep{watts2004ars}. Social network analysis is a longstanding and prominent subfield of sociology , and the study of biological networks, such as protein-protein interaction networks or metabolic networks, is a notable subfield of biology \citet{prell2011social, junker2008analysis}. Though these two disciplines and the many others that study networks are extremely different, they all benefit from good network visualization methods.
 
 % Visualization of networks helps with analysis
@@ -159,7 +137,6 @@ Coloring the vertices or edges in a graph is a quick way to visualize grouping a
 Many R packages already exist for network analysis and visualization such as \CRANpkg{igraph} by \citet{igraph}, \CRANpkg{sna} by \citet{sna}, and \CRANpkg{network} by \citet{network.jss, network}. Unfortunately, there is no standard format for network visualization across these packages, which requires detailed knowledge from users of each one of these packages in order to make meaningful changes to the network visualization. Customizing the colors, sizes, etc. of the vertices and edges of the network is done ``by hand'' and differently in each of these packages. For instance, the \pkg{igraph} package allows for coloring vertices by groups but the user has to assign the colors to each vertex individually as opposed to assigning color by a grouping factor variable.
 
 % ggplot2 as an implementation framework
-%We found the current tools to be lacking in this ability, so
 In this paper, our objective is to test the possibility to bring network plotting capabilities to the popular and widely used \CRANpkg{ggplot2} package \citep{ggplot2}. Designed as an implementation of the `grammar of graphics' proposed by \citet{wilkinson:1999}, the \pkg{ggplot2} package has become extremely popular among R users,%
   %
   \footnote{In order to give an indication of how massively large the user base of \pkg{ggplot2} is, we looked at its usage statistics from January 1, 2015 to October 10, 2015 (see \url{http://cran-logs.rstudio.com/}). Over that period, the \pkg{ggplot2} package was downloaded over 1.2 million times from CRAN, which amounts to over 4,000 downloads per day. The package has been downloaded at least once in 215 countries, and in 21 of those countries, including China, Israel, and Colombia, it has been downloaded over 10,000 times.} %
@@ -178,10 +155,9 @@ the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRA
 facilitating its extension through additional geometries (or \samp{geoms}).%
   %
   % this URL should be replaced with the CRAN one when ggplot2 1.1.0 gets there
-  \footnote{See \url{https://github.com/hadley/ggplot2/blob/master/NEWS.md} for the full list of changes in \pkg{ggplot2} 1.1.0, as well as the new package vignette, ``Extending ggplot2'', which explains how the internal \code{ggproto} system of object-oriented programming can be used to create new geoms.} %
+  % HH: I just replaced the URL with the CRAN one - as soon as version 1.1.0 comes out, it will point to the correct file
+  \footnote{See \url{https://cran.r-project.org/web/packages/ggplot2/NEWS} for the full list of changes in \pkg{ggplot2} 1.1.0, as well as the new package vignette, ``Extending ggplot2'', which explains how the internal \code{ggproto} system of object-oriented programming can be used to create new geoms.} %
   %
-
-%\fb{Not sure I understand 'Bioconductor plotting'.} - HH: I hope my changes clarify it.
 
 In the remainder of this paper, we present three different approaches to network visualization with \pkg{ggplot2}. Section~\ref{sec:background} introduces the basic terminology of networks and illustrates their ubiquity in natural and social life. Section~\ref{sec:implementations} then discusses the logic behind each of the three approaches that we offer. Section~\ref{sec:examples} extends that discussion through several examples ranging from simple to complex networks, for which we provide the code corresponding to each approach alongside its graphical result.
 
@@ -192,10 +168,6 @@ In the remainder of this paper, we present three different approaches to network
 %
 % ==============================================================================
 
-
-%%% \fb{How about having this block as a separate 'Background' section? Would allow readers familiar with networks to skip it and go directly to the implementations. I have read through the text and tried to make it simpler where possible.}
-%%% \hh{I'm fine with having a separate background section. }
-
 % getting into more of the nitty-gritty details
 At its core, a network is simply a set of points connected in pairs by a set of lines \citep{newman}. Here, we refer to the lines as edges (or ties) and to the points as nodes (or vertices), and we further restrict our discussion to one-mode networks, i.e. networks where all nodes are of the same kind and are able to connect to each other.
 
@@ -203,9 +175,9 @@ The two sets of graphical objects that make up a network (that is, points and se
 
 Networks vary widely in scope and complexity: the smallest network is simply an edge between two vertices, while one of the most commonly used and most complex networks, the world wide web, has billions of vertices (Web pages) and billions of edges (hyperlinks) connecting them. The edges in a network can  be directed or undirected: directed edges represent information travelling from one vertex to another, and switching the direction would change the structure of the network. The World Wide Web is an example of a directed network because hyperlinks connect one Web page to another, but not necessarily the other way around. Undirected edges are simply connections between vertices. Co-authorship networks are examples of undirected networks: nodes are authors connected by an edge if they have authored an academic publication together.
 
+
 A social network is a network that everyone is a part of in one way or another. We do not necessarily refer here to social media like Facebook or LinkedIn, but rather to the connections we form with other people. To demonstrate the functionality of our tools for plotting networks, we have chosen an example of a social network from the popular television show \emph{Mad Men}. This network, which was compiled by \citet{madmen}, is made up of 52 vertices and 87 edges. Each vertex represents a character on the show, and there is an edge between every two characters who have had a romantic relationship.
 
-Figure~\ref{fig.cap:madmen} shows this network. In the plot, we can see one central character who has many more relationships than any other character. This vertex represents the main character of the show, Don Draper, who is quite the ``ladies' man.''  This example shows just how ubiquitous networks are.
 
 \begin{figure}[hbtp]
 \centering
@@ -227,6 +199,9 @@ ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
 \caption{\label{fig.cap:madmen} Graph of the characters in the show Mad Men who are linked by a romantic relationship. }
 \end{figure}
 \afterpage{\clearpage}
+
+Figure~\ref{fig.cap:madmen} shows this network. In the plot, we can see one central character who has many more relationships than any other character. This vertex represents the main character of the show, Don Draper, who is quite the ``ladies' man.''  This example shows just how ubiquitous networks are.
+
 
 
 % ==============================================================================
@@ -403,7 +378,9 @@ So, for each of these examples, we are going to present the code necessary to pr
 \subsection{Blood Donation}
 In this directed network, there are eight vertices and 27 edges.  The vertices represent the eight different blood types in humans that are most important for donation: the ABO blood types A, B, AB, and O, combined with the RhD positive (+) and negative (-) types. The edges are directed: a person whose blood type is that of a \emph{from} vertex can to donate blood to a person whose blood type is that of a corresponding \emph{to} vertex.  In this example \hh{every vertex has a self-reference, }as blood between two people of matching ABO and RhD type can always be exchanged. This network is shown in Figure~\ref{fig.cap:blood}. The code to produce each one of these results is given in Figure~\ref{tab:blood}. \hh{The \code{geom\_node} approach shows these self-references as circles looping back to the vertex (this is controlled by using the parameter setting \code{selfies = TRUE}).}
 
-\fb{May I recommend renaming \code{selfies} to \code{loops}, which is what self-ties are called in the \pkg{network} package?}
+% \fb{May I recommend renaming \code{selfies} to \code{loops}, which is what self-ties are called in the \pkg{network} package?}
+% \hh{What bugs me about the word \code{loops} is, that it is a misdenomer - loops are paths through a graph that lead back to the starting point (which plays havoc with all kinds of theoretical results, such as convergence). Self-references are therefore loops, but not all loops are self-references. Besides, I would lie to think that it is pretty clear what is meant by selfies ... }
+
 
 \begin{figure}[hbtp]
 \caption{\label{tab:blood}Code for the three different approaches showing the blood donation network of figure~\ref{fig.cap:blood}.}
@@ -501,8 +478,8 @@ ggplot(data = emailnet,
   geom_net(
     aes(colour = CurrentEmploymentType,
         group = CurrentEmploymentType,
-        linewidth = 2*(...samegroup../8+.125)),
-    ealpha = 0.2, size = 4,
+        linewidth = 3*(...samegroup../8+.125)),
+    ealpha = 0.2, size = 4, curvature = 0.05,
     directed = TRUE, arrowsize = 0.75) +
   scale_colour_brewer("Employment Type", palette = "Set1") +
   theme_net() +
@@ -517,7 +494,7 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges(
     aes(color = curr_empl_type),
-    alpha = 0.25,
+    alpha = 0.25, 
     arrow = arrow(length = unit(5, "pt"),
                   type = "closed"),
     curvature = 0.05) +
@@ -539,10 +516,16 @@ This email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a 
 
 This network is plotted in figure \ref{fig.cap:email}.  There are six distinct clusters in this network which almost perfectly correspond to the six different types of employees in this company: administration, engineering, executive, facilities, information technology, and security.
 
-Additionally, the edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the value of the \code{ealpha} aesthetic: more emails between two employees lead to darker edges.  The value is set to 0.5 in this example, so that two or more emails between two employees result in a completely opaque edge. \hh{Additionally, edges between employees within the same employment type are colored in the same color as the corresponding nodes, while edges between employees from different types are plotted using a shade of grey. In almost all of the layouts, Security gets a central role in the email network of the company. Interestingly, one of the executives only communicates with a single person in Facilities. One of the IT personnel is also less connected to the rest of IT group and communicates more often with Security.} %This pattern of heavy communication between employees of the same type is fairly unsurprising.
+Note that edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the \code{alpha} value of the edge: more emails between two employees lead to darker edges.  %The value is set to 0.25 in this example, so that four or more emails between two employees result in a completely opaque edge. 
+Additionally, \hh{in the \code{geom\_net} layout,} edges between employees within the same employment type are colored in the same color as the corresponding nodes, while edges between employees from different types are plotted using a shade of grey. \hh{In the \code{ggnetwork} layout, edges are colored according to the sender's employment type.}
+\hh{Note that in these last two layouts \code{curvature} is set to 0.05, resulting in slightly curved edges. }
+
+\hh{In  all of the layouts, Security gets a central role in the email network of the company. Interestingly, one of the executives only communicates with a single person in Facilities. One of the IT personnel is also less connected to the rest of IT group and communicates more often with Security.} %This pattern of heavy communication between employees of the same type is fairly unsurprising.
 %SCT Let's not add things that make our cool visualizations sound less cool!
 
-To make this visualization even more interesting and informative, we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows the different email networks associated with each day of the week.
+To \hh{introduce a temporal aspect}
+%make this visualization even more interesting and informative
+, we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows email networks associated with each day of the week.
 
 \begin{figure}[hbtp]
 \caption{\label{tab:email_facet-ggnet2} ggnet2 code for the  email network facetted by day as shown in figure~\ref{fig:email_facet}. }
@@ -653,7 +636,8 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
 \end{figure}
 \afterpage{\clearpage}
 %
-This plot is shown in Figure~\ref{fig:email_facet}. With the facetting, we can see that there are several days where one or more departments do not communicate with any of the other departments. There are only two days, 13 and 15, without any isolated department communications. Facetting is one of the major benefits of creating a geometry for networks in \pkg{ggplot2}.  Facetting quickly separates dense networks into separate subnetworks for easy visual comparison and  analyses.
+Figure~\ref{fig:email_facet} shows the facetted network. Through the facetting it becomes obvious that there are several days where one or more of the departments does not communicate with any of the other departments. There are only two days, 13 and 15, without any isolated department communications. 
+Facetting is one of the major benefits of creating a geometry for networks in \pkg{ggplot2}.  Facetting allows us to quickly separate dense networks into smaller subnetworks for easy visual comparison and analyses.
 
 \subsection{\pkg{ggplot2} Theme Elements}
 This example comes from the \code{theme()} help page in the \pkg{ggplot2} documentation \citep{ggplot}.  It is a directed network which shows the structure of the inheritance of theme options in the construction of a \pkg{ggplot2} plot. There are 53 vertices and 36 edges in this network. Each vertex represents one possible theme option. There is an arrow from one theme option to another if the element represented by the \emph{to} vertex inherits its values from the \emph{from} vertex.  For example, the \code{axis.ticks.x} option inherits its value from the \code{axis.ticks} value, which in turn inherits its value from the \code{line} option.  Thus, setting the \code{line} option to a value such as \code{element\_blank()} sets the entire inheritance tree to \code{element\_blank()}, and no lines appear anywhere on the plot background. Finally, we note that the vertices with no edges were incorporated into the plot by adding their labels to the edges data frame in both the  \code{from\_id} and \code{to\_id} columns before passing the edges data frame to \code{ggplot}.
