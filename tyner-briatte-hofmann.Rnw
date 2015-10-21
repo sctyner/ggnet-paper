@@ -11,19 +11,22 @@ This paper explores three different techniques to visualize networks by building
 \hh{TODO list:
 
 \begin{enumerate}
-\item Francois, could you add your affiliation at the end of the document?
+%% \item Francois, could you add your affiliation at the end of the document?
+%% FB: done
 %\item the code in some of the examples goes beyond the page margin - we need to fix that. %% Done HH
-\item Should we feature curves in one of the examples?
+\item Should we feature curves in one of the examples?\\
+\fb{I've used curves in the \texttt{email\_ggnetwork} example.}
 \item a couple of the examples don't have all three solutions yet.
 %\item for the protein example it would probably be enough to just show the code for all implementations, but only one of the resulting donut rings.
 %\item there's still some inconsistencies with the formatting. Everything that is working code, and a s Francois pointed out, objects, functions, and arguments should be in the framework \code{working code}, everything that is a literal piece of text that should not be confused with regular text needs to go into the \samp{not regular text} environment.
-\item could we keep to the convention to use \code{CRANpkg} for the first mentioning of a package on CRAN (because it includes a hyperlink to CRAN) and \code{pkg} afterwards (same with the bioconductor package we have). Abstract and title don't count as first mentioning ...
+\item could we keep to the convention to use \code{CRANpkg} for the first mentioning of a package on CRAN (because it includes a hyperlink to CRAN) and \code{pkg} afterwards (same with the bioconductor package we have). Abstract and title don't count as first mentioning ...\\
+\fb{Works for me.}
 \end{enumerate}}
 
 % \fb{Question re:formatting, the R Journal instruction s(and the sample articles I have reas from it) seem to use the 'code' TeX tag for ``objects, functions and arguments'' [1], as well as for classes (which should be quoted [1]). I have used that formatting in the two subsections I have worked on, ggnet2 and ggnetwork, in the 'Implementations' section.
-% 
+%
 % [1]: \url{https://journal.r-project.org/share/author-guide.pdf}
-% 
+%
 % \hh{thanks for pointing this out! I was working off an old set of guidelines, where the objects, functions, and arguments weren't spelled out so nicely! }
 %}
 
@@ -167,7 +170,7 @@ In this paper, our objective is to test the possibility to bring network plottin
   %
   This is the audience we are aiming at by making network visualizations a part of \pkg{ggplot2}.
 
-Because the syntax that it implements is extendable to many different kinds of plots, the \pkg{ggplot2} package has inspired \hh{XXX too much inspiration XXX} many packages that build on it, including
+Because the syntax implemented in the \pkg{ggplot2} package is extendable to many different kinds of plots, many packages have built additional functionalities on top of it, including
 % \fb{Perhaps we could stress that one of the benefits of learning the
 %``grammar of graphics" is the opportunity to use that grammar in many
 %different situations, e.g. with}
@@ -190,11 +193,13 @@ In the remainder of this paper, we present three different approaches to network
 % ==============================================================================
 
 
-\fb{How about having this block as a separate 'Background' section? Would allow readers familiar with networks to skip it and go directly to the implementations. I have read through the text and tried to make it simpler where possible.}
-\hh{I'm fine with having a separate background section. }
+%%% \fb{How about having this block as a separate 'Background' section? Would allow readers familiar with networks to skip it and go directly to the implementations. I have read through the text and tried to make it simpler where possible.}
+%%% \hh{I'm fine with having a separate background section. }
 
 % getting into more of the nitty-gritty details
-At its core, a network is simply a set of points connected in pairs by a set of lines \citep{newman}. Here, we refer to the lines as edges (or ties) and the points as nodes (or vertices). These two seemingly simple sets of graphical objects, points and segments, are used to encode a huge variety and quantity of information across many fields of study. For instance, networks of scientific collaboration, a food web of marine animals, and American college football games are all covered in a paper on community detection in networks by \citet{football}.  \citet{networkfailures} examine node failure in interdependent networks like power grids.  Social networks, such as links between actors found on \url{http://www.imdb.com/}, and neural networks, like the completely mapped neural network of the \textit{C. elegans} worm are also extensively studied \citep{smallworld}.
+At its core, a network is simply a set of points connected in pairs by a set of lines \citep{newman}. Here, we refer to the lines as edges (or ties) and to the points as nodes (or vertices), and we further restrict our discussion to one-mode networks, i.e. networks where all nodes are of the same kind and are able to connect to each other.
+
+The two sets of graphical objects that make up a network (that is, points and segments between them) have been used to encode a huge variety and quantity of information across many different fields of study. For instance, networks of scientific collaboration, a food web of marine animals, and American college football games are all covered in a paper on community detection in networks by \citet{football}. \citet{networkfailures} examine node failure in interdependent networks like power grids.  Social networks, such as links between actors found on \url{http://www.imdb.com/}, and neural networks, like the completely mapped neural network of the \textit{C. elegans} worm are also extensively studied \citep{smallworld}.
 
 Networks vary widely in scope and complexity: the smallest network is simply an edge between two vertices, while one of the most commonly used and most complex networks, the world wide web, has billions of vertices (Web pages) and billions of edges (hyperlinks) connecting them. The edges in a network can  be directed or undirected: directed edges represent information travelling from one vertex to another, and switching the direction would change the structure of the network. The World Wide Web is an example of a directed network because hyperlinks connect one Web page to another, but not necessarily the other way around. Undirected edges are simply connections between vertices. Co-authorship networks are examples of undirected networks: nodes are authors connected by an edge if they have authored an academic publication together.
 
@@ -243,32 +248,29 @@ The \code{ggnet2} function is an improved version of the \code{ggnet} function, 
   %
   \footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnet/}.}%
 
-The \code{ggnet2} function %is the most 'encapsulated' of the three implementations presented in this paper, insofar as it
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-%SCT - I think we should stay away from superlatives ('most', 'best', etc.) when dicussing the three functionalities. It would be best for us to be a united force in front of the reviewers.
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-% FB - I'm fine with that, although I was trying to describe something about the
-% function (the fact that its syntax strays further away from ggplot2 than geom_net
-% or ggnetwork does).
-%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
-\hh{offers in a single function call a large range of network visualization functionality}.
-%% `as much as possible' ... I'm sure there's alwasy a bit more possible by adding yet another piece of functionality. let's avoid that phrase
-%tries to offer as much network visualization functionalities as possible in a single function call. 
-While the resulting object is a \pkg{ggplot2} object that can be further styled with \pkg{ggplot2} scales and themes, the syntax of the \code{ggnet2} function is \hh{designed to be} easily understood by the user:
+The \code{ggnet2} function offers a large range of network visualization functionalities in a single function call. Although its result is a \pkg{ggplot2} object that can be further styled with \pkg{ggplot2} scales and themes, the syntax of the \code{ggnet2} function is \hh{designed to be} easily understood by the user:
 %% sorry to be so picky, but I'd rather not take for granted what users understand.
 the aesthetics \hh{relating to} the nodes are controlled by arguments such as \code{node.alpha} or \code{node.color}, while those relating to the edges are controlled by %similarly named
-arguments starting with \samp{edge}. As a consequence,  \code{ggnet2} applies the grammar of graphics to network objects, but the function itself still works very much like the plotting functions of the \pkg{igraph} and \pkg{network} packages: a long series of arguments is used to control every possible aspect of how the network should be visualized.
+arguments starting with \samp{edge}. As a consequence, while \code{ggnet2} applies the grammar of graphics to network objects, the function itself still works very much like the plotting functions of the \pkg{igraph} and \pkg{network} packages: a long series of arguments is used to control every possible aspect of how the network should be visualized.
 
-The \code{ggnet2} function takes a single network object as input. This initial object might be an object of class \code{network} (with the exception of hypergraphs or multiplex graphs), or any data structure coercible to an object of that class, such as an incidence matrix, an adjacency matrix, or an edge list. Additionally, if the \CRANpkg{intergraph} package \citep{intergraph} is installed, the function  also accepts a network object of class \code{igraph}. Internally, the function  converts the network object to two data frames, one for edges and another one for nodes, and then passes them to \pkg{ggplot2} as arguments to segment and point geometries respectively.%
-  %
-  \footnote{The two data frames that \code{ggnet2} generates for edges and nodes contain the same information as those generated by \pkg{ggplot2} to plot segments and points respectively. \hh{XXX this is relevant information - could we include this in the actual text rather than a footnote? }}%
+The \code{ggnet2} function takes a single network object as input. This initial object might be an object of class \code{network} (with the exception of hypergraphs or multiplex graphs), or any data structure coercible to an object of that class, such as an incidence matrix, an adjacency matrix, or an edge list. Additionally, if the \CRANpkg{intergraph} package \citep{intergraph} is installed, the function  also accepts a network object of class \code{igraph}. Internally, the function  converts the network object to two data frames, one for edges and another one for nodes, and then passes them to \pkg{ggplot2}. Each of the two data frames contain the information required by \pkg{ggplot2} to plot segments and points respectively, such as a shape for the points (nodes) and a linetype for the segments (edges). The final result returned to the user is a plot with a minimum of two layers (or more, if there are edge and/or node labels).%
+
+\fb{Paragraph above now contains some information that were included in a footnote.}
 
 The %long
-list of arguments %that can be 
-passed to the \code{ggnet2} function offers extensive control over the aesthetics of the plot that it returns, including %through 
-the addition of edge and/or node labels and their respective aesthetics. 
+list of arguments %that can be
+passed to the \code{ggnet2} function offers extensive control over the aesthetics of the plot that it returns, including %through
+the addition of edge and/or node labels and their respective aesthetics.
 Arguments such as \code{node.shape} or \code{edge.lty}, which  control the shape of the nodes and the linetype of the edges, respectively, can take either a global value, such as \samp{15} (for \code{node.shape}) or \samp{dashed} (for \code{edge.lty}), a vector of global values, or the name of an edge or vertex attribute, in which case the values of that attribute are used as the mapping aesthetic.
+
 \hh{XXX could you discuss in more detail, how these attributes get into the network object? I think the \%v\% and \%n\% are really cool, and deserve some discussion, even if they are part of the network package.  }
+\fb{Attempt to do so in paragraph below.}
+
+This last functionality builds on one of the strengths of the \pkg{network} class, which can store meta-information on network edges and nodes as attributes that are then accessible to the user through the \code{\%e\%} and \code{\%v\%} operators respectively.%
+  %
+  \footnote{See \citet[p.~22-24]{network}. The equivalent operators in the \pkg{igraph} package are called \code{E} and \code{V}.} %
+  %
+  Just like \code{net \%v\% "importance"} will return the vertex attribute \samp{importance} of object \code{net} if that object is of class \code{"network"} and the attribute exists, if the \code{ggnet2} function is given the \code{node.alpha = "importance"} argument, it will interpret it as an attempt to map the vertex attribute called \samp{importance} to the transparency level of the nodes. The same result can be achieved by passing the more explicit argument \code{node.alpha = net \%v\% "importance"}. This functionality aims at making the \code{ggnet2} function work in similar fashion to how \pkg{ggplot2} maps aesthetics within the \code{aes} operator.
 
 The \code{ggnet2} function also provides a few network-specific options, such as sizing the nodes as a function of their (unweighted) degree, or using the primary and secondary modes of a bipartite network as an aesthetic mapping for the nodes.%
   %
@@ -277,10 +279,11 @@ The \code{ggnet2} function also provides a few network-specific options, such as
   %
   As a result, the function combines two different kinds of processes: (i) it translates a network object into a data frame suitable for plotting with \pkg{ggplot2}, and (ii) it applies some network-related aesthetic operations to that data frame, such as coloring the edges in function of the color of the nodes that they connect.
 
-\hh{XXX Thanks for answering most of my questions! }
+%%% \hh{XXX Thanks for answering most of my questions! }
+%%% you're welcome :)
 
 % \hh{the `some network-related operations' could use a bit more detail, I think. what kind of operations are you referring to? is it aesthetics as Sam suggests? Giving an example would help.}
-% 
+%
 % \fb{The paragraph cites three examples: sizing nodes as a function of their degree, using the mode of the nodes as an aesthetic, and coloring the edges based on nodal attribute similarity. And Sam is right, these are network-related \emph{aesthetic} operations, so I have kept her edit in place.}
 
 % \hh{XXX Francois, could you go into more detail here?
@@ -350,39 +353,40 @@ Following that logic, the \pkg{ggnetwork} package adds four aliased geometries t
 
 \hh{XXX could you go a bit into the changes that you have made to each of the geoms? The main difference would be in the parameters that you allow for these geoms, right? geom\_edges obviously has to have a curvature argument to be able to decide between segments and curves. }
 
-The four geoms are used to plot nodes, edges, node labels and edge labels, respectively. Two of the geoms that they alias, \code{geom\_curve} and \code{geom\_label}, are part of the new geometries introduced in \pkg{ggplot2} version 1.1.0.
+\fb{Paragraph below now contains a few sentences to make these changes clear.}
+
+The four geoms are used to plot nodes, edges, node labels and edge labels, respectively. Two of the geoms that they alias, \code{geom\_curve} and \code{geom\_label}, are part of the new geometries introduced in \pkg{ggplot2} version 1.1.0. All four geoms behave exactly like those that they alias, and take exactly the same arguments. The only exception to that rule is the special case of \code{geom\_edges}, which accepts both the arguments of \code{geom\_segment} and those of \code{geom\_curve}; if its \code{curvature} argument is set to anything but \code{0} (the default), then \code{geom\_edges} behaves exactly like \code{geom\_curve}; otherwise, it behaves exactly like \code{geom\_segment}.
 
 Just like the \code{ggnet2} function, the \pkg{ggnetwork} package takes a single network object as input, which might again be an object of class \code{"network"} or some data structure coercible to that class, or an object of class \code{"igraph"} when the \pkg{intergraph} package is installed. This object is passed to the \code{data} argument of the \code{ggplot} function after being converted to a data frame by the `workhorse' function of the \pkg{ggnetwork} package, which is also called \code{ggnetwork}.
 
 %% TODO: replace geom_net with name of package below
-Internally the \code{ggnetwork} function 
-%% uses the same technique as \code{geom\_net} to produce that data frame. 
+Internally the \code{ggnetwork} function
+%% uses the same technique as \code{geom\_net} to produce that data frame.
 %%
-%% HH: technically geom\_net doesn't do any of the data management - all of that  happens in stat\_net. 
+%% HH: technically geom\_net doesn't do any of the data management - all of that  happens in stat\_net.
 %%
-%It 
+%It
 starts by computing the \code{x} and \code{y} coordinates of all nodes in the network with respect to its \code{layout} argument, which defaults to the Fruchterman-Reingold layout algorithm. It then extracts the edge list of the network, to which it adds the coordinates of the sender and receiver nodes as well as all edge-level attributes. The result is a data frame with as many rows as there are edges in the network, and where the \code{x}, \code{y}, \code{xend} and \code{yend} hold the coordinates of the network edges.
 
 At that stage, the \code{ggnetwork} function performs a left-join of that `augmented' edge list with the vertex-level attributes of the sender nodes, and further adds one self-loop per node, in order to ensure that every node is plotted even when their degree is zero---that is, even if the node is not connected to any other node of the network, and is therefore absent from the edge list. The data frame created by this process contains one row per edge as well as one additional row per node, and features all edge-level and vertex-level attributes initially present in the network.%
   %
-  \footnote{One limitation of this process is that it requires some reserved variable names (\code{x}, \code{y}, \code{xend} and \code{yend}), which should not also be present as edge-level or vertex-level attributes (otherwise the function will simply break). Similarly, if an edge attribute and a vertex attribute have the same name, like \samp{"name"}, they will be renamed to \samp{"name.x"} (for the edge-level attribute) and \samp{"name.y"} (for the vertex-level attribute) by \code{ggnetwork}. \hh{XXX -- \samp{"na"} is an unfortunate choice of name - it is easily confused with \code{NA}. I hope you're OK with my renaming this to ``name". }} %
+  \footnote{One limitation of this process is that it requires some reserved variable names (\code{x}, \code{y}, \code{xend} and \code{yend}), which should not also be present as edge-level or vertex-level attributes (otherwise the function will simply break). Similarly, if an edge attribute and a vertex attribute have the same name, like \samp{"name"}, they will be renamed to \samp{name.x} (for the edge-level attribute) and \samp{name.y} (for the vertex-level attribute) by \code{ggnetwork}.} %
 
-The \code{ggnetwork} function also accepts the \hh{arguments} \code{arrow.gap} and  \code{by}. \code{arrow.gap} slightly shortens the edges of directed networks in order to avoid  overplotting of edge arrows and nodes. The argument \code{by} is meant for use with plot facets. 
-%% HH: just moved the paragraph here
-The facetting technique employed by \code{ggnetwork} 
-%is close to that of \code{geom\_net}, except it 
-happens internally to the function. Passing an edge attribute to the \code{by} argument will cause \code{ggnetwork} to return a data frame in which the nodes have been 'panelized' according to that attribute.
-\hh{XXX it don't quite understand what you mean by panelizing. Is that what you are describing below? ... then I would suggest to link to the two sentences using a phrase like `in the sense, that in the resulting data frame ...'}
-In that data frame, each node appears as many times as there are unique values to the edge attribute passed to \code{by}, which will cause the node to appear in all facets of the plot.
+%% \hh{XXX -- \samp{"na"} is an unfortunate choice of name - it is easily confused with \code{NA}. I hope you're OK with my renaming this to ``name". }
+%% FB: I'm fine with the renaming here, but I did not choose "na" by mistake: every object of class network carries a vertex attribute called 'na' and an edge attribute called 'na'. Both are used to flag missing (unobserved) data in network objects (see Butts' JSS article on the network package). Every data frame returned by ggnetwork therefore contains a column named na.x (indicating unobserved edges) and another one named na.y, indicating unobserved nodes.
 
-Both the \code{arrow.gap} and the \code{by} argument are further illustrated in the remainder of this paper.
+The \code{ggnetwork} function also accepts the arguments \code{arrow.gap} and \code{by}. \code{arrow.gap} slightly shortens the edges of directed networks in order to avoid overplotting edge arrows and nodes, whereas the argument \code{by} is meant for use with plot facets. Passing an edge attribute to the \code{by} argument will cause \code{ggnetwork} to return a data frame in which each node appears as many times as there are unique values to the edge attribute passed to \code{by}, using the same coordinates for all occurrences. If that same edge attribute is also passed to either \code{facet\_wrap} or \code{facet\_grid}, then each edge of the network will show in only one facet of the plot, while all nodes will appear in all facets at the same position, thus making the facets of the plot comparable to each other, and allowing the user to visualize edge formation as a function of a specific edge attribute (generally some kind of temporal attribute).
+
+\fb{Paragraph above re-written to explain what 'panelized' meant in previous write-up.}
+
+Both the \code{arrow.gap} and the \code{by} arguments are further illustrated in the remainder of this paper.
 
 % \hh{XXX For the above paragraph, are you talking about the package ggnetwork or the function ggnetwork? I was under the impression, that the ggnetwork package requires a data set with x, y, xend, yend, and, if labels are supposed to be shown, those, too. The function ggnetwork looks to me like a wrapper for network that produces a data set like just described from a network object. But that means that all of the information on colors or other aesthetics need to be part of that network object, which means that you are again, using the same tools as for ggnet2, i.e. this node and the edge operator. }
-% 
+%
 % \fb{The distinction should be clear now.}
-% 
+%
 % \sct{XXX This section could use some more detail about the arguments to the functions like the other two.  We should make sure that the readers of our paper can easily compare-contrast the 3 functionalities. Also, there has GOT to be another word we can use in addition to functionality. I'm getting tired of typing it! }
-% 
+%
 % \fb{I have added some details on how ggnetwork works.\\
 % Re: synonyms, 'capabilitie', 'features', 'options'?}
 
@@ -393,12 +397,13 @@ Both the \code{arrow.gap} and the \code{by} argument are further illustrated in 
 %
 % ==============================================================================
 
-
 In this section, we demonstrate the current capabilities of \code{ggnet2}, \code{geom\_net} and \code{ggnetwork} in a series of side by side examples. While the output is similar for each method of network visualization, the code and implementations differ across the three methods.
 So, for each of these examples, we are going to present the code necessary to produce the network, and discuss each application in detail.
 
 \subsection{Blood Donation}
 In this directed network, there are eight vertices and 27 edges.  The vertices represent the eight different blood types in humans that are most important for donation: the ABO blood types A, B, AB, and O, combined with the RhD positive (+) and negative (-) types. The edges are directed: a person whose blood type is that of a \emph{from} vertex can to donate blood to a person whose blood type is that of a corresponding \emph{to} vertex.  In this example \hh{every vertex has a self-reference, }as blood between two people of matching ABO and RhD type can always be exchanged. This network is shown in Figure~\ref{fig.cap:blood}. The code to produce each one of these results is given in Figure~\ref{tab:blood}. \hh{The \code{geom\_node} approach shows these self-references as circles looping back to the vertex (this is controlled by using the parameter setting \code{selfies = TRUE}).}
+
+\fb{May I recommend renaming \code{selfies} to \code{loops}, which is what self-ties are called in the \pkg{network} package?}
 
 \begin{figure}[hbtp]
 \caption{\label{tab:blood}Code for the three different approaches showing the blood donation network of figure~\ref{fig.cap:blood}.}
@@ -487,7 +492,7 @@ ggnet2(em.net, color = "curr_empl_type",
 \caption{geom\_net}
 <<email_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
 emailnet <- merge(
-  subset(email$edges, nrecipients < 54), 
+  subset(email$edges, nrecipients < 54),
   email$nodes,
   by.x="From", by.y="label", all=TRUE)
 
@@ -497,7 +502,7 @@ ggplot(data = emailnet,
     aes(colour = CurrentEmploymentType,
         group = CurrentEmploymentType,
         linewidth = 2*(...samegroup../8+.125)),
-    ealpha = 0.2, size = 4, 
+    ealpha = 0.2, size = 4,
     directed = TRUE, arrowsize = 0.75) +
   scale_colour_brewer("Employment Type", palette = "Set1") +
   theme_net() +
@@ -543,11 +548,11 @@ To make this visualization even more interesting and informative, we facet the n
 \caption{\label{tab:email_facet-ggnet2} ggnet2 code for the  email network facetted by day as shown in figure~\ref{fig:email_facet}. }
 <<email_facet_ggnet2, fig.height=4, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
 em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
-em.day <- lapply(unique(em.day$day), 
+em.day <- lapply(unique(em.day$day),
                  function(x) subset(em.day, day == x)[, 1:2 ])
 em.day <- lapply(em.day, network, directed = TRUE)
 for (i in 1:length(em.day)) {
-  em.day[[ i ]] %v% "curr_empl_type" <- 
+  em.day[[ i ]] %v% "curr_empl_type" <-
     em.cet[ network.vertex.names(em.day[[ i ]]) ]
   em.day[[ i ]] %n% "day" <- unique(email$edges$day)[ i ]
 }
@@ -624,7 +629,7 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
 %\sct{XXX I am not a fan of this paragraph. Again, we should appear united.}
 
 \hh{Note that the main difference in the visualizations stems from whether \emph{one} layout is used across all panels (as for the \code{ggnetwork} example) or whether individual layouts are fit to each of the subsets (as for the \code{ggnet2} and the \code{geom\_net} examples).  }
-% Furthermore, and unlike \hh{the default setting in} \code{geom\_net}, the same set of coordinates is assigned to all instances (i.e. to all rows) of the same node, which causes the position of each node to be identical in all facets of the plot. 
+% Furthermore, and unlike \hh{the default setting in} \code{geom\_net}, the same set of coordinates is assigned to all instances (i.e. to all rows) of the same node, which causes the position of each node to be identical in all facets of the plot.
 \hh{In \code{geom\_net} this is controlled via the argument \code{fiteach}. By default  \code{fiteach = TRUE}, but \code{fiteach = FALSE} results in all panels sharing the same layout.}
 
 
@@ -685,7 +690,7 @@ ggplot(data = TEnet,
   geom_net(
     aes(fontsize = degree), directed = TRUE,
     label = TRUE, vjust = -.5, size = 3,
-    ecolour = "grey70", arrowsize = 0.5, 
+    ecolour = "grey70", arrowsize = 0.5,
     linewidth = 0.5) +
   theme_net() +
   xlim(c(-0.05, 1.05))
@@ -746,7 +751,7 @@ ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
 ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
   geom_edges(color = "grey50") +
   geom_nodes(aes(colour = gender), size = 4) +
-  geom_nodetext(aes(colour = gender, label = vertex.names), 
+  geom_nodetext(aes(colour = gender, label = vertex.names),
                 size = 4, vjust = -0.6) +
   scale_colour_manual(values = mm.col) +
   xlim(c(-0.05, 1.05)) +
@@ -789,7 +794,7 @@ mm.dir %v% "gender" <- as.character(
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2\label{mm2:ggnet2}}
 <<madmen2_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
-# see fig.11 for data preparation 
+# see fig.11 for data preparation
 
 ggnet2(
   mm.dir, mode = "fruchtermanreingold", size = 3,
@@ -828,7 +833,7 @@ ggplot(data = MM2net,
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork \label{mm2:ggnetwork}}
 <<madmen2_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, dependson="madmen2_ggnet2">>=
-# see fig.11 for data preparation 
+# see fig.11 for data preparation
 
 ggplot(
   ggnetwork(mm.dir,
@@ -860,17 +865,17 @@ The network of football games is given in figure \ref{fig.cap:football}. Here, w
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}\vspace{-.5cm}
 <<football_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
-rownames(football$vertices) <- 
+rownames(football$vertices) <-
   football$vertices$label
 
-fb.net <- network(football$edges[, 1:2], 
+fb.net <- network(football$edges[, 1:2],
                   directed = FALSE)
 set.edge.attribute(
-  fb.net, "same.conf", 
+  fb.net, "same.conf",
   football$edges$same.conf)
-fb.net %v% "conf" <- 
-  football$vertices[ 
-    network.vertex.names(fb.net), "value" 
+fb.net %v% "conf" <-
+  football$vertices[
+    network.vertex.names(fb.net), "value"
     ]
 
 ggnet2(fb.net, mode = "fruchtermanreingold",
@@ -893,7 +898,7 @@ ftnet$schools <- ifelse(
   ftnet$value == "Independents", ftnet$from, "")
 
 # create data plot
-ggplot(data = ftnet, 
+ggplot(data = ftnet,
        aes(from_id = from, to_id = to)) +
   geom_net(
     aes(colour = value, group = value,
@@ -903,7 +908,7 @@ ggplot(data = ftnet,
     size = 5, vjust = -0.75, alpha = 0.3,
     layout = 'fruchtermanreingold') +
   theme_net() +
-  theme(legend.position = "bottom") + 
+  theme(legend.position = "bottom") +
   scale_colour_brewer("Conference", palette = "Paired")  +
   guides(linetype = FALSE)
 @
@@ -989,8 +994,7 @@ ggplot(data = ggnetwork(lesmis$edges[, 1:2 ], arrow.gap = 0),
 \end{figure}
 %
 \begin{figure}[hbtp]
-%\includegraphics[width=\textwidth]{figure/lesmis_ggnetwork-1.pdf}
-\hh{include ggnetwork example}
+\includegraphics[width=\textwidth]{figure/lesmis_ggnetwork-1.pdf}
 \caption{\label{fig.cap:lesmis:ggnetwork} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using ggnetwork.}
 \end{figure}
 %
@@ -1082,19 +1086,25 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 
 \hh{XXX We need to come up with a discussion. Let's get started with with some bullet points:}
 \begin{enumerate}
-\item \hh{this is a personal comment, and we don't have to include it in the final summary: I think that this discussion between the three of us helped to make each one of the approaches better. 
-Partly, because we had some `Annie' thing going on (I can do anything you can do), e.g.\ the edge coloring in ggnet2 and ggnetwork really forced some discussion on how to best implement edge coloring in geom\_net, which resulted  in the idea of the inside group/between group distinction using the \code{group} attribute. From one of your earlier comments, it sounded like that the whole geom idea of geom\_net spurred the ggnetwork approach in the first place ... Other things that made it into each one of our approaches are the gaps for the arrows and the curves. 
-Another improvement that I see is that, trying to differentiate between the approaches helped to focus on what each approach is best at. 
+\item \hh{this is a personal comment, and we don't have to include it in the final summary: I think that this discussion between the three of us helped to make each one of the approaches better.
+Partly, because we had some `Annie' thing going on (I can do anything you can do), e.g.\ the edge coloring in ggnet2 and ggnetwork really forced some discussion on how to best implement edge coloring in geom\_net, which resulted  in the idea of the inside group/between group distinction using the \code{group} attribute. From one of your earlier comments, it sounded like that the whole geom idea of geom\_net spurred the ggnetwork approach in the first place ... Other things that made it into each one of our approaches are the gaps for the arrows and the curves.
+Another improvement that I see is that, trying to differentiate between the approaches helped to focus on what each approach is best at.
 }
+
+\fb{I agree with the general observation here. And yes, ggnetwork was inspired by reading the code from geom\_net. I had never looked at the internals of ggplot2 before.}
+
 \item \hh{Should we make recommendations as to what type of user would be happier with either one of the approaches?
 I would think that the users of ggnet2 and ggnetwork are pretty well-versed with networks, and are looking at ggplot2 for  high-quality visualizations that also covers their other visualization needs. Data management and attribute handling is done through network operators on nodes and edges. These users might actually be attracted to ggplot2 because of the additional features open to them.
 
-Out of these two approaches, ggnetwork is more flexible and allows, eg a re-ordering of layers to emphasize one over the other. On the flip side of the flexibility lies, of course, that the user has to specify every single part of the network.  
+Out of these two approaches, ggnetwork is more flexible and allows, eg a re-ordering of layers to emphasize one over the other. On the flip side of the flexibility lies, of course, that the user has to specify every single part of the network.
 
 The geom\_net approach does not require any knowledge of networks from the user, so the audience would be people who are already familiar with ggplot2 and some of the other `Hadley'-verse, who find themselves dealing with data with a network structure. Data management skills are basic, some familiarity with the split-apply-combine paradigm, for example in form of plyr or dplyr, would be good to make full use of the features.
 
 I would like to think that both approaches are valid and necessary.
 }
+
+\fb{I don't have many ideas about the userbase of each function. All I know is that I get emails from time to time about ggnet and ggnet2. Some are from complete beginners (just got one this morning), others are much more advanced (e.g. Pedro Jordano, who helped me understand bipartite graphs). My guess is that all of them stumbled upon the function by googling for "network + ggplot2".}
+
 \end{enumerate}
 
 
@@ -1107,10 +1117,10 @@ I would like to think that both approaches are valid and necessary.
 \email{sctyner@mail.iastate.edu}
 
 \address{Fran\c{c}ois Briatte\\
-  Affiliation\\
-  Address\\
-  Country\\}
-\email{francois.briatte@sciencespo.fr}
+  European School of Political Sciences\\
+  Catholic University of Lille\\
+  France\\}
+\email{francois.briatte@univ-catholille.fr}
 
 \address{Heike Hofmann\\
   Department of Statistics and Statistical Laboratory\\
