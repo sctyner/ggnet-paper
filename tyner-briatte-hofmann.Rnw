@@ -969,8 +969,10 @@ ggplot(data = lesmisnet, aes(from_id = from, to_id = to,
   theme_net()
 @
 
-%% not sure I understand the aesth. mapping used above, so not using alpha below
+%% need this, otherwise "Floats lost" (TeX supports only a limited number of floats)
+\clearpage
 
+%% not sure I understand the aesth. mapping used above, so not using alpha below
 <<lesmis_ggnetwork, echo=TRUE, fig.width=9.5>>=
 # plot with ggnetwork
 ggplot(data = ggnetwork(lesmis$edges[, 1:2 ], arrow.gap = 0),
@@ -1041,6 +1043,16 @@ ggplot(aes(from_id = Start.station, to_id = End.station),  data = tripnet) +
 
 
 \subsection{Protein Interaction Network in Yeast}
+
+\fb{
+
+Should we stress the speed gain of using ggplot2 versus plot.network for instance? Below is the code to plot the same network with the network package: it takes around 4 seconds to draw. The same plot with ggnet2 takes (much) less than one second.
+
+\code{xy = gplot.layout.random(network(protein\$edges[, 1:2]), layout.par = list(dist = "uniang"))}\\
+\code{system.time(plot(network(protein\$edges[, 1:2]), coord = xy))}
+
+}
+
   This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, with a total of 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}. These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}.  We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices. Because all of the appraoches result in very similar figures, only one network is shown. The code for all three approaches is shown below:
 
 <<yeast_ggnet2, echo=TRUE, eval = FALSE, cache=FALSE>>=
