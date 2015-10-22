@@ -125,7 +125,7 @@ library(ggnetwork)
 @
 
 % introductory section
-\par There are many kinds of networks, and networks are extensively studied across many disciplines \citep{watts2004ars}. Social network analysis is a longstanding and prominent subfield of sociology , and the study of biological networks, such as protein-protein interaction networks or metabolic networks, is a notable subfield of biology \citet{prell2011social, junker2008analysis}. Though these two disciplines and the many others that study networks are extremely different, they all benefit from good network visualization methods.
+\par There are many kinds of networks, and networks are extensively studied across many disciplines \citep{watts2004ars}. Social network analysis is a longstanding and prominent subfield of sociology , and the study of biological networks, such as protein-protein interaction networks or metabolic networks, is a notable subfield of biology \citep{prell2011social, junker2008analysis}. Though these two disciplines and the many others that study networks are extremely different, they all benefit from good network visualization methods.
 
 % Visualization of networks helps with analysis
 Coloring the vertices or edges in a graph is a quick way to visualize grouping and can help with pattern or cluster detection. The vertices in a network and the edges between them compose the structure of a network, and being able to discover patterns among them visually is a key part of network analysis. Viewing multiple layouts of the same network can also help reveal patterns or clusters that would not be discovered when only viewing one layout or analyzing only its underlying adjacency matrix.
@@ -142,6 +142,9 @@ In this paper, our objective is to test the possibility to bring network plottin
   %
   \footnote{See \url{http://ggplot.yhathq.com/}.} %
   %
+\hh{XXX side note, but do you know about the port of ggplot2 to plotly? \url{https://plot.ly/ggplot2/} }  
+  
+  
   This is the audience we are aiming at by making network visualizations a part of \pkg{ggplot2}.
 
 Because the syntax implemented in the \pkg{ggplot2} package is extendable to many different kinds of plots, many packages have built additional functionalities on top of it, including
@@ -229,7 +232,7 @@ The \code{ggnet2} function takes a single network object as input. This initial 
 
 The \code{mode} argument of \code{ggnet2} controls how the nodes of the network are to be positioned in the plot returned by the function. This argument can take any of the layout values supported by the \code{gplot.layout} function of the \pkg{sna} package, and defaults to \samp{fruchtermanreingold}, which places the nodes through the Fruchterman-Reingold layout algorithm \citep{fruchterman_reingold}. See \code{?sna::gplot.layout} for the many other possible layouts and their parameters, which can also be passed \code{ggnet2} through the \code{layout.par} argument.
 
-\fb{Paragraph above now contains some information that were included in a footnote.}
+%\fb{Paragraph above now contains some information that were included in a footnote.}
 
 Other arguments passed to the \code{ggnet2} function offers extensive control over the aesthetics of the plot that it returns, including %through
 the addition of edge and/or node labels and their respective aesthetics.
@@ -251,9 +254,11 @@ The \code{ggnet2} function also provides a few network-specific options, such as
 
 \subsection{geomnet} % ================================================
 
-\subsubsection{Data structure}
+\subsubsection{Data Structure}
+\hh{XXX needs a gentler intro: geomnet is a package available at YYY implementing network visualization in a single ggplot2 layer. It consists of two main functions: geom\_net and stat\_net. All of the calculation (from edge list to layout) is done in stat\_net, the rendering happens in geom\_net. }
 
-Visualizing networks with a single layer as done in \code{geomnet} is similar to the implementation of other, native \pkg{ggplot2} geoms, such as, for example, \code{geom\_smooth}. When using \code{geom\_smooth}, the user does not need to know about any of the internals of the loess function, and similarly, when using \code{geomnet}, the user is not expected to know about the internals of the layout algorithm, but only needs to specify the essential elements necessary for calculating a layout. On the other hand, if users are comfortable with network analysis, the whole apparatus of layout methods provided by the \pkg{sna} package is available to them through the parameters \code{layout} and \code{layout.par}.
+%Visualizing networks with a single layer as done
+The approach taken in \code{geomnet} is similar to the implementation of other, native \pkg{ggplot2} geoms, such as, for example, \code{geom\_smooth}. When using \code{geom\_smooth}, the user does not need to know about any of the internals of the loess function, and similarly, when using \code{geomnet}, the user is not expected to know about the internals of the layout algorithm, but only needs to specify the essential elements necessary for calculating a layout. On the other hand, if users are comfortable with network analysis, the whole apparatus of layout methods provided by the \pkg{sna} package is available to them through the parameters \code{layout} and \code{layout.par}.
 %
 Network analysis is usally working with two sources of information: one data set consisting of a description of the actors, represented as the vertices in the network, and another data set detailing the relationship between these actors, the edge dataset. We assume the vertices are labelled using an `id' column and \hh{XXX the next sentence is not clear yet XXX how about: Edges are described as connection between vertices via their respective `id' labels in a `from' and a `to' column.} that the edges are described by the vertices they connect via a `from' column and a `to' column whose entries are the vertex `ids'. In order for this geometry to work, these two data sets need to be combined into a single data frame. For this, we are using the convention that all of the vertex information is merged into the edge data set using the `from' as the reference column \hh{in a full join operations:}. Generally, there will be some vertices that are sinks in the network because they only show up in the `to' column. We can easily accommodate for these by adding artificial edges in the data set that have missing information for the `to' column.
 
@@ -614,8 +619,13 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
 Figure~\ref{fig:email_facet} shows the facetted network. Through the facetting it becomes obvious that there are several days where one or more of the departments does not communicate with any of the other departments. There are only two days, 13 and 15, without any isolated department communications.
 Facetting is one of the major benefits of creating a geometry for networks in \pkg{ggplot2}.  Facetting allows us to quickly separate dense networks into smaller subnetworks for easy visual comparison and analyses.
 
+<<<<<<< HEAD
 \subsection{\pkg{ggplot2} theme elements}
 This example comes from the \code{theme()} help page in the \pkg{ggplot2} documentation \citep{ggplot2}.  It is a directed network which shows the structure of the inheritance of theme options in the construction of a \pkg{ggplot2} plot. There are 53 vertices and 36 edges in this network. Each vertex represents one possible theme option. There is an arrow from one theme option to another if the element represented by the \emph{to} vertex inherits its values from the \emph{from} vertex.  For example, the \code{axis.ticks.x} option inherits its value from the \code{axis.ticks} value, which in turn inherits its value from the \code{line} option.  Thus, setting the \code{line} option to a value such as \code{element\_blank()} sets the entire inheritance tree to \code{element\_blank()}, and no lines appear anywhere on the plot background. Finally, we note that the vertices with no edges were incorporated into the plot by adding their labels to the edges data frame in both the  \code{from\_id} and \code{to\_id} columns before passing the edges data frame to \code{ggplot}.
+=======
+\subsection{\pkg{ggplot2} Theme Elements}
+This example comes from the \code{theme()} help page in the \pkg{ggplot2} documentation \citep{ggplot2}.  It is a directed network which shows the structure of the inheritance of theme options in the construction of a \pkg{ggplot2} plot. There are 53 vertices and 36 edges in this network. Each vertex represents one possible theme option. There is an arrow from one theme option to another if the element represented by the \emph{to} vertex inherits its values from the \emph{from} vertex.  For example, the \code{axis.ticks.x} option inherits its value from the \code{axis.ticks} value, which in turn inherits its value from the \code{line} option.  Thus, setting the \code{line} option to a value such as \code{element\_blank()} sets the entire inheritance tree to \code{element\_blank()}, and no lines appear anywhere on the plot background. Finally, note that the vertices without edges were incorporated into the plot by adding their labels to the edges data frame in both the  \code{from\_id} and \code{to\_id} columns. %before passing the edges data frame to \code{ggplot}.
+>>>>>>> added the data
 
 \begin{figure}[hbtp]
 \begin{subfigure}[t]{\textwidth}
@@ -782,7 +792,8 @@ ggplot(data = MM2net,
     label = TRUE, ecolour = "grey50",
     linewidth = 0.5, size = 2.5, vjust = -.5,
     layout = "fruchtermanreingold") +
-  scale_colour_manual(values = mm.col) +
+  scale_colour_manual(
+    values = c("#ff69b4", "#0099ff")) +
   xlim(c(-0.1, 1.1)) +
    theme_net() +
   theme(legend.position = "bottom")
@@ -1140,7 +1151,7 @@ I would like to think that both approaches are valid and necessary.
 }
 
 \fb{I don't have many ideas about the userbase of each function. All I know is that I get emails from time to time about ggnet and ggnet2. Some are from complete beginners (just got one this morning), others are much more advanced (e.g. Pedro Jordano, who helped me understand bipartite graphs). My guess is that all of them stumbled upon the function by googling for "network + ggplot2".}
-
+\item{ \hh{internal calculation of the network versus external. Each call to geomnet results in a re-calculation of the network and, unless a seed is set, in a new layout. Once the network is calculated, subsequent calls to ggnet2 and ggnetwork are computationally more efficient.}}
 \end{enumerate}
 
 
