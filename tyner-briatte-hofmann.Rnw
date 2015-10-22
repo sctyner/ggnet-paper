@@ -993,7 +993,6 @@ ggplot(aes(from_id = Start.station, to_id = End.station),  data = tripnet) +
 
 
 \subsection{Protein Interaction Network in Yeast}
-
 \fb{
 
 Should we stress the speed gain of using ggplot2 versus plot.network for instance? Below is the code to plot the same network with the network package: it takes around 4 seconds to draw. The same plot with ggnet2 takes (much) less than one second.
@@ -1003,9 +1002,9 @@ Should we stress the speed gain of using ggplot2 versus plot.network for instanc
 
 }
 
-\hh{I like that idea! We would need to include the time for  the layout for a fair comparison though ...}
+\hh{XXX I like that idea! We would need to include the time for  the layout for a fair comparison though ...}
 
-  This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, with a total of 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}. These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}.  We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices. Because all of the appraoches result in very similar figures, only one network is shown. The code for all three approaches is shown below:
+This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, with a total of 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}. These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}.  We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices. Because all of the appraoches result in very similar figures, only one network is shown. The code for all three approaches is shown below:
 
 <<yeast_ggnet2, echo=TRUE, eval = FALSE, cache=FALSE>>=
 # plot with ggnet2
@@ -1040,11 +1039,19 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 \end{figure}
 \afterpage{\clearpage}
 
+
+\hh{Additionally, the \pkg{ggplot2} framework provides us with a considerable speed-up compared to the standard plotting routines that come with the \pkg{network} package. We executed the following code: 
+<<network-plot, echo=TRUE, eval = FALSE>>=
+xy = gplot.layout.random(network(protein$edges[, 1:2]), 
+                         layout.par = list(dist = "uniang"))
+plot(network(protein$edges[, 1:2]), coord = xy)
+@
+100 times and compared its run time to 100 runs each of the three visualisation approaches introduced in this paper. The results are shown in Figure~\ref{fig:timings}. The \pkg{ggplot2} framework provides a two to three-fold increase in speed on average.
+}
 \begin{figure}
 \centering
-<<compare, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 8, out.width = '0.5\\textwidth>>=
-# this code chunk will need to be moved eventually - just for trying things out right now.
-if (!file.exists("timings.csv")) {
+<<compare, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 8, out.width = '0.5\\textwidth'>>=
+if (!file.exists("data/timings.csv")) {
 network <- data.frame(t(replicate(100, {
 system.time({
   xy = gplot.layout.random(network(protein$edges[, 1:2]), 
@@ -1096,6 +1103,7 @@ qplot(data=timings, type, elapsed, geom="boxplot", fill = type, alpha = I(0.6)) 
   xlab("Visualisation Approach") + ylab("System time elapsed (in seconds)") + 
   ylim(c(0, 7.1)) + theme(legend.position = "none") + coord_flip()
 @
+\includegraphics[width=.5\textwidth]{figure/compare-1.pdf}
 \caption{\label{fig:timings} Comparison of the times needed for calculating and rendering the protein interaction network in the three \pkg{ggplot2} approaches (top three) and the standard plotting routine  of the \pkg{network} package based on 100 evaluations each.  }
 \end{figure}
 
