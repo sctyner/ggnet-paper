@@ -142,9 +142,10 @@ In this paper, our objective is to test the possibility to bring network plottin
   %
   \footnote{See \url{http://ggplot.yhathq.com/}.} %
   %
-\hh{XXX side note, but do you know about the port of ggplot2 to plotly? \url{https://plot.ly/ggplot2/} }  
-  
-  
+\hh{XXX side note, but do you know about the port of ggplot2 to plotly? \url{https://plot.ly/ggplot2/} }
+
+\fb{Nope, I had missed that one. Looks nice! Want to add it to the footnote?}
+
   This is the audience we are aiming at by making network visualizations a part of \pkg{ggplot2}.
 
 Because the syntax implemented in the \pkg{ggplot2} package is extendable to many different kinds of plots, many packages have built additional functionalities on top of it, including
@@ -315,11 +316,12 @@ Internally the \code{ggnetwork} function starts by computing the \code{x} and \c
 
 At that stage, the \code{ggnetwork} function performs a left-join of that `augmented' edge list with the vertex-level attributes of the sender nodes, and further adds one self-loop per node, in order to ensure that every node is plotted even when their degree is zero---that is, even if the node is not connected to any other node of the network, and is therefore absent from the edge list. The data frame created by this process contains one row per edge as well as one additional row per node, and features all edge-level and vertex-level attributes initially present in the network.%
   %
-  \footnote{One limitation of this process is that it requires some reserved variable names (\code{x}, \code{y}, \code{xend} and \code{yend}), which should not also be present as edge-level or vertex-level attributes (otherwise the function will simply break). Similarly, if an edge attribute and a vertex attribute have the same name, like  \samp{"na"}, \hh{the flag for missing nodes and edges which is introduced by the \pkg{network} package as an attribute in both the nodes and edges}, they will be renamed to \samp{na.x} (for the edge-level attribute) and \samp{na.y} (for the vertex-level attribute) by \code{ggnetwork}.} %
+  \footnote{One limitation of this process is that it requires some reserved variable names (\code{x}, \code{y}, \code{xend} and \code{yend}), which should not also be present as edge-level or vertex-level attributes (otherwise the function will simply break). Similarly, if an edge attribute and a vertex attribute have the same name, like  \samp{na}, \fb{which the \pkg{network} package defines as an attribute for both edges and vertices in order to flag missing data}, \code{ggnetwork} will rename them to \samp{na.x} (for the edge-level attribute) and \samp{na.y} (for the vertex-level attribute).} %
 
 %% \hh{XXX -- \samp{"na"} is an unfortunate choice of name - it is easily confused with \code{NA}. I hope you're OK with my renaming this to ``name". }
 %% FB: I'm fine with the renaming here, but I did not choose "na" by mistake: every object of class network carries a vertex attribute called 'na' and an edge attribute called 'na'. Both are used to flag missing (unobserved) data in network objects (see Butts' JSS article on the network package). Every data frame returned by ggnetwork therefore contains a column named na.x (indicating unobserved edges) and another one named na.y, indicating unobserved nodes.
 %% HH: so my hunch with missing values was right, I just didn't interpret it right - I reverted the column names to `na', but added more details.
+%% FB: thanks; reformulated.
 
 The \code{ggnetwork} function also accepts the arguments \code{arrow.gap} and \code{by}. \code{arrow.gap} slightly shortens the edges of directed networks in order to avoid overplotting edge arrows and nodes, whereas the argument \code{by} is meant for use with plot facets. Passing an edge attribute to the \code{by} argument will cause \code{ggnetwork} to return a data frame in which each node appears as many times as there are unique values to the edge attribute passed to \code{by}, using the same coordinates for all occurrences. If that same edge attribute is also passed to either \code{facet\_wrap} or \code{facet\_grid}, then each edge of the network will show in only one facet of the plot, while all nodes will appear in all facets at the same position, thus making the facets of the plot comparable to each other, and allowing the user to visualize edge formation as a function of a specific edge attribute (generally some kind of temporal attribute).
 
@@ -444,7 +446,7 @@ ggplot(data = emailnet,
     aes(colour = CurrentEmploymentType,
         group = CurrentEmploymentType,
         linewidth = 3*(...samegroup../8+.125)),
-    #ealpha = 0.2, 
+    #ealpha = 0.2,
     size = 4, curvature = 0.05,
     directed = TRUE, arrowsize = 0.75) +
   scale_colour_brewer("Employment Type", palette = "Set1") +
@@ -486,7 +488,7 @@ A comparison of the results of \pkg{ggnet}, \pkg{geomnet} and \pkg{ggnetwork} re
 \begin{itemize}
 
   \item %
-  In the \code{ggnet2} implementation, the darkness and thickness of the edges between employees in the same cluster are more pronounced than those of the edges between employees in different clusters. This is due to the fact that the email network does not feature edge weights: instead, every email between two employees is represented by a different edge, resulting in edge overplotting. Since the \code{edge.alpha} argument has been set to a value smaller than 1, multiple emails between two employees create darker, thicker edges between them. This effect is not visible in the layouts created by \code{geom\_net} and \code{ggnetwork} because both implementations draw a single segment between connected nodes, regardless of how many edges exist between them. \hh{XXX single segment - that's not quite right - from-to and to-from are distinguished as multiple instances.  XXX  }
+  In the \code{ggnet2} implementation, the darkness and thickness of the edges between employees in the same cluster are more pronounced than those of the edges between employees in different clusters. This is due to the fact that the email network does not feature edge weights: instead, every email between two employees is represented by a different edge, resulting in edge overplotting. Since the \code{edge.alpha} argument has been set to a value smaller than 1, multiple emails between two employees create darker, thicker edges between them. This effect is not visible in the layouts created by \code{geom\_net} and \code{ggnetwork} because both implementations draw a single segment \fb{for each directed edge}, regardless of how many of these edges exist in the network data. \hh{XXX single segment - that's not quite right - from-to and to-from are distinguished as multiple instances.} \fb{That's correct; reformulated.}
 
   %The value is set to 0.25 in this example, so that four or more emails between two employees result in a completely opaque edge. %% <- is that how overplotting alpha values work?
 
@@ -507,6 +509,7 @@ Last, it is interesting to observe that, in all of the layouts, the `Security' e
 
 \hh{XXX Francois, what are you trying to say with the previous comment? What edge weights do you think should be used? The number of emails between sender and receiver is considered in the layout calculation in stat\_net. It is only afterwards, that the data is reduced to unique edges between from and to. }
 
+\fb{Sorry for not being clear above, I'll try again. The email network should be weighted, but it is not: instead, some of its edges are duplicated. This structure probably affects the result of the K-K placement algorithm in a way that is different from how weights should affect the result of the algorithm, which understands weights as ``geometric distances'' (K-K paper, p. 14). The same problem likely affects the F-R algorithm (which has a `weights' argument in \pkg{igraph}), although I could not understand from the paper how the edge weights are supposed to be taken into account.}
 
 To \hh{introduce a temporal aspect}
 %make this visualization even more interesting and informative
@@ -1026,6 +1029,8 @@ Should we stress the speed gain of using ggplot2 versus plot.network for instanc
 }
 
 \hh{XXX I like that idea! We would need to include the time for  the layout for a fair comparison though ...}
+
+\fb{What could be a cool benchmark would be to generate random graphs of varying sizes, and then measure their plotting runtime with all functions + plot.network. I'm pretty sure the speed gain will grow faster than the size of the networks.}
 
 This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, with a total of 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}. These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}.  We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices. Because all of the appraoches result in very similar figures, only one network is shown. The code for all three approaches is shown below:
 
