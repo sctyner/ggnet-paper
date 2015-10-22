@@ -107,10 +107,10 @@ library(ggplot2) # needs to be version ≥ 1.0.1.9003
 library(dplyr)
 
 ## geom_net
-if (!require(ggnet, quietly = TRUE)) {
-  devtools::install_github("sctyner/ggnet")
+if (!require(geomnet, quietly = TRUE)) {
+  devtools::install_github("sctyner/geomnet")
 }
-library(ggnet)
+library(geomnet)
 ## TODO: FB: I would recommend renaming the repo to e.g. geomnet for clarity
 ## please see https://github.com/sctyner/ggnet-paper/issues/3 as well as TODO below
 
@@ -610,7 +610,7 @@ Figure~\ref{fig:email_facet} shows the facetted network. Through the facetting i
 Facetting is one of the major benefits of creating a geometry for networks in \pkg{ggplot2}.  Facetting allows us to quickly separate dense networks into smaller subnetworks for easy visual comparison and analyses.
 
 \subsection{\pkg{ggplot2} Theme Elements}
-This example comes from the \code{theme()} help page in the \pkg{ggplot2} documentation \citep{ggplot}.  It is a directed network which shows the structure of the inheritance of theme options in the construction of a \pkg{ggplot2} plot. There are 53 vertices and 36 edges in this network. Each vertex represents one possible theme option. There is an arrow from one theme option to another if the element represented by the \emph{to} vertex inherits its values from the \emph{from} vertex.  For example, the \code{axis.ticks.x} option inherits its value from the \code{axis.ticks} value, which in turn inherits its value from the \code{line} option.  Thus, setting the \code{line} option to a value such as \code{element\_blank()} sets the entire inheritance tree to \code{element\_blank()}, and no lines appear anywhere on the plot background. Finally, we note that the vertices with no edges were incorporated into the plot by adding their labels to the edges data frame in both the  \code{from\_id} and \code{to\_id} columns before passing the edges data frame to \code{ggplot}.
+This example comes from the \code{theme()} help page in the \pkg{ggplot2} documentation \citep{ggplot2}.  It is a directed network which shows the structure of the inheritance of theme options in the construction of a \pkg{ggplot2} plot. There are 53 vertices and 36 edges in this network. Each vertex represents one possible theme option. There is an arrow from one theme option to another if the element represented by the \emph{to} vertex inherits its values from the \emph{from} vertex.  For example, the \code{axis.ticks.x} option inherits its value from the \code{axis.ticks} value, which in turn inherits its value from the \code{line} option.  Thus, setting the \code{line} option to a value such as \code{element\_blank()} sets the entire inheritance tree to \code{element\_blank()}, and no lines appear anywhere on the plot background. Finally, we note that the vertices with no edges were incorporated into the plot by adding their labels to the edges data frame in both the  \code{from\_id} and \code{to\_id} columns before passing the edges data frame to \code{ggplot}.
 
 \begin{figure}[hbtp]
 \begin{subfigure}[t]{\textwidth}
