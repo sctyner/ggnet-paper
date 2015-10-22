@@ -248,14 +248,11 @@ The \code{ggnet2} function also provides a few network-specific options, such as
   As a result, the function combines two different kinds of processes: (i) it translates a network object into a data frame suitable for plotting with \pkg{ggplot2}, and (ii) it applies some network-related aesthetic operations to that data frame, such as coloring the edges in function of the color of the nodes that they connect.
 
 
-\subsection{ggnet: geom\_net} % ================================================
-
-%% FB: I believe it would be helpful to rename the geom_net repo into geomnet or
-%% something like that: see https://github.com/sctyner/ggnet-paper/issues/3
+\subsection{geomnet} % ================================================
 
 \subsubsection{Data Structure}
 
-Visualizing networks with a single layer as done in \code{geom\_net} is similar to the implementation of other, native \pkg{ggplot2} geoms, such as, for example, \code{geom\_smooth}. When using \code{geom\_smooth}, the user does not need to know about any of the internals of the loess function, and similarly, when using \code{geom\_net}, the user is not expected to know about the internals of the layout algorithm, but only needs to specify the essential elements necessary for calculating a layout. On the other hand, if users are comfortable with network analysis, the whole apparatus of layout methods provided by the \pkg{sna} package is available to them through the parameters \code{layout} and \code{layout.par}.
+Visualizing networks with a single layer as done in \code{geomnet} is similar to the implementation of other, native \pkg{ggplot2} geoms, such as, for example, \code{geom\_smooth}. When using \code{geom\_smooth}, the user does not need to know about any of the internals of the loess function, and similarly, when using \code{geomnet}, the user is not expected to know about the internals of the layout algorithm, but only needs to specify the essential elements necessary for calculating a layout. On the other hand, if users are comfortable with network analysis, the whole apparatus of layout methods provided by the \pkg{sna} package is available to them through the parameters \code{layout} and \code{layout.par}.
 %
 Network analysis is usally working with two sources of information: one data set consisting of a description of the actors, represented as the vertices in the network, and another data set detailing the relationship between these actors, the edge dataset. We assume the vertices are labelled using an `id' column and \hh{XXX the next sentence is not clear yet XXX how about: Edges are described as connection between vertices via their respective `id' labels in a `from' and a `to' column.} that the edges are described by the vertices they connect via a `from' column and a `to' column whose entries are the vertex `ids'. In order for this geometry to work, these two data sets need to be combined into a single data frame. For this, we are using the convention that all of the vertex information is merged into the edge data set using the `from' as the reference column \hh{in a full join operations:}. Generally, there will be some vertices that are sinks in the network because they only show up in the `to' column. We can easily accommodate for these by adding artificial edges in the data set that have missing information for the `to' column.
 Fortunately, R provides functionality that allows for an easy way of producing the required result: both \code{merge} and \code{join} can be used. In \code{merge} the parameter \code{all} needs to be set to \code{TRUE}, in \code{join}, the parameter setting has to be \code{type='full'}, and \code{all=TRUE}.
@@ -287,7 +284,7 @@ Note that the edge specific aesthetics that overwrite node aesthetics are curren
 
 \subsection{ggnetwork} % =======================================================
 
-\pkg{ggnetwork} is a small R package that mimicks the behaviour of \code{geom\_net} by defining several geoms to achieve similar results. The package can be installed from \url{https://github.com/briatte/ggnetwork} and is fully documented in the package vignette.%
+\pkg{ggnetwork} is a small R package that mimicks the behaviour of \code{geomnet} by defining several geoms to achieve similar results. The package can be installed from \url{https://github.com/briatte/ggnetwork} and is fully documented in the package vignette.%
   %
   \footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnetwork/}.}%
 
@@ -308,11 +305,6 @@ Just like the \code{ggnet2} function, the \pkg{ggnetwork} package takes a single
 
 %% TODO: replace geom_net with name of package below
 Internally the \code{ggnetwork} function
-%% uses the same technique as \code{geom\_net} to produce that data frame.
-%%
-%% HH: technically geom\_net doesn't do any of the data management - all of that  happens in stat\_net.
-%%
-%It
 starts by computing the \code{x} and \code{y} coordinates of all nodes in the network with respect to its \code{layout} argument, which defaults to the Fruchterman-Reingold layout algorithm. It then extracts the edge list of the network, to which it adds the coordinates of the sender and receiver nodes as well as all edge-level attributes. The result is a data frame with as many rows as there are edges in the network, and where the \code{x}, \code{y}, \code{xend} and \code{yend} hold the coordinates of the network edges.
 
 At that stage, the \code{ggnetwork} function performs a left-join of that `augmented' edge list with the vertex-level attributes of the sender nodes, and further adds one self-loop per node, in order to ensure that every node is plotted even when their degree is zero---that is, even if the node is not connected to any other node of the network, and is therefore absent from the edge list. The data frame created by this process contains one row per edge as well as one additional row per node, and features all edge-level and vertex-level attributes initially present in the network.%
@@ -338,7 +330,7 @@ Both the \code{arrow.gap} and the \code{by} arguments are further illustrated in
 %
 % ==============================================================================
 
-In this section, we demonstrate the current capabilities of \code{ggnet2}, \code{geom\_net} and \code{ggnetwork} in a series of side by side examples. While the output is similar for each method of network visualization, the code and implementations differ across the three methods.
+In this section, we demonstrate the current capabilities of \code{ggnet2}, \code{geomnet} and \code{ggnetwork} in a series of side by side examples. While the output is similar for each method of network visualization, the code and implementations differ across the three methods.
 So, for each of these examples, we are going to present the code necessary to produce the network, and discuss each application in detail.
 
 \subsection{Blood Donation}
@@ -391,7 +383,7 @@ ggplot(ggnetwork(network(blood$edges[, 1:2]),
 \includegraphics[width=\textwidth]{figure/blood_ggnet2-1.pdf}
 \end{subfigure}
 \begin{subfigure}[t]{.32\textwidth}
-\caption{geom\_net}
+\caption{geomnet}
 \includegraphics[width=\textwidth]{figure/blood_geom_net-1.pdf}
 \end{subfigure}
 \begin{subfigure}[t]{.32\textwidth}
@@ -432,7 +424,7 @@ ggnet2(em.net, color = "curr_empl_type",
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
-\caption{geom\_net}
+\caption{geomnet}
 <<email_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
 emailnet <- merge(
   subset(email$edges, nrecipients < 54),
@@ -483,7 +475,7 @@ This email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a 
 This network is plotted in figure \ref{fig.cap:email}.  There are six distinct clusters in this network which almost perfectly correspond to the six different types of employees in this company: administration, engineering, executive, facilities, information technology, and security.
 
 Note that edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the \code{alpha} value of the edge: more emails between two employees lead to darker edges.  %The value is set to 0.25 in this example, so that four or more emails between two employees result in a completely opaque edge.
-Additionally, \hh{in the \code{geom\_net} layout,} edges between employees within the same employment type are colored in the same color as the corresponding nodes, while edges between employees from different types are plotted using a shade of grey. \hh{In the \code{ggnetwork} layout, edges are colored according to the sender's employment type.}
+Additionally, \hh{in the \code{geomnet} layout,} edges between employees within the same employment type are colored in the same color as the corresponding nodes, while edges between employees from different types are plotted using a shade of grey. \hh{In the \code{ggnetwork} layout, edges are colored according to the sender's employment type.}
 \hh{Note that in these last two layouts \code{curvature} is set to 0.05, resulting in slightly curved edges. }
 
 \hh{In  all of the layouts, Security gets a central role in the email network of the company. Interestingly, one of the executives only communicates with a single person in Facilities. One of the IT personnel is also less connected to the rest of IT group and communicates more often with Security.} %This pattern of heavy communication between employees of the same type is fairly unsurprising.
@@ -519,7 +511,7 @@ gridExtra::grid.arrange(grobs = g, nrow = 2)
 \end{figure}
 
 \begin{figure}[hbtp]
-\caption{\label{tab:email_facet-geom_net} geom\_net code for the  email network facetted by day as shown in figure~\ref{fig:email_facet}. }
+\caption{\label{tab:email_facet-geom_net} geomnet code for the  email network facetted by day as shown in figure~\ref{fig:email_facet}. }
 <<email_facet_geom_net, fig.height=4.5, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
 # data step: making sure that there is one entry for each person on each day
 employee <- data.frame(expand.grid(label = unique(email$nodes$label),
@@ -577,9 +569,9 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
 
 %\sct{XXX I am not a fan of this paragraph. Again, we should appear united.}
 
-\hh{Note that the main difference in the visualizations stems from whether \emph{one} layout is used across all panels (as for the \code{ggnetwork} example) or whether individual layouts are fit to each of the subsets (as for the \code{ggnet2} and the \code{geom\_net} examples).  }
-% Furthermore, and unlike \hh{the default setting in} \code{geom\_net}, the same set of coordinates is assigned to all instances (i.e. to all rows) of the same node, which causes the position of each node to be identical in all facets of the plot.
-\hh{In \code{geom\_net} this is controlled via the argument \code{fiteach}. By default  \code{fiteach = TRUE}, but \code{fiteach = FALSE} results in all panels sharing the same layout.}
+\hh{Note that the main difference in the visualizations stems from whether \emph{one} layout is used across all panels (as for the \code{ggnetwork} example) or whether individual layouts are fit to each of the subsets (as for the \code{ggnet2} and the \code{geomnet} examples).  }
+% Furthermore, and unlike \hh{the default setting in} \code{geomnet}, the same set of coordinates is assigned to all instances (i.e. to all rows) of the same node, which causes the position of each node to be identical in all facets of the plot.
+\hh{In \code{geomnet} this is controlled via the argument \code{fiteach}. By default  \code{fiteach = TRUE}, but \code{fiteach = FALSE} results in all panels sharing the same layout.}
 
 
 \begin{figure}[hbt]
@@ -589,7 +581,7 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
-\caption{geom\_net}
+\caption{geomnet}
 \includegraphics[width=\textwidth]{figure/email_facet_geom_net-1.pdf}
 \end{subfigure}
 %
@@ -622,7 +614,7 @@ ggnet2(te.net, label = TRUE, color = "white",
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
-\caption{geom\_net}
+\caption{geomnet}
 <<theme_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE, fig.width=7, fig.height = 7>>=
 # data step: merge nodes and edges and
 # introduce a degree-out variable
@@ -759,7 +751,7 @@ ggnet2(
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
-\caption{geom\_net}
+\caption{geomnet}
 <<madmen2_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE>>=
 MM2net <- merge(
   mm.directed$edges,
@@ -836,7 +828,7 @@ ggnet2(fb.net, mode = "fruchtermanreingold",
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
-\caption{geom\_net}\vspace{-.5cm}
+\caption{geomnet}\vspace{-.5cm}
 <<football_geom_net, size="footnotesize", fig.height=10, opts.label="codefig", echo=TRUE>>=
 # data step: merge vertices and edges
 ftnet <- merge(
@@ -942,7 +934,7 @@ ggplot(data = ggnetwork(lesmis$edges[, 1:2 ], arrow.gap = 0),
 %
 \begin{figure}[hbtp]
 \includegraphics[width=\textwidth]{figure/lesmis_geom_net-1.pdf}
-\caption{\label{fig.cap:lesmis:ggnet} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using geom\_net.}
+\caption{\label{fig.cap:lesmis:ggnet} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using geomnet.}
 \end{figure}
 %
 \begin{figure}[hbtp]
@@ -1040,13 +1032,13 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 \afterpage{\clearpage}
 
 
-\hh{Additionally, the \pkg{ggplot2} framework provides us with a considerable speed-up compared to the standard plotting routines that come with the \pkg{network} package. We executed the following code: 
+\hh{Additionally, the \pkg{ggplot2} framework provides us with a considerable speed-up compared to the standard plotting routines that come with the \pkg{network} package. We executed the following code: }
 <<network-plot, echo=TRUE, eval = FALSE>>=
 xy = gplot.layout.random(network(protein$edges[, 1:2]), 
                          layout.par = list(dist = "uniang"))
 plot(network(protein$edges[, 1:2]), coord = xy)
 @
-100 times and compared its run time to 100 runs each of the three visualisation approaches introduced in this paper. The results are shown in Figure~\ref{fig:timings}. The \pkg{ggplot2} framework provides a two to three-fold increase in speed on average.
+\hh{100 times and compared its run time to 100 runs each of the three visualisation approaches introduced in this paper. The results are shown in Figure~\ref{fig:timings}. The \pkg{ggplot2} framework provides a two to three-fold increase in speed on average.
 }
 \begin{figure}
 \centering
@@ -1112,18 +1104,18 @@ qplot(data=timings, type, elapsed, geom="boxplot", fill = type, alpha = I(0.6)) 
 \hh{XXX We need to come up with a discussion. Let's get started with with some bullet points:}
 \begin{enumerate}
 \item \hh{this is a personal comment, and we don't have to include it in the final summary: I think that this discussion between the three of us helped to make each one of the approaches better.
-Partly, because we had some `Annie' thing going on (I can do anything you can do), e.g.\ the edge coloring in ggnet2 and ggnetwork really forced some discussion on how to best implement edge coloring in geom\_net, which resulted  in the idea of the inside group/between group distinction using the \code{group} attribute. From one of your earlier comments, it sounded like that the whole geom idea of geom\_net spurred the ggnetwork approach in the first place ... Other things that made it into each one of our approaches are the gaps for the arrows and the curves.
+Partly, because we had some `Annie' thing going on (I can do anything you can do), e.g.\ the edge coloring in ggnet2 and ggnetwork really forced some discussion on how to best implement edge coloring in geomnet, which resulted  in the idea of the inside group/between group distinction using the \code{group} attribute. From one of your earlier comments, it sounded like that the whole geom idea of geomnet spurred the ggnetwork approach in the first place ... Other things that made it into each one of our approaches are the gaps for the arrows and the curves.
 Another improvement that I see is that, trying to differentiate between the approaches helped to focus on what each approach is best at.
 }
 
-\fb{I agree with the general observation here. And yes, ggnetwork was inspired by reading the code from geom\_net. I had never looked at the internals of ggplot2 before.}
+\fb{I agree with the general observation here. And yes, ggnetwork was inspired by reading the code from geomnet. I had never looked at the internals of ggplot2 before.}
 
 \item \hh{Should we make recommendations as to what type of user would be happier with either one of the approaches?
 I would think that the users of ggnet2 and ggnetwork are pretty well-versed with networks, and are looking at ggplot2 for  high-quality visualizations that also covers their other visualization needs. Data management and attribute handling is done through network operators on nodes and edges. These users might actually be attracted to ggplot2 because of the additional features open to them.
 
 Out of these two approaches, ggnetwork is more flexible and allows, eg a re-ordering of layers to emphasize one over the other. On the flip side of the flexibility lies, of course, that the user has to specify every single part of the network.
 
-The geom\_net approach does not require any knowledge of networks from the user, so the audience would be people who are already familiar with ggplot2 and some of the other `Hadley'-verse, who find themselves dealing with data with a network structure. Data management skills are basic, some familiarity with the split-apply-combine paradigm, for example in form of plyr or dplyr, would be good to make full use of the features.
+The geomnet approach does not require any knowledge of networks from the user, so the audience would be people who are already familiar with ggplot2 and some of the other `Hadley'-verse, who find themselves dealing with data with a network structure. Data management skills are basic, some familiarity with the split-apply-combine paradigm, for example in form of plyr or dplyr, would be good to make full use of the features.
 
 I would like to think that both approaches are valid and necessary.
 }
