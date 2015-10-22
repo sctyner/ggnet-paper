@@ -101,30 +101,26 @@ codefig = list(codefig = TRUE, fig.show = "hide",
 
 
 <<load_packages, results='hide'>>=
-## ggplot2
-library(ggplot2) # needs to be version ≥ 1.0.1.9003
-## dplyr
 library(dplyr)
+library(ggplot2) # needs to be version ≥ 1.0.1.9003
+
+## ggnet2
+if (!require(ggnet, quietly = TRUE)) {
+  devtools::install_github("briatte/ggnet")
+}
+library(ggnet)
 
 ## geom_net
 if (!require(geomnet, quietly = TRUE)) {
   devtools::install_github("sctyner/geomnet")
 }
 library(geomnet)
-## TODO: FB: I would recommend renaming the repo to e.g. geomnet for clarity
-## please see https://github.com/sctyner/ggnet-paper/issues/3 as well as TODO below
 
 ## ggnetwork
 if (!require(ggnetwork, quietly = TRUE)) {
   devtools::install_github("briatte/ggnetwork")
 }
 library(ggnetwork)
-
-## ggnet2
-source("https://raw.githubusercontent.com/briatte/ggnet/master/ggnet2.R")
-## TODO: should be a lightweight package... any chance geom_net could come
-## in a package called geomnet or something like that, so that I can use
-## the name ggnet to package ggnet and ggnet2?
 @
 
 % introductory section
@@ -464,7 +460,7 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges(
     aes(color = curr_empl_type),
-    alpha = 0.25, 
+    alpha = 0.25,
     arrow = arrow(length = unit(5, "pt"),
                   type = "closed"),
     curvature = 0.05) +
@@ -486,7 +482,7 @@ This email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a 
 
 This network is plotted in figure \ref{fig.cap:email}.  There are six distinct clusters in this network which almost perfectly correspond to the six different types of employees in this company: administration, engineering, executive, facilities, information technology, and security.
 
-Note that edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the \code{alpha} value of the edge: more emails between two employees lead to darker edges.  %The value is set to 0.25 in this example, so that four or more emails between two employees result in a completely opaque edge. 
+Note that edges between employees in the same cluster are  darker than edges between employees in different clusters. This is due to the \code{alpha} value of the edge: more emails between two employees lead to darker edges.  %The value is set to 0.25 in this example, so that four or more emails between two employees result in a completely opaque edge.
 Additionally, \hh{in the \code{geom\_net} layout,} edges between employees within the same employment type are colored in the same color as the corresponding nodes, while edges between employees from different types are plotted using a shade of grey. \hh{In the \code{ggnetwork} layout, edges are colored according to the sender's employment type.}
 \hh{Note that in these last two layouts \code{curvature} is set to 0.05, resulting in slightly curved edges. }
 
@@ -606,7 +602,7 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
 \end{figure}
 \afterpage{\clearpage}
 %
-Figure~\ref{fig:email_facet} shows the facetted network. Through the facetting it becomes obvious that there are several days where one or more of the departments does not communicate with any of the other departments. There are only two days, 13 and 15, without any isolated department communications. 
+Figure~\ref{fig:email_facet} shows the facetted network. Through the facetting it becomes obvious that there are several days where one or more of the departments does not communicate with any of the other departments. There are only two days, 13 and 15, without any isolated department communications.
 Facetting is one of the major benefits of creating a geometry for networks in \pkg{ggplot2}.  Facetting allows us to quickly separate dense networks into smaller subnetworks for easy visual comparison and analyses.
 
 \subsection{\pkg{ggplot2} Theme Elements}
