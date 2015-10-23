@@ -445,7 +445,7 @@ ggplot(data = emailnet,
         linewidth = 3*(...samegroup../8+.125)),
     ealpha = 0.25,
     size = 4, curvature = 0.05,
-    directed = TRUE, arrowsize = 0.75) +
+    directed = TRUE, arrowsize = 0.5) +
   scale_colour_brewer("Employment Type", palette = "Set1") +
   theme_net() +
   theme(legend.position = "bottom")
@@ -474,13 +474,18 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02),
 
 \caption{\label{fig.cap:email} Email network within a company over a two week period.}
 \end{figure}
-%\afterpage{\clearpage}
+\afterpage{\clearpage}
 
 The email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a directed network of emails between company employees with 55 vertices and 9,063 edges. Each vertex represents an employee of the company, and each edge stands for an email sent from one employee to one or more other employees. The arrow of the directed edge points to the recipient(s) of the email. The network contains two business weeks of emails across the entire company. In order to better visualize the structure of the communication network between employees, emails that were sent out to all employees are removed.
 
+% let's have all of the interpretation in a single place to simplify the flow 
 This network is plotted in Figure~\ref{fig.cap:email}. There are six distinct clusters in this network which almost perfectly correspond to the six different types of employees in this company: administration, engineering, executive, facilities, information technology, and security.
 
-A comparison of the results of \pkg{ggnet}, \pkg{geomnet} and \pkg{ggnetwork} reveals some of the subtle differences that exist between the implementations:
+%% HH: this is not necessarily true anymore, when taking the number of emails exchanged into account
+It is interesting to observe that, in all of the layouts, the `Security' employee group plays a central role in the email network of the company. This observation holds regardless of the actual network layout used (remember that \code{ggnet2} and \code{ggnetwork} default to the Fruchterman-Reingold algorithm, while \code{geomnet} defaults to the Kamada-Kawai algorithm; both layouts are force-directed, but proceed differently to assign coordinates to the nodes). 
+We also see that one of the executives only communicates with a single person in Facilities, while one of the IT employees frequently communicates with a Security employee.
+
+A comparison of the results of \pkg{ggnet}, \pkg{geomnet} and \pkg{ggnetwork} reveals some of the (subtle) differences that exist between the implementations:
 
 \begin{itemize}
 
@@ -497,22 +502,43 @@ A comparison of the results of \pkg{ggnet}, \pkg{geomnet} and \pkg{ggnetwork} re
 
 \end{itemize}
 
-It is interesting to observe that, in all of the layouts, the `Security' employee group plays a central role in the email network of the company. This observation holds regardless of the actual network layout used (remember that \code{ggnet2} and \code{ggnetwork} default to the Fruchterman-Reingold algorithm, while \code{geomnet} defaults to the Kamada-Kawai algorithm; both layouts are force-directed, but proceed differently to assign coordinates to the nodes). We also see that one of the executives only communicates with a single person in Facilities, while one of the IT employees frequently communicates with a Security employee.
-
-\fb{Note that we are fitting node placement algorithms that support edge weights (at least for K-K, and at least in their \pkg{igraph} implementations) to a network that should be weighted, but that is not.}
-
-\hh{XXX Francois, what are you trying to say with the previous comment? What edge weights do you think should be used? The number of emails between sender and receiver is considered in the layout calculation in stat\_net. It is only afterwards, that the data is reduced to unique edges between from and to. }
-
-\fb{Sorry for not being clear above, I'll try again. The email network should be weighted, but it is not: instead, some of its edges are duplicated. This structure probably affects the result of the K-K placement algorithm in a way that is different from how weights should affect the result of the algorithm, which understands weights as ``geometric distances'' (K-K paper, p. 14). The same problem likely affects the F-R algorithm (which has a `weights' argument in \pkg{igraph}), although I could not understand from the paper how the edge weights are supposed to be taken into account.}
 
 
-To \hh{introduce a temporal aspect}
-%make this visualization even more interesting and informative
-, we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows email networks associated with each day of the week.
+% \fb{Note that we are fitting node placement algorithms that support edge weights (at least for K-K, and at least in their \pkg{igraph} implementations) to a network that should be weighted, but that is not.}
+% 
+% \hh{XXX Francois, what are you trying to say with the previous comment? What edge weights do you think should be used? The number of emails between sender and receiver is considered in the layout calculation in stat\_net. It is only afterwards, that the data is reduced to unique edges between from and to. }
+% 
+ \fb{Sorry for not being clear above, I'll try again. The email network should be weighted, but it is not: instead, some of its edges are duplicated. This structure probably affects the result of the K-K placement algorithm in a way that is different from how weights should affect the result of the algorithm, which understands weights as ``geometric distances'' (K-K paper, p. 14). The same problem likely affects the F-R algorithm (which has a `weights' argument in \pkg{igraph}), although I could not understand from the paper how the edge weights are supposed to be taken into account.}
+% 
 
-\begin{figure}[hbtp]
-\caption{\label{tab:email_facet-ggnet2} ggnet2 code for the  email network facetted by day as shown in figure~\ref{fig:email_facet}. }
-<<email_facet_ggnet2, fig.height=4, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
+\hh{OK, point taken - and actually fixed. I was under the impression that the edgelist routine in the network package dealt with multiplicities in a smarter way. Thank you - see point 1 in the intro :)}
+
+To introduce a temporal aspect
+ we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows email networks associated with each day of the week. The code for these visualization is below:
+
+\begin{figure}[hbt]
+\begin{subfigure}[t]{\textwidth}
+\caption{ggnet2}\label{email:ggnet2}
+\includegraphics[width=\textwidth]{figure/email_facet_ggnet2-1.pdf}
+\end{subfigure}
+%
+\begin{subfigure}[t]{\textwidth}
+\caption{geomnet}
+\includegraphics[width=\textwidth]{figure/email_facet_geom_net-1.pdf}
+\end{subfigure}
+%
+\begin{subfigure}[t]{\textwidth}
+\caption{ggnetwork}
+\includegraphics[width=\textwidth]{figure/email_facet_ggnetwork-1.pdf}
+\end{subfigure}
+
+\caption{\label{fig:email_facet} The same email network as in figure~\ref{fig.cap:email} facetted by day of the week.}
+\end{figure}
+\afterpage{\clearpage}
+<<email_facet_ggnet2, echo=TRUE>>=
+# ggnet2 code for the email network facetted by day as shown in fig.4a
+
+# data preparation 
 em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
 em.day <- lapply(unique(em.day$day),
                  function(x) subset(em.day, day == x)[, 1:2 ])
@@ -523,6 +549,7 @@ for (i in 1:length(em.day)) {
   em.day[[ i ]] %n% "day" <- unique(email$edges$day)[ i ]
 }
 
+# plot ggnet2
 g <- list(length(em.day))
 for (i in 1:length(em.day)) {
   g[[ i ]] <- ggnet2(em.day[[ i ]], size = 2, color = "curr_empl_type",
@@ -533,11 +560,10 @@ for (i in 1:length(em.day)) {
 }
 gridExtra::grid.arrange(grobs = g, nrow = 2)
 @
-\end{figure}
 
-\begin{figure}[hbtp]
-\caption{\label{tab:email_facet-geom_net} geomnet code for the  email network facetted by day as shown in figure~\ref{fig:email_facet}. }
 <<email_facet_geom_net, fig.height=4.5, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
+# geomnet code for the  email network facetted by day as shown in fig.4b
+
 # data step: making sure that there is one entry for each person on each day
 employee <- data.frame(expand.grid(label = unique(email$nodes$label),
                                    day = unique(email$edges$day)))
@@ -559,14 +585,13 @@ ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
         panel.border = element_rect(fill = NA, colour = "grey60"),
         plot.margin = unit(c(0,0,0,0),"mm"))
 @
-\end{figure}
 
-\begin{figure}[hbtp]
-\caption{\label{tab:email_facet-ggnetwork} ggnetwork for the  email network facetted by day as shown in figure~\ref{fig:email_facet}. }
 %% NOTE: the code below requires version >= 0.1.7 of ggnetwork
 %% devtools::install_github("briatte/ggnetwork")
 
 <<email_facet_ggnetwork, fig.height=4, fig.width=8,echo=TRUE, out.width='\\textwidth'>>=
+# ggnetwork code for the  email network facetted by day as shown in fig.4c
+
 # create the network and aesthetics
 edges <- subset(email$edges, nrecipients < 54)
 edges <- edges[, c("From", "to", "day") ]
@@ -589,36 +614,13 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
   facet_wrap(~ day, nrow = 2, labeller = "label_both") +
   theme_facet(legend.position = "bottom")
 @
-\end{figure}
 
 %\sct{XXX I am not a fan of this paragraph. Again, we should appear united.}
 
-\hh{Note that the main difference in the visualizations stems from whether \emph{one} layout is used across all panels (as for the \code{ggnetwork} example) or whether individual layouts are fit to each of the subsets (as for the \code{ggnet2} and the \code{geomnet} examples).  }
-% Furthermore, and unlike \hh{the default setting in} \code{geomnet}, the same set of coordinates is assigned to all instances (i.e. to all rows) of the same node, which causes the position of each node to be identical in all facets of the plot.
-\hh{In \code{geomnet} this is controlled via the argument \code{fiteach}. By default  \code{fiteach = TRUE}, but \code{fiteach = FALSE} results in all panels sharing the same layout.}
-
-
-\begin{figure}[hbt]
-\begin{subfigure}[t]{\textwidth}
-\caption{ggnet2}
-\includegraphics[width=\textwidth]{figure/email_facet_ggnet2-1.pdf}
-\end{subfigure}
+Note that the main difference in the visualizations of Figure~\ref{fig:email_facet} stems from whether \emph{one} layout is used across all panels (as for the \code{ggnetwork} example) or whether individual layouts are fit to each of the subsets (as for the \code{ggnet2} and the \code{geomnet} examples).  
+In \code{geomnet} this is controlled via the argument \code{fiteach}. By default  \code{fiteach = TRUE}, but \code{fiteach = FALSE} results in all panels sharing the same layout.
 %
-\begin{subfigure}[t]{\textwidth}
-\caption{geomnet}
-\includegraphics[width=\textwidth]{figure/email_facet_geom_net-1.pdf}
-\end{subfigure}
-%
-\begin{subfigure}[t]{\textwidth}
-\caption{ggnetwork}
-\includegraphics[width=\textwidth]{figure/email_facet_ggnetwork-1.pdf}
-\end{subfigure}
-
-\caption{\label{fig:email_facet} The same email network as in figure~\ref{fig.cap:email} facetted by day of the week.}
-\end{figure}
-%\afterpage{\clearpage}
-%
-Figure~\ref{fig:email_facet} shows the facetted network. Through the facetting it becomes obvious that there are several days where one or more of the departments does not communicate with any of the other departments. There are only two days, day 13 and day 15, without any isolated department communications.
+Through the facetting it becomes obvious that there are several days where one or more of the departments does not communicate with any of the other departments. There are only two days, day 13 and day 15, without any isolated department communications.
 Facetting is one of the major benefits of creating a geometry for networks in \pkg{ggplot2}.  Facetting allows us to quickly separate dense networks into smaller subnetworks for easy visual comparison and analyses.
 
 
@@ -681,7 +683,7 @@ ggplot(ggnetwork(te.net),
 
 \caption{\label{fig.cap:theme} Inheritance structure of \pkg{ggplot2} theme elements. This is a recreation of the graph found at \protect\url{http://docs.ggplot2.org/current/theme.html}.}
 \end{figure}
-%\afterpage{\clearpage}
+\afterpage{\clearpage}
 
 The inheritance structure is plotted in figure \ref{fig.cap:theme}.  In this plot, it is easy to quickly determine the parent and child vertices. Using this plot made creation of the \code{theme\_net} object used throughout these examples very simple. We just made set each of the major parent elements, \code{text}, \code{rect}, and \code{line} to \code{element\_blank()} and then set the aspect ratio equal to one.
 
@@ -761,7 +763,7 @@ mm.dir %v% "gender" <- as.character(
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2\label{mm2:ggnet2}}
 <<madmen2_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
-# see fig.11 for data preparation
+# see fig.7 for data preparation
 
 ggnet2(
   mm.dir, mode = "fruchtermanreingold", size = 3,
@@ -801,7 +803,7 @@ ggplot(data = MM2net,
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork \label{mm2:ggnetwork}}
 <<madmen2_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, dependson="madmen2_ggnet2">>=
-# see fig.11 for data preparation
+# see fig.7 for data preparation
 
 ggplot(
   ggnetwork(mm.dir,
@@ -820,9 +822,9 @@ ggplot(
   theme(legend.position = "bottom")
 @
 \end{subfigure}
-
 \caption{\label{fig.cap:madmen2} A directed network of relationships in Mad Men.}
 \end{figure}
+\afterpage{\clearpage}
 This network is shown in figure \ref{fig.cap:madmen2}.  It is a lot more densely connected than the previous Mad Men example.  This network allows us to see much more of the drama in the show. For instance, we can see that Roger made advances towards Betty, his business partner's wife, which is much more scandalous than what appears in the first network.
 
 \subsection{College football}
@@ -903,9 +905,9 @@ ggplot(
 \end{subfigure}
 \caption{\label{fig.cap:football} The network of regular season Division I college football games in the season of fall 2000. The vertices and their labels are colored by conference.}
 \end{figure}
-%\afterpage{\clearpage}
+\afterpage{\clearpage}
 
-\subsection{Character coappearances in \emph{Les Mis\'{e}rables}}
+\subsection{Character co-appearances in \emph{Les Mis\'{e}rables}}
 
 This next network comes from \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book, and an edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.
 This network is shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}; the corresponding code is shown in Figure~\ref{tab:lesmis}. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
