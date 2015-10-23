@@ -592,8 +592,7 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
   scale_color_brewer("Employment Type",
                      palette = "Set1") +
   facet_wrap(~ day, nrow = 2, labeller = "label_both") +
-  theme_blank() +
-  theme(legend.position = "bottom")
+  theme_facet(legend.position = "bottom")
 @
 \end{figure}
 
@@ -1009,6 +1008,68 @@ ggplot(aes(from_id = Start.station, to_id = End.station),  data = tripnet) +
   theme(legend.position = "bottom")
 @
 
+<<bikes_prepare, echo = TRUE>>=
+bikes.net <- network(bikes$trips[, 1:2 ], directed = FALSE)
+set.edge.attribute(bikes.net, "n", bikes$trips[, 3 ] / 15)
+bikes.net %v% "station" <-
+  grepl("Metro", network.vertex.names(bikes.net))
+bikes.net %v% "station" <-
+  1 + as.integer(bikes.net %v% "station")
+rownames(bikes$stations) <- bikes$stations$name
+bikes.net %v% "lon" <-
+  bikes$stations[ network.vertex.names(bikes.net), "long" ]
+bikes.net %v% "lat" <-
+  bikes$stations[ network.vertex.names(bikes.net), "lat" ]
+bikes.col <- c("grey40", "darkorange")
+@
+
+<<bikes_ggnet2, echo = TRUE, fig.keep='all'>>=
+# Fruchterman-Reingold placement
+ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
+       edge.size = "n", color = bikes.col[ bikes.net %v% "station" ],
+       label.color = bikes.col[ bikes.net %v% "station" ],
+       layout.exp = 1.1)
+# geographic placement
+ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
+       mode = c("lon", "lat"),
+       edge.size = "n",
+       color = bikes.col[ bikes.net %v% "station" ],
+       label.color = bikes.col[ bikes.net %v% "station" ],
+       layout.exp = 1.1)
+@
+
+<<bikes_ggnetwork, echo = TRUE, fig.keep='all'>>=
+# Fruchterman-Reingold placement
+ggplot(data = ggnetwork(bikes.net),
+       aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(aes(size = n), color = "grey40") +
+  geom_nodes(aes(color = factor(station)), size = 4) +
+  geom_nodetext(aes(label = vertex.names,
+                    color = factor(station)),
+                vjust = -0.5) +
+  scale_colour_manual("Metro station",
+                      labels = c("FALSE", "TRUE"),
+                      values = c("grey40", "darkorange")) +
+  theme_blank() +
+  theme(legend.position = "bottom", legend.box = "horizontal")
+# geographic placement
+coords <- c(bikes.net %v% "lon", bikes.net %v% "lat")
+coords <- matrix(coords, ncol = 2)
+ggplot(data = ggnetwork(bikes.net, layout = coords),
+       aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(aes(size = n), color = "grey40") +
+  geom_nodes(aes(color = factor(station)), size = 4) +
+  geom_nodetext(aes(label = vertex.names,
+                    color = factor(station)),
+                vjust = -0.5) +
+  scale_colour_manual("Metro station",
+                      labels = c("FALSE", "TRUE"),
+                      values = c("grey40", "darkorange")) +
+  scale_x_continuous(limits = c(-0.1, 1.1)) +
+  theme_blank() +
+  theme(legend.position = "bottom", legend.box = "horizontal")
+@
+
 \begin{figure}[hbtp]
 \centering
 \includegraphics[width=.49\textwidth]{figure/bikes_geom_net-1.pdf}
@@ -1017,6 +1078,19 @@ ggplot(aes(from_id = Start.station, to_id = End.station),  data = tripnet) +
 \end{figure}
 %\afterpage{\clearpage}
 
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-1.pdf}
+\includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-2.pdf}
+\caption{\label{fig:bikes_ggnet2} ggnet2}
+\end{figure}
+
+\begin{figure}[hbtp]
+\centering
+\includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-1.pdf}
+\includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-2.pdf}
+\caption{\label{fig:bikes_ggnet2} ggnetwork \fb{Problem: standardizing the coordinates to (0,1) distorts the aspect ratio}}
+\end{figure}
 
 \subsection{Protein interactions in yeast}
 \fb{
