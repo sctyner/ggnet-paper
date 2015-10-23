@@ -910,11 +910,12 @@ ggplot(
 \subsection{Character co-appearances in \emph{Les Mis\'{e}rables}}
 
 This next network comes from \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book, and an edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.
-This network is shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}; the corresponding code is shown in Figure~\ref{tab:lesmis}. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
+This network is shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}; the corresponding code is shown below. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
 
-\begin{figure}[hbtp]
-\caption{\label{tab:lesmis}Code for the three approaches of visualizing the relationships between characters in Les Mis\'{e}rables as shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}.}
+% \begin{figure}[hbtp]
+% \caption{\label{tab:lesmis}Code for the three approaches of visualizing the relationships between characters in Les Mis\'{e}rables as shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}.}
 <<lesmis_ggnet2, echo=TRUE>>=
+# Code for the three visualization approaches of co-appearances 
 # plot with ggnet2
 ggnet2(lesmis$edges[, 1:2 ], mode = "fruchtermanreingold",
        color = "white", label = TRUE, label.color = "grey30",
@@ -940,9 +941,6 @@ ggplot(data = lesmisnet, aes(from_id = from, to_id = to,
   theme_net()
 @
 
-%% need this, otherwise "Floats lost" (TeX supports only a limited number of floats)
-%%\clearpage
-
 %% not sure I understand the aesth. mapping used above, so not using alpha below
 <<lesmis_ggnetwork, echo=TRUE, fig.width=9.5>>=
 # plot with ggnetwork
@@ -954,7 +952,7 @@ ggplot(data = ggnetwork(lesmis$edges[, 1:2 ], arrow.gap = 0),
   geom_nodetext(aes(label = vertex.names), color = "grey30") +
   theme_blank()
 @
-\end{figure}
+%\end{figure}
 %
 \begin{figure}[hbtp]
 \includegraphics[width=\textwidth]{figure/lesmis_ggnet2-1.pdf}
@@ -977,7 +975,7 @@ ggplot(data = ggnetwork(lesmis$edges[, 1:2 ], arrow.gap = 0),
 
 The data shows the second quartal trips in 2015 taken with bikes from the bike share company \url{https://secure.capitalbikeshare.com/}.
 
-While this bikesharing company is located in the heart of Washington D.C.\, they do have a set of bike stations just outside of Washington in Rockville, MD and north of it. Each station is shown as a dot, lines between stations indicate that at least five trips were taken between these two stations; the wider the line, the more trips have been taken between stations. In order to reflect distance between stations, we use as an additional restriction that the fastest trip was at most ten minutes long.
+While this bikesharing company is located in the heart of Washington D.C.\ they do have a set of bike stations just outside of Washington in Rockville, MD and north of it. Each station is shown as a dot, lines between stations indicate that at least five trips were taken between these two stations; the wider the line, the more trips have been taken between stations. In order to reflect distance between stations, we use as an additional restriction that the fastest trip was at most ten minutes long.
 
 <<bikes_geom_net, echo=TRUE, warning=FALSE, fig.keep='all'>>=
 tripnet <- merge(bikes$trips, bikes$stations, by.x = "Start.station",
@@ -1153,9 +1151,9 @@ plot(network(protein$edges[, 1:2]), coord = xy)
 if (!file.exists("data/timings.csv")) {
 network <- data.frame(t(replicate(100, {
 system.time({
-  xy = gplot.layout.random(network(protein$edges[, 1:2]),
-                         layout.par = list(dist = "uniang"))
-  plot(network(protein$edges[, 1:2]), coord = xy)
+#  xy = gplot.layout.random(network(protein$edges[, 1:2]),
+#                         layout.par = list(dist = "uniang"))
+  plot(network(protein$edges[, 1:2]), coord = gplot.layout.random(network(protein$edges[, 1:2]), layout.par = list(dist = "uniang")))
   })}
 )))
 
