@@ -143,9 +143,9 @@ In this paper, our objective is to test the possibility to bring network plottin
   %
   \footnote{See \url{http://ggplot.yhathq.com/}.} %
   %
-\hh{XXX side note, but do you know about the port of ggplot2 to plotly? \url{https://plot.ly/ggplot2/} }
-
-\fb{Nope, I had missed that one. Looks nice! Want to add it to the footnote?}
+%\hh{XXX side note, but do you know about the port of ggplot2 to plotly? \url{https://plot.ly/ggplot2/} }
+%\fb{Nope, I had missed that one. Looks nice! Want to add it to the footnote?}
+%\hh{not necessary - I have to admit that I find the use of footnotes excessive - I havent seen nearly as many footnotes in any paper in Stats - I'm assuming that that is a Poly Sci thing?}
 
   This is the audience we are aiming at by making network visualizations a part of \pkg{ggplot2}.
 
@@ -216,8 +216,6 @@ Figure~\ref{fig.cap:madmen} shows this network. In the plot, we can see one cent
 
 There are two main approaches to making use of the \pkg{ggplot2} framework: (i) implement network visualizations using \pkg{ggplot2}, by providing a wrapper for the user to visualize a network with \pkg{ggplot2} elements, and (ii) implement network visualizations as internal layers in \pkg{ggplot2}.  For the second approach, two main implementations exist: one which implements the structures of a network, such as nodes, edges, and node labels as independent geoms and another which wraps all of these structures into a single geom. We will discuss all of these approaches in this paper.
 
-%\fb{Paragraph above comes from the introduction. Feels to me it fits better here.}
-
 
 \subsection{ggnet2} % ==========================================================
 
@@ -234,7 +232,6 @@ The \code{ggnet2} function takes a single network object as input. This initial 
 
 The \code{mode} argument of \code{ggnet2} controls how the nodes of the network are to be positioned in the plot returned by the function. This argument can take any of the layout values supported by the \code{gplot.layout} function of the \pkg{sna} package, and defaults to \samp{fruchtermanreingold}, which places the nodes through the Fruchterman-Reingold layout algorithm \citep{fruchterman_reingold}. See \code{?sna::gplot.layout} for the many other possible layouts and their parameters, which can also be passed \code{ggnet2} through the \code{layout.par} argument.
 
-%\fb{Paragraph above now contains some information that were included in a footnote.}
 
 Other arguments passed to the \code{ggnet2} function offer extensive control over the aesthetics of the plot that it returns, including %through
 the addition of edge and/or node labels and their respective aesthetics.
@@ -317,20 +314,11 @@ Internally the \code{ggnetwork} function starts by computing the \code{x} and \c
 
 At that stage, the \code{ggnetwork} function performs a left-join of that `augmented' edge list with the vertex-level attributes of the sender nodes, and further adds one self-loop per node, in order to ensure that every node is plotted even when their degree is zero---that is, even if the node is not connected to any other node of the network, and is therefore absent from the edge list. The data frame created by this process contains one row per edge as well as one additional row per node, and features all edge-level and vertex-level attributes initially present in the network.%
   %
-  \footnote{One limitation of this process is that it requires some reserved variable names (\code{x}, \code{y}, \code{xend} and \code{yend}), which should not also be present as edge-level or vertex-level attributes (otherwise the function will simply break). Similarly, if an edge attribute and a vertex attribute have the same name, like  \samp{na}, \fb{which the \pkg{network} package defines as an attribute for both edges and vertices in order to flag missing data}, \code{ggnetwork} will rename them to \samp{na.x} (for the edge-level attribute) and \samp{na.y} (for the vertex-level attribute).} %
-
-%% \hh{XXX -- \samp{"na"} is an unfortunate choice of name - it is easily confused with \code{NA}. I hope you're OK with my renaming this to ``name". }
-%% FB: I'm fine with the renaming here, but I did not choose "na" by mistake: every object of class network carries a vertex attribute called 'na' and an edge attribute called 'na'. Both are used to flag missing (unobserved) data in network objects (see Butts' JSS article on the network package). Every data frame returned by ggnetwork therefore contains a column named na.x (indicating unobserved edges) and another one named na.y, indicating unobserved nodes.
-%% HH: so my hunch with missing values was right, I just didn't interpret it right - I reverted the column names to `na', but added more details.
-%% FB: thanks; reformulated.
+  \footnote{One limitation of this process is that it requires some reserved variable names (\code{x}, \code{y}, \code{xend} and \code{yend}), which should not also be present as edge-level or vertex-level attributes (otherwise the function will simply break). Similarly, if an edge attribute and a vertex attribute have the same name, like  \samp{na}, which the \pkg{network} package defines as an attribute for both edges and vertices in order to flag missing data, \code{ggnetwork} will rename them to \samp{na.x} (for the edge-level attribute) and \samp{na.y} (for the vertex-level attribute).} %
 
 The \code{ggnetwork} function also accepts the arguments \code{arrow.gap} and \code{by}. \code{arrow.gap} slightly shortens the edges of directed networks in order to avoid overplotting edge arrows and nodes, whereas the argument \code{by} is meant for use with plot facets. Passing an edge attribute to the \code{by} argument will cause \code{ggnetwork} to return a data frame in which each node appears as many times as there are unique values to the edge attribute passed to \code{by}, using the same coordinates for all occurrences. If that same edge attribute is also passed to either \code{facet\_wrap} or \code{facet\_grid}, then each edge of the network will show in only one facet of the plot, while all nodes will appear in all facets at the same position, thus making the facets of the plot comparable to each other, and allowing the user to visualize edge formation as a function of a specific edge attribute (generally some kind of temporal attribute).
 
-%\fb{Paragraph above re-written to explain what 'panelized' meant in previous write-up.}
-
 Both the \code{arrow.gap} and the \code{by} arguments are further illustrated in the remainder of this paper.
-
-
 
 % ==============================================================================
 %
@@ -340,23 +328,19 @@ Both the \code{arrow.gap} and the \code{by} arguments are further illustrated in
 % ==============================================================================
 
 In this section, we demonstrate the current capabilities of \code{ggnet2}, \code{geomnet} and \code{ggnetwork} in a series of side by side examples. While the output is similar for each method of network visualization, the code and implementations differ across the three methods.
-So, for each of these examples, we are going to present the code necessary to produce the network, and discuss each application in detail.
+For each of these examples, we are going to present the code necessary to produce the network, and discuss each application in detail.
 
 \subsection{Blood donation}
-In this directed network, there are eight vertices and 27 edges.  The vertices represent the eight different blood types in humans that are most important for donation: the ABO blood types A, B, AB, and O, combined with the RhD positive (+) and negative (-) types. The edges are directed: a person whose blood type is that of a \emph{from} vertex can to donate blood to a person whose blood type is that of a corresponding \emph{to} vertex.  This network is shown in Figure~\ref{fig.cap:blood}. The code to produce each one of these results is given in Figure~\ref{tab:blood}. In this example every vertex has a self-reference, as blood between two people of matching ABO and RhD type can always be exchanged.  The \pkg{geomnet} approach shows these self-references as circles looping back to the vertex (this is controlled by using the parameter setting \code{selfies = TRUE}).
+In this directed network, there are eight vertices and 27 edges.  The vertices represent the eight different blood types in humans that are most important for donation: the ABO blood types A, B, AB, and O, combined with the RhD positive (+) and negative (-) types. The edges are directed: a person whose blood type is that of a \emph{from} vertex can to donate blood to a person whose blood type is that of a corresponding \emph{to} vertex.  This network is shown in Figure~\ref{fig.cap:blood}. The code to produce each one of the networks is shown below:
 
-% \fb{May I recommend renaming \code{selfies} to \code{loops}, which is what self-ties are called in the \pkg{network} package?}
-% \hh{What bugs me about the word \code{loops} is, that it is a misdenomer - loops are paths through a graph that lead back to the starting point (which plays havoc with all kinds of theoretical results, such as convergence). Self-references are therefore loops, but not all loops are self-references. Besides, I would like to think that it is pretty clear what is meant by selfies ... }
-
-
-\begin{figure}[hbtp]
-\caption{\label{tab:blood}Code for the three different approaches showing the blood donation network of figure~\ref{fig.cap:blood}.}
+% \begin{figure}[hbtp]
+% \caption{\label{tab:blood}Code for the three different approaches showing the blood donation network of figure~\ref{fig.cap:blood}.}
 %
 <<blood_common>>=
-data(blood)
+data(blood, package = "geomnet")
 @
 %
-<<blood_ggnet2, echo=TRUE, fig.width=6, fig.height=6>>=
+<<blood_ggnet2,  echo=TRUE, fig.width=6, fig.height=6>>=
 # plot with ggnet2
 ggnet2(network(blood$edges[, 1:2]), mode = "circle", size = 15,
        label = TRUE, arrow.size = 10, arrow.gap = 0.05, vjust = 0.5,
@@ -364,7 +348,7 @@ ggnet2(network(blood$edges[, 1:2]), mode = "circle", size = 15,
 @
 
 <<blood_geom_net, echo=TRUE, fig.width=6, fig.height=6>>=
-# plot with geom_net
+# plot with geomnet
 ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
   geom_net(colour = "darkred", layout = "circle", label = TRUE, size = 15,
            directed = TRUE, vjust = 0.5, labelcolour = "grey80",
@@ -384,7 +368,9 @@ ggplot(ggnetwork(network(blood$edges[, 1:2]),
   geom_nodetext(aes(label = vertex.names), color = "grey80") +
   theme_blank()
 @
-\end{figure}
+
+In this example every vertex has a self-reference, as blood between two people of matching ABO and RhD type can always be exchanged.  The \pkg{geomnet} approach shows these self-references as circles looping back to the vertex (this is controlled by using the parameter setting \code{selfies = TRUE}).
+
 
 \begin{figure}[hbt]
 \begin{subfigure}[t]{.32\textwidth}
@@ -403,7 +389,6 @@ ggplot(ggnetwork(network(blood$edges[, 1:2]),
 \end{figure}
 %%\afterpage{\clearpage}
 
-%This network is shown in figure \ref{fig.cap:blood}.  Here, we have used
 \code{Colour} and \code{size} aesthetics in Figure~\ref{fig.cap:blood} are set to identity values to change the size and color of all vertices. We have also used the \code{layout} and \code{label} arguments to change the default layout to a circle layout and to print the blood types, respectively. The circle layout places blood types of the same ABO type next to each other and spreads the vertices out far enough to distinguish between the various ``in" and ``out" types.  We can tell clearly from this plot that the O- type is the universal donor: it has an out-degree of seven and an in-degree of zero. Additionally, we can see that the AB+ type is the universal recipient, with an in-degree of seven and an out-degree of zero. Anyone looking at this plot can quickly determine which type(s) of blood they can receive and which type(s) can receive their blood.
 
 \subsection{Email network}
@@ -447,7 +432,7 @@ ggplot(data = emailnet,
     aes(colour = CurrentEmploymentType,
         group = CurrentEmploymentType,
         linewidth = 3*(...samegroup../8+.125)),
-    #ealpha = 0.2,
+    ealpha = 0.25,
     size = 4, curvature = 0.05,
     directed = TRUE, arrowsize = 0.75) +
   scale_colour_brewer("Employment Type", palette = "Set1") +
@@ -480,37 +465,35 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02),
 \end{figure}
 %\afterpage{\clearpage}
 
-This email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a directed network of emails between company employees with 55 vertices and 9,063 edges. Each vertex is an employee of the company, and each edge is an email sent from one employee to one or more other employees. The arrow of the directed edge points to the recipient(s) of the email. The network contains two business weeks of emails across the entire company. In order to better visualize the structure of the communication network between employees, emails that were sent out to all employees are removed.
+The email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a directed network of emails between company employees with 55 vertices and 9,063 edges. Each vertex represents an employee of the company, and each edge stands for an email sent from one employee to one or more other employees. The arrow of the directed edge points to the recipient(s) of the email. The network contains two business weeks of emails across the entire company. In order to better visualize the structure of the communication network between employees, emails that were sent out to all employees are removed.
 
-This network is plotted in figure \ref{fig.cap:email}. There are six distinct clusters in this network which almost perfectly correspond to the six different types of employees in this company: administration, engineering, executive, facilities, information technology, and security.
+This network is plotted in Figure~\ref{fig.cap:email}. There are six distinct clusters in this network which almost perfectly correspond to the six different types of employees in this company: administration, engineering, executive, facilities, information technology, and security.
 
 A comparison of the results of \pkg{ggnet}, \pkg{geomnet} and \pkg{ggnetwork} reveals some of the subtle differences that exist between the implementations:
 
 \begin{itemize}
 
   \item %
-  In the \code{ggnet2} implementation, the darkness and thickness of the edges between employees in the same cluster are more pronounced than those of the edges between employees in different clusters. This is due to the fact that the email network does not feature edge weights: instead, every email between two employees is represented by a different edge, resulting in edge overplotting. Since the \code{edge.alpha} argument has been set to a value smaller than 1, multiple emails between two employees create darker, thicker edges between them. This effect is not visible in the layouts created by \code{geom\_net} and \code{ggnetwork} because both implementations draw a single segment \fb{for each directed edge}, regardless of how many of these edges exist in the network data. \hh{XXX single segment - that's not quite right - from-to and to-from are distinguished as multiple instances.} \fb{That's correct; reformulated.}
+  In the \code{ggnet2} implementation, the \sct{opacity} and thickness of the edges between employees in the same cluster are more pronounced than those of the edges between employees in different clusters. This is due to the fact that the email network does not feature edge weights: instead, every email between two employees is represented by a different edge, resulting in edge overplotting. As the \code{edge.alpha} argument has been set to a value smaller than one, multiple emails between two employees create more opaque, thicker \hh{XXX why thicker? the linewidth is not related to thickness XXX} edges between them. This effect is not visible in the layouts created by \pkg{geomnet} and \code{ggnetwork} because both implementations draw a single segment for each directed edge, regardless of how many of these edges exist in the network data. 
 
   %The value is set to 0.25 in this example, so that four or more emails between two employees result in a completely opaque edge. %% <- is that how overplotting alpha values work?
 
   \item %
-  In the first two layouts, edges between employees who share the same employment type are given the color of that employment type, while edges between employees belonging to different types are plotted in grey. This feature is particularly useful to visualize the amount of within-group connectedness in a network. By contrast, in the last layout, edges are colored according to the sender's employment type, because the \code{ggnetwork} package does not support coloring edges as a function of node-level attributes.
+  In the first two layouts of Figure~\ref{fig.cap:email}, edges between employees who share the same employment type are given the color of that employment type, while edges between employees belonging to different types are plotted in grey. This feature is particularly useful to visualize the amount of within-group connectedness in a network. By contrast, in the last layout, edges are colored according to the sender's employment type, because the \code{ggnetwork} package does not support coloring edges as a function of node-level attributes.
 
 	\item %
-	  Finally, in the last two layouts, the \code{curvature} argument has been set to 0.05, resulting in slightly curved edges in both plots. This feature, which takes advantage of the \code{geom\_curve} geometry released in \pkg{ggplot2} 1.1.0, makes it possible to visualize which edges correspond to reciprocal connections; in an email communication network, as one might expect, most edges fall into that category.
+	  Finally, in the last two layouts of Figure~\ref{fig.cap:email}, the \code{curvature} argument has been set to 0.05, resulting in slightly curved edges in both plots. This feature, which takes advantage of the \code{geom\_curve} geometry released in \pkg{ggplot2} 1.1.0, makes it possible to visualize which edges correspond to reciprocal connections; in an email communication network, as one might expect, most edges fall into that category.
 
 \end{itemize}
 
-\hh{XXX Last}
-Last, it is interesting to observe that, in all of the layouts, the `Security' employee group gets a central role in the email network of the company. This observation holds regardless of the actual network layout used (remember that \code{ggnet2} and \code{ggnetwork} default to the Fruchterman-Reingold algorithm, while \code{geomnet} defaults to the Kamada-Kawai algorithm; both layouts are force-directed, but proceed differently to assign coordinates to the nodes). Interestingly, one of the executives only communicates with a single person in Facilities.\hh{XXX Last} Last, one of the IT employees is also frequently communicates with a Security employee.
-%This pattern of heavy communication between employees of the same type is fairly unsurprising.
-%SCT Let's not add things that make our cool visualizations sound less cool!
+It is interesting to observe that, in all of the layouts, the `Security' employee group plays a central role in the email network of the company. This observation holds regardless of the actual network layout used (remember that \code{ggnet2} and \code{ggnetwork} default to the Fruchterman-Reingold algorithm, while \code{geomnet} defaults to the Kamada-Kawai algorithm; both layouts are force-directed, but proceed differently to assign coordinates to the nodes). We also see that one of the executives only communicates with a single person in Facilities, while one of the IT employees frequently communicates with a Security employee.
 
 \fb{Note that we are fitting node placement algorithms that support edge weights (at least for K-K, and at least in their \pkg{igraph} implementations) to a network that should be weighted, but that is not.}
 
 \hh{XXX Francois, what are you trying to say with the previous comment? What edge weights do you think should be used? The number of emails between sender and receiver is considered in the layout calculation in stat\_net. It is only afterwards, that the data is reduced to unique edges between from and to. }
 
 \fb{Sorry for not being clear above, I'll try again. The email network should be weighted, but it is not: instead, some of its edges are duplicated. This structure probably affects the result of the K-K placement algorithm in a way that is different from how weights should affect the result of the algorithm, which understands weights as ``geometric distances'' (K-K paper, p. 14). The same problem likely affects the F-R algorithm (which has a `weights' argument in \pkg{igraph}), although I could not understand from the paper how the edge weights are supposed to be taken into account.}
+
 
 To \hh{introduce a temporal aspect}
 %make this visualization even more interesting and informative
@@ -1090,20 +1073,20 @@ ggplot(data = ggnetwork(bikes.net, layout = coords),
 \centering
 \includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-1.pdf}
 \includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-2.pdf}
-\caption{\label{fig:bikes_ggnet2} ggnetwork \fb{Problem: standardizing the coordinates to (0,1) distorts the aspect ratio}}
+\caption{\label{fig:bikes_ggnetwork} ggnetwork \fb{Problem: standardizing the coordinates to (0,1) distorts the aspect ratio}}
 \end{figure}
 
 \subsection{Protein interactions in yeast}
-\fb{
-
-Should we stress the speed gain of using ggplot2 versus plot.network for instance? Below is the code to plot the same network with the network package: it takes around 4 seconds to draw. The same plot with ggnet2 takes (much) less than one second.
-
-\code{xy = gplot.layout.random(network(protein\$edges[, 1:2]), layout.par = list(dist = "uniang"))}\\
-\code{system.time(plot(network(protein\$edges[, 1:2]), coord = xy))}
-
-}
-
-\hh{XXX I like that idea! We would need to include the time for  the layout for a fair comparison though ...}
+% \fb{
+% 
+% Should we stress the speed gain of using ggplot2 versus plot.network for instance? Below is the code to plot the same network with the network package: it takes around 4 seconds to draw. The same plot with ggnet2 takes (much) less than one second.
+% 
+% \code{xy = gplot.layout.random(network(protein\$edges[, 1:2]), layout.par = list(dist = "uniang"))}\\
+% \code{system.time(plot(network(protein\$edges[, 1:2]), coord = xy))}
+% 
+% }
+% 
+% \hh{XXX I like that idea! We would need to include the time for  the layout for a fair comparison though ...}
 
 \fb{What could be a cool benchmark would be to generate random graphs of varying sizes, and then measure their plotting runtime with all functions + plot.network. I'm pretty sure the speed gain will grow faster than the size of the networks.}
 
@@ -1153,7 +1136,7 @@ plot(network(protein$edges[, 1:2]), coord = xy)
 }
 \begin{figure}
 \centering
-<<compare, echo = FALSE, eval = TRUE, fig.height = 5, fig.width = 8, out.width = '0.5\\textwidth'>>=
+<<compare, echo = FALSE, eval = TRUE, fig.height = 4, fig.width = 8, out.width = '\\textwidth'>>=
 if (!file.exists("data/timings.csv")) {
 network <- data.frame(t(replicate(100, {
 system.time({
