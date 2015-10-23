@@ -107,12 +107,10 @@ library(ggplot2) # needs to be version ≥ 1.0.1.9003
 library(dplyr)
 
 ## geom_net
-if (!require(ggnet, quietly = TRUE)) {
-  devtools::install_github("sctyner/ggnet")
+if (!require(geomnet, quietly = TRUE)) {
+  devtools::install_github("sctyner/geomnet")
 }
-library(ggnet)
-## TODO: FB: I would recommend renaming the repo to e.g. geomnet for clarity
-## please see https://github.com/sctyner/ggnet-paper/issues/3 as well as TODO below
+library(geomnet)
 
 ## ggnetwork
 if (!require(ggnetwork, quietly = TRUE)) {
@@ -122,9 +120,6 @@ library(ggnetwork)
 
 ## ggnet2
 source("https://raw.githubusercontent.com/briatte/ggnet/master/ggnet2.R")
-## TODO: should be a lightweight package... any chance geom_net could come
-## in a package called geomnet or something like that, so that I can use
-## the name ggnet to package ggnet and ggnet2?
 @
 
 % introductory section
@@ -272,10 +267,7 @@ The \code{ggnet2} function also provides a few network-specific options, such as
 % \fb{I have added some details on the system: see the node.shape and edge.lty paragraph.}
 
 
-\subsection{ggnet: geom\_net} % ================================================
-
-%% FB: I believe it would be helpful to rename the geom_net repo into geomnet or
-%% something like that: see https://github.com/sctyner/ggnet-paper/issues/3
+\subsection{geomnet: geom\_net}
 
 \subsubsection{Data Structure}
 
