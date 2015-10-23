@@ -12,10 +12,12 @@ This paper explores three different techniques to visualize networks by building
 \begin{enumerate}
 %\item Should we feature curves in one of the examples?\\
 %\fb{I've used curves in the \texttt{email\_ggnetwork} example.}
-\item a couple of the examples don't have all three solutions yet.
+\item a couple of the examples don't have all three solutions yet.\\
+\fb{Which ones please?}
 %\item could we keep to the convention to use \code{CRANpkg} for the first mentioning of a package on CRAN (because it includes a hyperlink to CRAN) and \code{pkg} afterwards (same with the bioconductor package we have). Abstract and title don't count as first mentioning ...\\
 %\fb{Works for me.}
 % \item moved the comment to the discussion section
+\item \fb{Not sure why, but all figures get sent to the end in the current version of the doc.}
 \end{enumerate}}
 
 
@@ -119,7 +121,7 @@ library(geomnet)
 
 ## ggnetwork
 if (!require(ggnetwork, quietly = TRUE) ||
-    packageVersion("ggnetwork") < "0.1.8") {
+    packageVersion("ggnetwork") < "0.2.0") {
   devtools::install_github("briatte/ggnetwork")
 }
 library(ggnetwork)
@@ -146,6 +148,7 @@ In this paper, our objective is to test the possibility to bring network plottin
 %\hh{XXX side note, but do you know about the port of ggplot2 to plotly? \url{https://plot.ly/ggplot2/} }
 %\fb{Nope, I had missed that one. Looks nice! Want to add it to the footnote?}
 %\hh{not necessary - I have to admit that I find the use of footnotes excessive - I havent seen nearly as many footnotes in any paper in Stats - I'm assuming that that is a Poly Sci thing?}
+%\fb{Oh, believe me, we're nowhere near law scholars or historians :) every social science usually goes heavy on footnotes for details, sources, remarks etc.}
 
   This is the audience we are aiming at by making network visualizations a part of \pkg{ggplot2}.
 
@@ -153,7 +156,7 @@ Because the syntax implemented in the \pkg{ggplot2} package is extendable to man
 % \fb{Perhaps we could stress that one of the benefits of learning the
 %``grammar of graphics" is the opportunity to use that grammar in many
 %different situations, e.g. with}
-the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRANpkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the package \CRANpkg{GGally} by \citet{ggally}, or the \BIOpkg{ggbio} Bioconductor package by \citet{ggbio}, which provides graphics for biological data, to name a only few. Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization. Out efforts are supported by the most recent changes to \pkg{ggplot2} (version 1.1.0, released mid November 2015), which aim at
+the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRANpkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the package \CRANpkg{GGally} by \citet{ggally}, or the \BIOpkg{ggbio} Bioconductor package by \citet{ggbio}, which provides graphics for biological data, to name a only few. Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization. Our efforts are supported by the most recent changes to \pkg{ggplot2} (version 1.1.0, released mid November 2015), which aim at
 facilitating its extension through additional geometries (or \samp{geoms}).%
   %
   % this URL should be replaced with the CRAN one when ggplot2 1.1.0 gets there
@@ -223,9 +226,7 @@ The \code{ggnet2} function is an improved version of the \code{ggnet} function, 
   %
   \footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnet/}.}%
 
-The \code{ggnet2} function offers a large range of network visualization functionalities in a single function call. Although its result is a \pkg{ggplot2} object that can be further styled with \pkg{ggplot2} scales and themes, the syntax of the \code{ggnet2} function is \hh{designed to be} easily understood by the user:
-%% sorry to be so picky, but I'd rather not take for granted what users understand.
-the aesthetics \hh{relating to} the nodes are controlled by arguments such as \code{node.alpha} or \code{node.color}, while those relating to the edges are controlled by %similarly named
+The \code{ggnet2} function offers a large range of network visualization functionalities in a single function call. Although its result is a \pkg{ggplot2} object that can be further styled with \pkg{ggplot2} scales and themes, the syntax of the \code{ggnet2} function is designed to be easily understood by the user: the aesthetics relating to the nodes are controlled by arguments such as \code{node.alpha} or \code{node.color}, while those relating to the edges are controlled by %similarly named
 arguments starting with \samp{edge}. As a consequence, while \code{ggnet2} applies the grammar of graphics to network objects, the function itself still works very much like the plotting functions of the \pkg{igraph} and \pkg{network} packages: a long series of arguments is used to control every possible aspect of how the network should be visualized.
 
 The \code{ggnet2} function takes a single network object as input. This initial object might be an object of class \code{network} (with the exception of hypergraphs or multiplex graphs), or any data structure coercible to an object of that class, such as an incidence matrix, an adjacency matrix, or an edge list. Additionally, if the \CRANpkg{intergraph} package \citep{intergraph} is installed, the function  also accepts a network object of class \code{igraph}. Internally, the function converts the network object to two data frames, one for edges and another one for nodes, and then passes them to \pkg{ggplot2}. Each of the two data frames contain the information required by \pkg{ggplot2} to plot segments and points respectively, such as a shape for the points (nodes) and a linetype for the segments (edges). The final result returned to the user is a plot with a minimum of two layers (or more, if there are edge and/or node labels).%
@@ -474,7 +475,7 @@ A comparison of the results of \pkg{ggnet}, \pkg{geomnet} and \pkg{ggnetwork} re
 \begin{itemize}
 
   \item %
-  In the \code{ggnet2} implementation, the \sct{opacity} and thickness of the edges between employees in the same cluster are more pronounced than those of the edges between employees in different clusters. This is due to the fact that the email network does not feature edge weights: instead, every email between two employees is represented by a different edge, resulting in edge overplotting. As the \code{edge.alpha} argument has been set to a value smaller than one, multiple emails between two employees create more opaque, thicker \hh{XXX why thicker? the linewidth is not related to thickness XXX} edges between them. This effect is not visible in the layouts created by \pkg{geomnet} and \code{ggnetwork} because both implementations draw a single segment for each directed edge, regardless of how many of these edges exist in the network data. 
+  In the \code{ggnet2} implementation, the \sct{opacity} and thickness of the edges between employees in the same cluster are more pronounced than those of the edges between employees in different clusters. This is due to the fact that the email network does not feature edge weights: instead, every email between two employees is represented by a different edge, resulting in edge overplotting. As the \code{edge.alpha} argument has been set to a value smaller than one, multiple emails between two employees create more opaque, thicker \hh{XXX why thicker? the linewidth is not related to thickness XXX} edges between them. This effect is not visible in the layouts created by \pkg{geomnet} and \code{ggnetwork} because both implementations draw a single segment for each directed edge, regardless of how many of these edges exist in the network data.
 
   %The value is set to 0.25 in this example, so that four or more emails between two employees result in a completely opaque edge. %% <- is that how overplotting alpha values work?
 
@@ -928,7 +929,7 @@ ggplot(data = lesmisnet, aes(from_id = from, to_id = to,
 @
 
 %% need this, otherwise "Floats lost" (TeX supports only a limited number of floats)
-\clearpage
+%%\clearpage
 
 %% not sure I understand the aesth. mapping used above, so not using alpha below
 <<lesmis_ggnetwork, echo=TRUE, fig.width=9.5>>=
@@ -1078,14 +1079,14 @@ ggplot(data = ggnetwork(bikes.net, layout = coords),
 
 \subsection{Protein interactions in yeast}
 % \fb{
-% 
+%
 % Should we stress the speed gain of using ggplot2 versus plot.network for instance? Below is the code to plot the same network with the network package: it takes around 4 seconds to draw. The same plot with ggnet2 takes (much) less than one second.
-% 
+%
 % \code{xy = gplot.layout.random(network(protein\$edges[, 1:2]), layout.par = list(dist = "uniang"))}\\
 % \code{system.time(plot(network(protein\$edges[, 1:2]), coord = xy))}
-% 
+%
 % }
-% 
+%
 % \hh{XXX I like that idea! We would need to include the time for  the layout for a fair comparison though ...}
 
 \fb{What could be a cool benchmark would be to generate random graphs of varying sizes, and then measure their plotting runtime with all functions + plot.network. I'm pretty sure the speed gain will grow faster than the size of the networks.}
