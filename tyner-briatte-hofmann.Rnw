@@ -125,12 +125,6 @@ if (!require(ggnetwork, quietly = TRUE) ||
   devtools::install_github("briatte/ggnetwork")
 }
 library(ggnetwork)
-<<<<<<< HEAD
-
-## ggnet2
-source("https://raw.githubusercontent.com/briatte/ggnet/master/ggnet2.R")
-=======
->>>>>>> 64bde7416499551d26a99fa0ceb1ecba7338c3fb
 @
 
 % introductory section
