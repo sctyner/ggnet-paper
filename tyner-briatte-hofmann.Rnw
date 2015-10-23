@@ -251,8 +251,6 @@ The \code{ggnet2} function also provides a few network-specific options, such as
   %
   As a result, the function combines two different kinds of processes: (i) it translates a network object into a data frame suitable for plotting with \pkg{ggplot2}, and (ii) it applies some network-related aesthetic operations to that data frame, such as coloring the edges in function of the color of the nodes that they connect.
 
-
-<<<<<<< HEAD
 % \hh{XXX Francois, could you go into more detail here?
 % node aesthetics, edge aesthetics, what kind of networks work as input ... is it restricted to output from the network package? e.g. the expectation from the user is really to be able to deal with a network call.
 % How you work with the networks to get additional information in is also interesting - you could also discuss the edge and node operators that you use.
@@ -265,9 +263,6 @@ The \code{ggnet2} function also provides a few network-specific options, such as
 
 
 \subsection{geomnet: geom\_net}
-=======
-\subsection{geomnet} % ================================================
->>>>>>> 64bde7416499551d26a99fa0ceb1ecba7338c3fb
 
 \subsubsection{Data Structure}
 \hh{XXX needs a gentler intro: geomnet is a package available at YYY implementing network visualization in a single ggplot2 layer. It consists of two main functions: geom\_net and stat\_net. All of the calculation (from edge list to layout) is done in stat\_net, the rendering happens in geom\_net. }
