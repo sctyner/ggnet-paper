@@ -998,18 +998,19 @@ ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
   theme(legend.position = "bottom")
 
 data(metro_map)
+
 ggplot(data = metro_map_df_t2, aes(x = long, y = lat)) +
-  geom_raster(fill = metro_map_df_t2$color) +
+  geom_raster(fill = metro_map_df_t2$color, alpha = 0.75) +
   geom_net(data = tripnet, layout = NULL, label = TRUE,
-           vjust = -0.5, aes(from_id = Start.station,
-                             to_id = End.station,
-                             x = long, y = lat,
-                             linewidth = n / 15,
-                             colour = Metro)) +
+           labelcolour = "black", vjust = -0.5,
+           aes(from_id = Start.station,
+               to_id = End.station,
+               x = long, y = lat,
+               linewidth = n / 15,
+               colour = Metro)) +
   theme_net() +
   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
   theme(legend.position = "bottom")
-
 
 # compare to https://secure.capitalbikeshare.com/map/
 #ggplot(aes(from_id = Start.station, to_id = End.station),  data = tripnet) +
