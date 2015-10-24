@@ -10,15 +10,21 @@ This paper explores three different techniques to visualize networks by building
 \hh{TODO list:
 
 \begin{enumerate}
+\item \hh{start of end phase!!! Proof read.
+Check examples for consistency. }
+\item \hh{need to re-run the timing after all the changes are made to the packages. }
 %\item Should we feature curves in one of the examples?\\
 %\fb{I've used curves in the \texttt{email\_ggnetwork} example.}
-\item a couple of the examples don't have all three solutions yet.\\
-\fb{Which ones please?}
+% \item a couple of the examples don't have all three solutions yet.\\
+% \fb{Which ones please?}
+% \hh{looks like we're done :)}
 %\item could we keep to the convention to use \code{CRANpkg} for the first mentioning of a package on CRAN (because it includes a hyperlink to CRAN) and \code{pkg} afterwards (same with the bioconductor package we have). Abstract and title don't count as first mentioning ...\\
 %\fb{Works for me.}
 % \item moved the comment to the discussion section
 \item \fb{Not sure why, but all figures get sent to the end in the current version of the doc.}
+\hh{working on it ... and it should be much better in this version already.}
 \end{enumerate}}
+
 
 
 <<setup_knitr, echo=FALSE>>=
@@ -521,6 +527,7 @@ To introduce a temporal aspect
  we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows email networks associated with each day of the week. The code for these visualization is below:
 
  \fb{Not sure what's happening with Fig. 4a, but it's now taking half of the page on my end, squashing other subfigures out of the page. I've tried to solve the issue by setting aspect.ratio to 1.}
+\hh{I first noticed this problem after you included the bikes example. It looks like some scaling issue, but the aspect ratio seems to fix it!}
 
 \begin{figure}[hbt]
 \begin{subfigure}[t]{\textwidth}
@@ -1102,7 +1109,7 @@ ggplot(data = ggnetwork(bikes.net, layout = coords),
 \centering
 \includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-1.pdf}
 \includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-2.pdf}
-\caption{\label{fig:bikes_ggnetwork} ggnetwork \fb{Problem: standardizing the coordinates to (0,1) distorts the aspect ratio}}
+\caption{\label{fig:bikes_ggnetwork} ggnetwork \fb{Problem: standardizing the coordinates to (0,1) distorts the aspect ratio} \hh{have a look at the map - the area covered is actually fairly quadratic. Geographic Lat and Long don't operate on the same scales. }}
 \end{figure}
 
 \subsection{Protein interactions in yeast}
@@ -1118,6 +1125,7 @@ ggplot(data = ggnetwork(bikes.net, layout = coords),
 % \hh{XXX I like that idea! We would need to include the time for  the layout for a fair comparison though ...}
 
 \fb{What could be a cool benchmark would be to generate random graphs of varying sizes, and then measure their plotting runtime with all functions + plot.network. I'm pretty sure the speed gain will grow faster than the size of the networks.}
+\hh{I like the idea! }
 
 This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, with a total of 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}. These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}.  We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices. Because all of the appraoches result in very similar figures, only one network is shown. The code for all three approaches is shown below:
 
@@ -1245,7 +1253,9 @@ I would like to think that both approaches are valid and necessary.
 
 \fb{I don't have many ideas about the userbase of each function. All I know is that I get emails from time to time about ggnet and ggnet2. Some are from complete beginners (just got one this morning), others are much more advanced (e.g. Pedro Jordano, who helped me understand bipartite graphs). My guess is that all of them stumbled upon the function by googling for "network + ggplot2".}
 \item{ \hh{internal calculation of the network versus external. Each call to geomnet results in a re-calculation of the network and, unless a seed is set, in a new layout. Once the network is calculated, subsequent calls to ggnet2 and ggnetwork are computationally more efficient.}
-\item \fb{This is not really a to-do, just an observation: the placement algorithms availabe through \pkg{igraph} seem both more divserse and more correct than those provided through \pkg{sna}. This is likely due to the factthat the first package is still under active development, while the second one is more or less dormant. An illustration of that is the Kamada-Kawai algorithm, which can take edge weights into account in the \pkg{igraph} implementation but not in the \pkg{sna} one (AFAICT). Consequently, if I had to learn network analysis in R all over again, I would choose to use \pkg{igraph} instead of \pkg{network} + \pkg{sna}.}}
+\item \fb{This is not really a to-do, just an observation: the placement algorithms availabe through \pkg{igraph} seem both more divserse and more correct than those provided through \pkg{sna}. This is likely due to the factthat the first package is still under active development, while the second one is more or less dormant. An illustration of that is the Kamada-Kawai algorithm, which can take edge weights into account in the \pkg{igraph} implementation but not in the \pkg{sna} one (AFAICT). Consequently, if I had to learn network analysis in R all over again, I would choose to use \pkg{igraph} instead of \pkg{network} + \pkg{sna}.}
+\hh{We definitely need to discuss edge weights in the discussion. I am not sure that I have the same take on packages - I would not assume that not being under active development is equivalent to `dormant'.  }
+}
 \end{enumerate}
 
 
