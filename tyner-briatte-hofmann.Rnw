@@ -474,11 +474,11 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02),
 
 The email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a directed network of emails between company employees with 55 vertices and 9,063 edges. Each vertex represents an employee of the company, and each edge stands for an email sent from one employee to one or more other employees. The arrow of the directed edge points to the recipient(s) of the email. The network contains two business weeks of emails across the entire company. In order to better visualize the structure of the communication network between employees, emails that were sent out to all employees are removed.
 
-% let's have all of the interpretation in a single place to simplify the flow 
+% let's have all of the interpretation in a single place to simplify the flow
 This network is plotted in Figure~\ref{fig.cap:email}. There are six distinct clusters in this network which almost perfectly correspond to the six different types of employees in this company: administration, engineering, executive, facilities, information technology, and security.
 
 %% HH: this is not necessarily true anymore, when taking the number of emails exchanged into account
-It is interesting to observe that, in all of the layouts, the `Security' employee group plays a central role in the email network of the company. This observation holds regardless of the actual network layout used (remember that \code{ggnet2} and \code{ggnetwork} default to the Fruchterman-Reingold algorithm, while \code{geomnet} defaults to the Kamada-Kawai algorithm; both layouts are force-directed, but proceed differently to assign coordinates to the nodes). 
+It is interesting to observe that, in all of the layouts, the `Security' employee group plays a central role in the email network of the company. This observation holds regardless of the actual network layout used (remember that \code{ggnet2} and \code{ggnetwork} default to the Fruchterman-Reingold algorithm, while \code{geomnet} defaults to the Kamada-Kawai algorithm; both layouts are force-directed, but proceed differently to assign coordinates to the nodes).
 We also see that one of the executives only communicates with a single person in Facilities, while one of the IT employees frequently communicates with a Security employee.
 
 A comparison of the results of \pkg{ggnet}, \pkg{geomnet} and \pkg{ggnetwork} reveals some of the (subtle) differences that exist between the implementations:
@@ -501,16 +501,26 @@ A comparison of the results of \pkg{ggnet}, \pkg{geomnet} and \pkg{ggnetwork} re
 
 
 % \fb{Note that we are fitting node placement algorithms that support edge weights (at least for K-K, and at least in their \pkg{igraph} implementations) to a network that should be weighted, but that is not.}
-% 
+%
 % \hh{XXX Francois, what are you trying to say with the previous comment? What edge weights do you think should be used? The number of emails between sender and receiver is considered in the layout calculation in stat\_net. It is only afterwards, that the data is reduced to unique edges between from and to. }
-% 
+%
  \fb{Sorry for not being clear above, I'll try again. The email network should be weighted, but it is not: instead, some of its edges are duplicated. This structure probably affects the result of the K-K placement algorithm in a way that is different from how weights should affect the result of the algorithm, which understands weights as ``geometric distances'' (K-K paper, p. 14). The same problem likely affects the F-R algorithm (which has a `weights' argument in \pkg{igraph}), although I could not understand from the paper how the edge weights are supposed to be taken into account.}
-% 
+%
 
 \hh{OK, point taken - and actually fixed. I was under the impression that the edgelist routine in the network package dealt with multiplicities in a smarter way. Thank you - see point 1 in the intro :)}
 
+\fb{To be honest, I have no idea how \pkg{network} deals with edge multiplicity. It does not seem to deal with them at all. As for \pkg{sna}, it clearly understands edge weights when coercing to an edge list (which is the first step of its K-K layout implementation), but what happens to the weights later on is unclear to me.
+
+Here's proof that \pkg{sna} preserves edge weights:
+
+\code{sna::as.edgelist.sna(rbind(1:3, 1:3, 1:3))}
+
+What happens to the weights (\code{val}) column is coded in \code{sna::gplot.layout.kamadakawai} (must have to do with the \code{edge.val.as.str} and \code{layout.par\$elen} bits, but I don't get those).}
+
 To introduce a temporal aspect
  we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows email networks associated with each day of the week. The code for these visualization is below:
+
+ \fb{Not sure what's happening with Fig. 4a, but it's now taking half of the page on my end, squashing other subfigures out of the page. I've tried to solve the issue by setting aspect.ratio to 1.}
 
 \begin{figure}[hbt]
 \begin{subfigure}[t]{\textwidth}
@@ -531,10 +541,10 @@ To introduce a temporal aspect
 \caption{\label{fig:email_facet} The same email network as in figure~\ref{fig.cap:email} facetted by day of the week.}
 \end{figure}
 \afterpage{\clearpage}
-<<email_facet_ggnet2, echo=TRUE>>=
+<<email_facet_ggnet2, fig.height=4, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
 # ggnet2 code for the email network facetted by day as shown in fig.4a
 
-# data preparation 
+# data preparation
 em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
 em.day <- lapply(unique(em.day$day),
                  function(x) subset(em.day, day == x)[, 1:2 ])
@@ -552,7 +562,8 @@ for (i in 1:length(em.day)) {
                      palette = "Set1", arrow.size = 0, arrow.gap = 0.01,
                      edge.alpha = 0.1, legend.position = "none") +
     ggtitle(paste("Day", em.day[[ i ]] %n% "day")) +
-    theme(panel.border = element_rect(color = "grey50", fill = NA))
+    theme(panel.border = element_rect(color = "grey50", fill = NA),
+          aspect.ratio = 1)
 }
 gridExtra::grid.arrange(grobs = g, nrow = 2)
 @
@@ -582,9 +593,6 @@ ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
         plot.margin = unit(c(0,0,0,0),"mm"))
 @
 
-%% NOTE: the code below requires version >= 0.1.7 of ggnetwork
-%% devtools::install_github("briatte/ggnetwork")
-
 <<email_facet_ggnetwork, fig.height=4, fig.width=8,echo=TRUE, out.width='\\textwidth'>>=
 # ggnetwork code for the  email network facetted by day as shown in fig.4c
 
@@ -613,7 +621,7 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
 
 %\sct{XXX I am not a fan of this paragraph. Again, we should appear united.}
 
-Note that the main difference in the visualizations of Figure~\ref{fig:email_facet} stems from whether \emph{one} layout is used across all panels (as for the \code{ggnetwork} example) or whether individual layouts are fit to each of the subsets (as for the \code{ggnet2} and the \code{geomnet} examples).  
+Note that the main difference in the visualizations of Figure~\ref{fig:email_facet} stems from whether \emph{one} layout is used across all panels (as for the \code{ggnetwork} example) or whether individual layouts are fit to each of the subsets (as for the \code{ggnet2} and the \code{geomnet} examples).
 In \code{geomnet} this is controlled via the argument \code{fiteach}. By default  \code{fiteach = TRUE}, but \code{fiteach = FALSE} results in all panels sharing the same layout.
 %
 Through the facetting it becomes obvious that there are several days where one or more of the departments does not communicate with any of the other departments. There are only two days, day 13 and day 15, without any isolated department communications.
@@ -911,7 +919,7 @@ This network is shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmi
 % \begin{figure}[hbtp]
 % \caption{\label{tab:lesmis}Code for the three approaches of visualizing the relationships between characters in Les Mis\'{e}rables as shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}.}
 <<lesmis_ggnet2, echo=TRUE>>=
-# Code for the three visualization approaches of co-appearances 
+# Code for the three visualization approaches of co-appearances
 # plot with ggnet2
 ggnet2(lesmis$edges[, 1:2 ], mode = "fruchtermanreingold",
        color = "white", label = TRUE, label.color = "grey30",
@@ -990,13 +998,13 @@ ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
   theme(legend.position = "bottom")
 
 data(metro_map)
-ggplot(data = metro_map_df_t2, aes(x = long, y = lat)) + 
+ggplot(data = metro_map_df_t2, aes(x = long, y = lat)) +
   geom_raster(fill = metro_map_df_t2$color) +
-  geom_net(data = tripnet, layout = NULL, label = TRUE, 
-           vjust = -0.5, aes(from_id = Start.station, 
-                             to_id = End.station, 
-                             x = long, y = lat, 
-                             linewidth = n / 15, 
+  geom_net(data = tripnet, layout = NULL, label = TRUE,
+           vjust = -0.5, aes(from_id = Start.station,
+                             to_id = End.station,
+                             x = long, y = lat,
+                             linewidth = n / 15,
                              colour = Metro)) +
   theme_net() +
   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
