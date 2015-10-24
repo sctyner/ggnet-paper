@@ -249,9 +249,9 @@ This last functionality builds on one of the strengths of the \pkg{network} clas
 The \code{ggnet2} function also provides a few network-specific options, such as sizing the nodes as a function of their (unweighted) degree, or using the primary and secondary modes of a bipartite network as an aesthetic mapping for the nodes.%
   %
   % added to answer Sam's comment about clarity/rephrasing
-  \footnote{Bipartite (or 'two-mode') networks are networks with two different kinds of nodes and where all ties are formed between these two kinds. Affiliation networks, which represent the ties between individuals and the groups to which they belong, are examples of such networks (see \citealt[p.~53-54 and p.~123-127]{newman}).}%
+  \footnote{Bipartite (or 'two-mode') networks are networks with two different kinds of nodes and where all ties are formed between these two kinds. Affiliation networks, which represent the ties between individuals and the groups to which they belong, are examples of such networks \citep[see][p.~53-54 and p.~123-127]{newman}.}%
   %
-  As a result, the function combines two different kinds of processes: (i) it translates a network object into a data frame suitable for plotting with \pkg{ggplot2}, and (ii) it applies some network-related aesthetic operations to that data frame, such as coloring the edges in function of the color of the nodes that they connect.
+  As a result, the function combines two different kinds of processes: (i) it translates a network object into a data frame suitable for plotting with \pkg{ggplot2}, and (ii) it applies  network-related aesthetic operations to that data frame, such as coloring the edges in function of the color of the nodes that they connect.
 
 % \hh{XXX Francois, could you go into more detail here?
 % node aesthetics, edge aesthetics, what kind of networks work as input ... is it restricted to output from the network package? e.g. the expectation from the user is really to be able to deal with a network call.
@@ -264,7 +264,7 @@ The \code{ggnet2} function also provides a few network-specific options, such as
 % \fb{I have added some details on the system: see the node.shape and edge.lty paragraph.}
 
 
-\subsection{geomnet: geom\_net}
+\subsection{geomnet}
 
 \subsubsection{Data Structure}
 \hh{XXX needs a gentler intro: geomnet is a package available at YYY implementing network visualization in a single ggplot2 layer. It consists of two main functions: geom\_net and stat\_net. All of the calculation (from edge list to layout) is done in stat\_net, the rendering happens in geom\_net. }
@@ -274,7 +274,7 @@ The approach taken in \code{geomnet} is similar to the implementation of other, 
 %
 Network analysis is usally working with two sources of information: one data set consisting of a description of the actors, represented as the vertices in the network, and another data set detailing the relationship between these actors, the edge dataset. We assume the vertices are labelled using an `id' column and \hh{XXX the next sentence is not clear yet XXX how about: Edges are described as connection between vertices via their respective `id' labels in a `from' and a `to' column.} that the edges are described by the vertices they connect via a `from' column and a `to' column whose entries are the vertex `ids'. In order for this geometry to work, these two data sets need to be combined into a single data frame. For this, we are using the convention that all of the vertex information is merged into the edge data set using the `from' as the reference column \hh{in a full join operations:}. Generally, there will be some vertices that are sinks in the network because they only show up in the `to' column. We can easily accommodate for these by adding artificial edges in the data set that have missing information for the `to' column.
 
-Fortunately, R provides functionality that allows for an easy way of producing the required result: \code{merge} (in base R), \code{join} \citep[in \CRANpkg{plyr}][]{plyr} and \code{full\_join} \citep[in \CRANpkg{dplyr}][]{dplyr} can be used. In \code{merge} the argument \code{all} needs to be set to \code{TRUE}; in \code{join}, the parameters have to be set to \code{type = "full"} and \code{all = TRUE}. These operations are equivalent to a `full join' in SQL terminology.
+Fortunately, R provides functionality that allows for an easy way of producing the required result: \code{merge} (in base R), \code{join} \citep[in \CRANpkg{plyr} see][]{plyr} and \code{full\_join} \citep[in \CRANpkg{dplyr}, see][]{dplyr} can be used. In \code{merge} the argument \code{all} needs to be set to \code{TRUE}; in \code{join}, the parameters have to be set to \code{type = "full"} and \code{all = TRUE}. These operations are equivalent to a `full join' in SQL terminology.
 
 The formal requirements of \code{stat\_net} are two columns, called \code{from\_id} and \code{to\_id}. During this routine, columns \code{x, y} and \code{xend, yend} are calculated and used as a required input for \code{geom\_net}.
 %
@@ -592,7 +592,7 @@ ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
                group = CurrentEmploymentType,
                linewidth=2*(...samegroup../8+.125)),
            fiteach = TRUE, ealpha = 0.5, size = 1.5) +
-  scale_colour_brewer(palette = "Set1") +
+  scale_colour_brewer("Employment Type", palette = "Set1") +
   theme_net() +
   facet_wrap(~ day, nrow = 2, labeller = "label_both") +
   theme(legend.position = "bottom",
@@ -1009,7 +1009,7 @@ data(metro_map)
 ggplot(data = metro_map_df_t2, aes(x = long, y = lat)) +
   geom_raster(fill = metro_map_df_t2$color, alpha = 0.75) +
   geom_net(data = tripnet, layout = NULL, label = TRUE,
-           labelcolour = "black", vjust = -0.5,
+           vjust = -0.5,
            aes(from_id = Start.station,
                to_id = End.station,
                x = long, y = lat,
@@ -1020,12 +1020,6 @@ ggplot(data = metro_map_df_t2, aes(x = long, y = lat)) +
   theme(legend.position = "bottom")
 
 # compare to https://secure.capitalbikeshare.com/map/
-#ggplot(aes(from_id = Start.station, to_id = End.station),  data = tripnet) +
-#  geom_net(layout = NULL, label = TRUE, vjust = -0.5,
-#           aes(x = long, y = lat, linewidth = n / 15, colour = Metro)) +
-#  theme_net() +
-#  scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
-#  theme(legend.position = "bottom")
 @
 
 <<bikes_prepare, echo = TRUE>>=
@@ -1072,6 +1066,7 @@ ggplot(data = ggnetwork(bikes.net),
                       values = c("grey40", "darkorange")) +
   theme_blank() +
   theme(legend.position = "bottom", legend.box = "horizontal")
+
 # geographic placement
 coords <- c(bikes.net %v% "lon", bikes.net %v% "lat")
 coords <- matrix(coords, ncol = 2)
@@ -1094,7 +1089,7 @@ ggplot(data = ggnetwork(bikes.net, layout = coords),
 \centering
 \includegraphics[width=.49\textwidth]{figure/bikes_geom_net-1.pdf}
 \includegraphics[width=.49\textwidth]{figure/bikes_geom_net-2.pdf}
-\caption{\label{fig:bikes} Network of bike trips using a Kamada-Kawai layout (left) and a geographically true representation (right, \hh{XXX I would like to include a ggmap here, we need to wait until that package is fixed}). Metro stations are shown in orange. In the Kamada-Kawai layout based on the trips taken, metro stations take a much more central position than in the geographically true representation. }
+\caption{\label{fig:bikes} Network of bike trips using a Kamada-Kawai layout (left) and a geographically true representation (right) overlaid on a satellite map. Metro stations are shown in orange. In the Kamada-Kawai layout based on the trips taken, metro stations take a much more central position than in the geographically true representation. }
 \end{figure}
 %\afterpage{\clearpage}
 
