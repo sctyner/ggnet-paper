@@ -528,6 +528,7 @@ To introduce a temporal aspect
 
  \fb{Not sure what's happening with Fig. 4a, but it's now taking half of the page on my end, squashing other subfigures out of the page. I've tried to solve the issue by setting aspect.ratio to 1.}
 \hh{I first noticed this problem after you included the bikes example. It looks like some scaling issue, but the aspect ratio seems to fix it!}
+\fb{Scaling issue was due to fig.width and fig.height having been removed. Putting them back fixed it. Strange thing, though: with identical fig.width and fig.height, geomnet produces a smaller figure than the two others.}
 
 \begin{figure}[hbt]
 \begin{subfigure}[t]{\textwidth}
@@ -1058,11 +1059,10 @@ ggplot(data = ggnetwork(bikes.net),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges(aes(size = n), color = "grey40") +
   geom_nodes(aes(color = factor(station)), size = 4) +
-  geom_nodetext(aes(label = vertex.names,
-                    color = factor(station)),
+  geom_nodetext(aes(label = vertex.names, color = factor(station)),
                 vjust = -0.5) +
-  scale_colour_manual("Metro station",
-                      labels = c("FALSE", "TRUE"),
+  scale_size_continuous("Trips", breaks = c(2, 4, 6), labels = c(30, 60, 90)) +
+  scale_colour_manual("Metro station", labels = c("FALSE", "TRUE"),
                       values = c("grey40", "darkorange")) +
   theme_blank() +
   theme(legend.position = "bottom", legend.box = "horizontal")
@@ -1072,13 +1072,15 @@ coords <- c(bikes.net %v% "lon", bikes.net %v% "lat")
 coords <- matrix(coords, ncol = 2)
 ggplot(data = ggnetwork(bikes.net, layout = coords),
        aes(x, y, xend = xend, yend = yend)) +
+  geom_raster(data = metro_map_df_t2,
+              aes(x = long, y = lat, xend = NULL, yend = NULL),
+              fill = metro_map_df_t2$color, alpha = 0.75) +
   geom_edges(aes(size = n), color = "grey40") +
   geom_nodes(aes(color = factor(station)), size = 4) +
-  geom_nodetext(aes(label = vertex.names,
-                    color = factor(station)),
+  geom_nodetext(aes(label = vertex.names, color = factor(station)),
                 vjust = -0.5) +
-  scale_colour_manual("Metro station",
-                      labels = c("FALSE", "TRUE"),
+  scale_size_continuous("Trips", breaks = c(2, 4, 6), labels = c(30, 60, 90)) +
+  scale_colour_manual("Metro station", labels = c("FALSE", "TRUE"),
                       values = c("grey40", "darkorange")) +
   scale_x_continuous(limits = c(-0.1, 1.1)) +
   theme_blank() +
@@ -1104,7 +1106,7 @@ ggplot(data = ggnetwork(bikes.net, layout = coords),
 \centering
 \includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-1.pdf}
 \includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-2.pdf}
-\caption{\label{fig:bikes_ggnetwork} ggnetwork \fb{Problem: standardizing the coordinates to (0,1) distorts the aspect ratio} \hh{have a look at the map - the area covered is actually fairly quadratic. Geographic Lat and Long don't operate on the same scales. }}
+\caption{\label{fig:bikes_ggnetwork} ggnetwork \fb{Problem: standardizing the coordinates to (0,1) distorts the aspect ratio} \hh{have a look at the map - the area covered is actually fairly quadratic. Geographic Lat and Long don't operate on the same scales. } \fb{Still unsure what changes I should bring to make the geographic plot as correct as possible... XYZ} }
 \end{figure}
 
 \subsection{Protein interactions in yeast}
