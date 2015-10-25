@@ -1,3 +1,7 @@
+## network
+if (!require(ggnetwork, quietly = TRUE)) {
+  install.package("network")
+}
 library(network)
 
 ## ggplot2
@@ -78,7 +82,7 @@ for (i in seq(20, 1000, 20)) {
 
     }
 
-    write.csv(d, f)
+    write.csv(d, f, row.names = FALSE)
 
   }
 
