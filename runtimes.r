@@ -1,8 +1,14 @@
 ## network
-if (!require(ggnetwork, quietly = TRUE)) {
+if (!require(network, quietly = TRUE)) {
   install.package("network")
 }
 library(network)
+
+## igraph
+if (!require(igraph, quietly = TRUE)) {
+  install.package("igraph")
+}
+library(igraph)
 
 ## ggplot2
 if (!require(ggnetwork, quietly = TRUE) ||
@@ -22,6 +28,7 @@ if (!require(geomnet, quietly = TRUE)) {
   devtools::install_github("sctyner/geomnet")
 }
 library(geomnet)
+library(dplyr) # currently required by geomnet
 
 ## ggnetwork
 if (!require(ggnetwork, quietly = TRUE) ||
@@ -38,7 +45,7 @@ for (i in seq(20, 1000, 20)) {
   f = paste0("runtimes", sprintf("%04.0f", i), ".csv")
   if (!file.exists(f)) {
 
-    n = network(sna::rgraph(i))
+    r = sna::rgraph(i)
 
     cat("Timing functions with networks of size", i, "...\n")
 
@@ -46,6 +53,14 @@ for (i in seq(20, 1000, 20)) {
     p = txtProgressBar(0, 100, style = 3)
 
     for (j in 1:100) {
+
+      n = graph.adjacency(r)
+
+      t00 = system.time({
+        plot(n)
+      })[1]
+
+      n = network(r)
 
       t0 = system.time({
         plot.network(n)
@@ -70,6 +85,7 @@ for (i in seq(20, 1000, 20)) {
       d = rbind(d, data.frame(
         network_size = i,
         iteration = j,
+        igraph = t00,
         network = t0,
         ggnet2 = t1,
         geomnet = t2,
@@ -82,6 +98,7 @@ for (i in seq(20, 1000, 20)) {
 
     }
 
+    cat("\n")
     write.csv(d, f, row.names = FALSE)
 
   }
