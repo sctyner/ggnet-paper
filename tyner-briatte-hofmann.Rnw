@@ -491,10 +491,10 @@ A comparison of the results of \pkg{ggnet}, \pkg{geomnet} and \pkg{ggnetwork} re
 
 \begin{itemize}
 
-  \item %
-  In the \code{ggnet2} implementation, the \sct{opacity} and thickness of the edges between employees in the same cluster are more pronounced than those of the edges between employees in different clusters. This is due to the fact that the email network does not feature edge weights: instead, every email between two employees is represented by a different edge, resulting in edge overplotting. As the \code{edge.alpha} argument has been set to a value smaller than one, multiple emails between two employees create more opaque, thicker \hh{XXX why thicker? the linewidth is not related to thickness XXX} edges between them. This effect is not visible in the layouts created by \pkg{geomnet} and \code{ggnetwork} because both implementations draw a single segment for each directed edge, regardless of how many of these edges exist in the network data.
+  %% this paragraph has been fixed to reflect your (sct + hh) remarks -- fb
 
-  %The value is set to 0.25 in this example, so that four or more emails between two employees result in a completely opaque edge. %% <- is that how overplotting alpha values work?
+  \item %
+  In the \code{ggnet2} implementation, the opacity of the edges between employees in the same cluster is higher than it is for the edges between employees in different clusters. This is due to the fact that the email network does not feature edge weights: instead, every email between two employees is represented by a different edge, resulting in edge overplotting. As the \code{edge.alpha} argument has been set to a value smaller than one, multiple emails between two employees create more opaque edges between them. This effect is not visible in the layouts created by \pkg{geomnet} and \code{ggnetwork} because both implementations draw a single segment for each directed edge, regardless of how many of these edges exist in the network data.
 
   \item %
   In the first two layouts of Figure~\ref{fig.cap:email}, edges between employees who share the same employment type are given the color of that employment type, while edges between employees belonging to different types are plotted in grey. This feature is particularly useful to visualize the amount of within-group connectedness in a network. By contrast, in the last layout, edges are colored according to the sender's employment type, because the \code{ggnetwork} package does not support coloring edges as a function of node-level attributes.
@@ -504,27 +504,7 @@ A comparison of the results of \pkg{ggnet}, \pkg{geomnet} and \pkg{ggnetwork} re
 
 \end{itemize}
 
-
-
-% \fb{Note that we are fitting node placement algorithms that support edge weights (at least for K-K, and at least in their \pkg{igraph} implementations) to a network that should be weighted, but that is not.}
-%
-% \hh{XXX Francois, what are you trying to say with the previous comment? What edge weights do you think should be used? The number of emails between sender and receiver is considered in the layout calculation in stat\_net. It is only afterwards, that the data is reduced to unique edges between from and to. }
-%
- \fb{Sorry for not being clear above, I'll try again. The email network should be weighted, but it is not: instead, some of its edges are duplicated. This structure probably affects the result of the K-K placement algorithm in a way that is different from how weights should affect the result of the algorithm, which understands weights as ``geometric distances'' (K-K paper, p. 14). The same problem likely affects the F-R algorithm (which has a `weights' argument in \pkg{igraph}), although I could not understand from the paper how the edge weights are supposed to be taken into account.}
-%
-
-\hh{OK, point taken - and actually fixed. I was under the impression that the edgelist routine in the network package dealt with multiplicities in a smarter way. Thank you - see point 1 in the intro :)}
-
-\fb{To be honest, I have no idea how \pkg{network} deals with edge multiplicity. It does not seem to deal with them at all. As for \pkg{sna}, it clearly understands edge weights when coercing to an edge list (which is the first step of its K-K layout implementation), but what happens to the weights later on is unclear to me.
-
-Here's proof that \pkg{sna} preserves edge weights:
-
-\code{sna::as.edgelist.sna(rbind(1:3, 1:3, 1:3))}
-
-What happens to the weights (\code{val}) column is coded in \code{sna::gplot.layout.kamadakawai} (must have to do with the \code{edge.val.as.str} and \code{layout.par\$elen} bits, but I don't get those).}
-
-To introduce a temporal aspect
- we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows email networks associated with each day of the week. The code for these visualization is below:
+To introduce a temporal aspect, we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows email networks associated with each day of the week. The code for these visualization is below:
 
 %  \fb{Not sure what's happening with Fig. 4a, but it's now taking half of the page on my end, squashing other subfigures out of the page. I've tried to solve the issue by setting aspect.ratio to 1.}
 % \hh{I first noticed this problem after you included the bikes example. It looks like some scaling issue, but the aspect ratio seems to fix it!}
@@ -1250,11 +1230,15 @@ I would like to think that both approaches are valid and necessary.
 
 \fb{I don't have many ideas about the userbase of each function. All I know is that I get emails from time to time about ggnet and ggnet2. Some are from complete beginners (just got one this morning), others are much more advanced (e.g. Pedro Jordano, who helped me understand bipartite graphs). My guess is that all of them stumbled upon the function by googling for "network + ggplot2".}
 \item{ \hh{internal calculation of the network versus external. Each call to geomnet results in a re-calculation of the network and, unless a seed is set, in a new layout. Once the network is calculated, subsequent calls to ggnet2 and ggnetwork are computationally more efficient.}
-\item \fb{This is not really a to-do, just an observation: the placement algorithms availabe through \pkg{igraph} seem both more divserse and more correct than those provided through \pkg{sna}. This is likely due to the factthat the first package is still under active development, while the second one is more or less dormant. An illustration of that is the Kamada-Kawai algorithm, which can take edge weights into account in the \pkg{igraph} implementation but not in the \pkg{sna} one (AFAICT). Consequently, if I had to learn network analysis in R all over again, I would choose to use \pkg{igraph} instead of \pkg{network} + \pkg{sna}.}
+%% paragraph below re-rewritten from comments
+\item \textbf{Discussion of edge weights.}
+
+\fb{All our approaches rely on \pkg{sna}. A larger range of layouts is available through \pkg{igraph}. However, the parameters of layouts that exist in both packages are sometimes different, e.g. \pkg{igraph} claims to support weights for F-R placement, even though it is unclear from the original article how these are supposed to affect the layout.}
+
 \hh{We definitely need to discuss edge weights in the discussion. I am not sure that I have the same take on packages - I would not assume that not being under active development is equivalent to `dormant'.  }
+
 }
 \end{enumerate}
-
 
 \bibliography{tyner-briatte-hofmann}
 
