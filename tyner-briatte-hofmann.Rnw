@@ -131,7 +131,7 @@ library(geomnet)
 
 ## ggnetwork
 if (!require(ggnetwork, quietly = TRUE) ||
-    packageVersion("ggnetwork") < "0.2.0") {
+    packageVersion("ggnetwork") < "0.2.1") {
   devtools::install_github("briatte/ggnetwork")
 }
 library(ggnetwork)
