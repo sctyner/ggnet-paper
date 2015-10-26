@@ -526,9 +526,9 @@ What happens to the weights (\code{val}) column is coded in \code{sna::gplot.lay
 To introduce a temporal aspect
  we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows email networks associated with each day of the week. The code for these visualization is below:
 
- \fb{Not sure what's happening with Fig. 4a, but it's now taking half of the page on my end, squashing other subfigures out of the page. I've tried to solve the issue by setting aspect.ratio to 1.}
-\hh{I first noticed this problem after you included the bikes example. It looks like some scaling issue, but the aspect ratio seems to fix it!}
-\fb{Scaling issue was due to fig.width and fig.height having been removed. Putting them back fixed it. Strange thing, though: with identical fig.width and fig.height, geomnet produces a smaller figure than the two others.}
+%  \fb{Not sure what's happening with Fig. 4a, but it's now taking half of the page on my end, squashing other subfigures out of the page. I've tried to solve the issue by setting aspect.ratio to 1.}
+% \hh{I first noticed this problem after you included the bikes example. It looks like some scaling issue, but the aspect ratio seems to fix it!}
+% \fb{Scaling issue was due to fig.width and fig.height having been removed. Putting them back fixed it. Strange thing, though: with identical fig.width and fig.height, geomnet produces a smaller figure than the two others.}
 
 \begin{figure}[hbt]
 \begin{subfigure}[t]{\textwidth}
@@ -1106,7 +1106,7 @@ ggplot(data = ggnetwork(bikes.net, layout = coords),
 \centering
 \includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-1.pdf}
 \includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-2.pdf}
-\caption{\label{fig:bikes_ggnetwork} ggnetwork \fb{Problem: standardizing the coordinates to (0,1) distorts the aspect ratio} \hh{have a look at the map - the area covered is actually fairly quadratic. Geographic Lat and Long don't operate on the same scales. } \fb{Still unsure what changes I should bring to make the geographic plot as correct as possible... XYZ} }
+\caption{\label{fig:bikes_ggnetwork} ggnetwork \fb{Problem: standardizing the coordinates to (0,1) distorts the aspect ratio} \hh{have a look at the map - the area covered is actually fairly quadratic. Geographic Lat and Long don't operate on the same scales. } \fb{Still unsure what changes I should bring to make the geographic plot as correct as possible... XYZ} \hh{Shouldn't things on a map have equal distances in x and y? Have a look at the area on the actual map ... it is square - in the image that I'm seeing, the width is about half as wide as it should be.} }
 \end{figure}
 
 \subsection{Protein interactions in yeast}
