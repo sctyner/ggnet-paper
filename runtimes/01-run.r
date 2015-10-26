@@ -1,14 +1,14 @@
-## network
-if (!require(network, quietly = TRUE)) {
-  install.package("network")
-}
-library(network)
-
-## igraph
+## igraph (current: v1.0.1)
 if (!require(igraph, quietly = TRUE)) {
   install.package("igraph")
 }
 library(igraph)
+
+## network (current: v1.13.0)
+if (!require(network, quietly = TRUE)) {
+  install.package("network")
+}
+library(network)
 
 ## ggplot2
 if (!require(ggnetwork, quietly = TRUE) ||
@@ -42,40 +42,39 @@ library(ggnetwork)
 
 for (i in seq(20, 1000, 20)) {
 
-  f = paste0("runtimes", sprintf("%04.0f", i), ".csv")
+  f = paste0("runtimes-", sprintf("%04.0f", i), ".csv")
   if (!file.exists(f)) {
 
     r = sna::rgraph(i)
-
-    cat("Timing functions with networks of size", i, "...\n")
-
     d = data.frame()
-    p = txtProgressBar(0, 100, style = 3)
 
     for (j in 1:100) {
 
+      cat("Timing networks of size", i,
+          "iteration", sprintf("%3.0f", j), "/ 100\n")
+
       n = graph.adjacency(r)
 
-      t00 = system.time({
+      t1 = system.time({
         plot(n)
       })[1]
 
       n = network(r)
 
-      t0 = system.time({
+      t2 = system.time({
         plot.network(n)
       })[1]
 
-      t1 = system.time({
+      t3 = system.time({
         print(ggnet2(n))
       })[1]
 
-      t2 = system.time({
+      t4 = system.time({
         print(ggplot(data = data.frame(sna::as.edgelist.sna(n))) +
                 geom_net(aes(from_id = X1, to_id = X2)))
       })[1]
 
-      t3 = system.time({
+      t5 = system.time({
         print(ggplot(ggnetwork(n),
                      aes(x, y, xend = xend, yend = yend)) +
                 geom_edges() +
@@ -85,15 +84,14 @@ for (i in seq(20, 1000, 20)) {
       d = rbind(d, data.frame(
         network_size = i,
         iteration = j,
-        igraph = t00,
-        network = t0,
-        ggnet2 = t1,
-        geomnet = t2,
-        ggnetwork = t3,
+        igraph = t1,
+        network = t2,
+        ggnet2 = t3,
+        geomnet = t4,
+        ggnetwork = t5,
         row.names = NULL
       ))
 
-      setTxtProgressBar(p, j)
       dev.off()
 
     }
