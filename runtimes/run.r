@@ -1,3 +1,6 @@
+library(tidyr)
+library(dplyr)
+
 ## igraph (current: v1.0.1)
 if (!require(igraph, quietly = TRUE)) {
   install.package("igraph")
@@ -27,8 +30,7 @@ library(ggnet)
 if (!require(geomnet, quietly = TRUE)) {
   devtools::install_github("sctyner/geomnet")
 }
-library(geomnet)
-library(dplyr) # currently required by geomnet
+library(geomnet) # also currently requires dplyr
 
 ## ggnetwork
 if (!require(ggnetwork, quietly = TRUE) ||
@@ -45,21 +47,21 @@ for (i in seq(20, 1000, 20)) {
   f = paste0("runtimes-", sprintf("%04.0f", i), ".csv")
   if (!file.exists(f)) {
 
-    r = sna::rgraph(i)
     d = data.frame()
 
     for (j in 1:100) {
 
-      cat("Timing networks of size", i,
-          "iteration", sprintf("%3.0f", j), "/ 100\n")
+      r = sna::rgraph(i, tprob = 0.5)
+      
+      cat("Network size", i, "iteration", sprintf("%3.0f", j), "/ 100\n")
 
-      n = graph.adjacency(r)
+      n = graph_from_adjacency_matrix(r, mode = "undirected")
 
       t1 = system.time({
         plot(n)
       })[1]
 
-      n = network(r)
+      n = network(r, directed = FALSE)
 
       t2 = system.time({
         plot.network(n)
@@ -96,9 +98,25 @@ for (i in seq(20, 1000, 20)) {
 
     }
 
-    cat("\n")
     write.csv(d, f, row.names = FALSE)
 
   }
+  
+  g = list.files(pattern = "csv$") %>%
+        lapply(read.csv, stringsAsFactors = FALSE) %>%
+        bind_rows %>%
+        gather(`Visualization method`, time, -network_size, -iteration) %>%
+        group_by(network_size, `Visualization method`) %>%
+        summarise(mean_time = mean(time), min = min(time), max = max(time))
+
+  g = ggplot(g, aes(x = network_size, y = mean_time,
+                    fill = `Visualization method`)) +
+    geom_ribbon(aes(ymin = min, ymax = max), alpha = 0.5) +
+    geom_line(aes(color = `Visualization method`)) +
+    labs(y = "Average plotting time (seconds)", x = "Network size") +
+    theme_classic() +
+    theme(legend.justification = c(0,1), legend.position = c(0,1))
+    
+  ggsave("runtimes.pdf", g, width = 9, height = 9)
 
 }
