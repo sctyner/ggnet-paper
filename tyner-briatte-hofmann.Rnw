@@ -1246,7 +1246,15 @@ I would like to think that both approaches are valid and necessary.
 \hh{We definitely need to discuss edge weights in the discussion. I am not sure that I have the same take on packages - I would not assume that not being under active development is equivalent to `dormant'.  }
 
 }
+\item \hh{Which approach is the best? This is a question that we cannot answer overall, but we can give suggestions as to which approach is the best for you, depending on your answers to a couple of questions:
 
+\begin{enumerate}
+\item Do you want to draw graph? if yes, you're off to a  good start, you're in the right place, keep reading. If no, sorry, but you can stop reading now.
+\item Do you have the data to draw your network? yes? good, keep reading, if not, find some data.
+\item Do you have experience drawing a network? yes? your packages of choice are ggnet2 or ggnetwork, but keep reading. no? go check out geomnet. 
+\item Do you know ggplot2? yes? use ggnetwork. no? ggnet2 is your package. 
+\end{enumerate}
+} 
 \end{enumerate}
 
 \bibliography{tyner-briatte-hofmann}
