@@ -21,10 +21,6 @@ This paper explores three different techniques to visualize networks by building
 
   \fb{I have included some testing code + prelim. results in the "runtimes" folder.}
 
-\item %%%%%%%%%%%%
-  \fb{Why does geomnet in Fig. 4b (email\_facet\_geom\_net-1) produce a smaller figure than the two other approaches? The fig.width has to be set to 4.5 instead of 4 to produce a same-sized figure. Due to aspect.ratio setting, perhaps?}
-\hh{aspect ratio makes the plot be square - the additional .5 of an inch is accounting for the facetting labels and the legend at the bottom. I was aiming for having all images at about the same size - we can reduce the width on 4b a bit, if you'd like.}
-
 \end{enumerate}}
 
 <<setup_knitr, echo=FALSE>>=
