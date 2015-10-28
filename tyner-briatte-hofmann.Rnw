@@ -1179,7 +1179,10 @@ Another improvement that I see is that, trying to differentiate between the appr
 
 Another benefit that emerges from using \pkg{ggplot2} for network visualization has to do with the speed at which it can plot relatively large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{igraph} and \pkg{network} packages.
 
-The first test relies on random undirected networks in which the probability of a tie was set to 0.5. We generated 100 of these networks at different network sizes between 20 and 240 nodes, using increments of 20. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}. The benefits of using \pkg{ggplot2}-based approaches is most obvious when compared to the plotting function included in the \pkg{network} package, which very quickly becomes very slow when network size increases.
+The first test relies on random undirected networks in which the probability of a tie was set to 0.5. \hh{XXX We have been using `edge' in the paper - I'd stick to that and expand a bit on the explanation: `in which the probability for an edge between any two nodes was set to 0.5.' XXX This makes the networks pretty densele connected - none of our other networks is nearly that connected. How does the runtime vary with different tie probability?   } We generated 100 of these networks at different network sizes between 20 and 240 nodes, using increments of 20. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}. 
+\hh{XXX We need to get the comparison to be fair between the three methods. at the moment, the time in geomnet covers a) the extraction of the edgelist from an existing network, b) a re-calculation of the network in a K-K layout, and c) the actual plotting. All of the other routines do just the plotting.
+XXX I'm not sure that we can actually fix this, if the network already exists.  I think this drives the message home again, that there are different motivations behind the three approaches. XXX }
+The benefits of using \pkg{ggplot2}-based approaches is most obvious when compared to the plotting function included in the \pkg{network} package, which very quickly becomes very slow when network size increases.
 
 }
 
@@ -1243,6 +1246,7 @@ I would like to think that both approaches are valid and necessary.
 \hh{We definitely need to discuss edge weights in the discussion. I am not sure that I have the same take on packages - I would not assume that not being under active development is equivalent to `dormant'.  }
 
 }
+
 \end{enumerate}
 
 \bibliography{tyner-briatte-hofmann}
