@@ -42,7 +42,7 @@ library(ggnetwork)
 # note: plot.network might be slower because it actually prints the plots, so to
 # compare the methods, we need to evaluate the ggplot plots by printing them too
 
-for (i in seq(20, 1000, 20)) {
+for (i in seq(20, 240, 20)) {
 
   f = paste0("runtimes-", sprintf("%04.0f", i), ".csv")
   if (!file.exists(f)) {
@@ -111,9 +111,11 @@ for (i in seq(20, 1000, 20)) {
 
   g = ggplot(g, aes(x = network_size, y = mean_time,
                     fill = `Visualization method`)) +
-    geom_ribbon(aes(ymin = min, ymax = max), alpha = 0.5) +
+    geom_ribbon(aes(ymin = min, ymax = max), alpha = 1/3) +
     geom_line(aes(color = `Visualization method`)) +
-    labs(y = "Average plotting time (seconds)", x = "Network size") +
+    scale_y_continuous(breaks = seq(0, max(g$max), 10)) +
+    scale_x_continuous(breaks = seq(20, 240, 40)) +
+    labs(y = "Average plotting time (seconds)\n", x = "\nNetwork size") +
     theme_classic() +
     theme(legend.justification = c(0,1), legend.position = c(0,1))
     
