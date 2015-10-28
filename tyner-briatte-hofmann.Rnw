@@ -1162,7 +1162,7 @@ qplot(data = timings, reorder(type, elapsed, median), elapsed, geom = "boxplot",
 \caption{\label{fig:timings} Comparison of the times needed for calculating and rendering the protein interaction network in the three \pkg{ggplot2} approaches (top three) and the standard plotting routine  of the \pkg{network} package based on 100 evaluations each.  }
 \end{figure}
 
-\section{Summary}
+\section{Summary and Discussion}
 
 \hh{XXX We need to come up with a discussion. Let's get started with with some bullet points:}
 \begin{enumerate}
