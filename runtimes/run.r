@@ -105,14 +105,14 @@ for (i in seq(20, 240, 20)) {
   g = list.files(pattern = "csv$") %>%
         lapply(read.csv, stringsAsFactors = FALSE) %>%
         bind_rows %>%
-        gather(`Visualization method`, time, -network_size, -iteration) %>%
-        group_by(network_size, `Visualization method`) %>%
+        gather(`Visualization approach`, time, -network_size, -iteration) %>%
+        group_by(network_size, `Visualization approach`) %>%
         summarise(mean_time = mean(time), min = min(time), max = max(time))
 
   g = ggplot(g, aes(x = network_size, y = mean_time,
-                    fill = `Visualization method`)) +
+                    fill = `Visualization approach`)) +
     geom_ribbon(aes(ymin = min, ymax = max), alpha = 1/3) +
-    geom_line(aes(color = `Visualization method`)) +
+    geom_line(aes(color = `Visualization approach`)) +
     scale_y_continuous(breaks = seq(0, max(g$max), 10)) +
     scale_x_continuous(breaks = seq(20, 240, 40)) +
     labs(y = "Average plotting time (seconds)\n", x = "\nNetwork size") +
