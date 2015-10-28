@@ -1053,7 +1053,9 @@ ggplot(data = ggnetwork(bikes.net, layout = coords),
 
 \subsection{Protein interactions in yeast} % ===================================
 
-This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, with a total of 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}. These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}.  We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices. Because all of the appraoches result in very similar figures, only one network is shown. The code for all three approaches is shown below:
+\fb{Suggestion: convert this example to a discussion point about speed.}
+
+This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, with a total of 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}. These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}.  We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices. Because all of the approaches result in very similar figures, only one network is shown. The code for all three approaches is shown below:
 
 <<yeast_ggnet2, echo=TRUE, eval = FALSE, cache=FALSE>>=
 # plot with ggnet2
@@ -1103,55 +1105,58 @@ plot(network(protein$edges[, 1:2]), coord = xy)
 \centering
 <<compare, echo = FALSE, eval = TRUE, fig.height = 4, fig.width = 8, out.width = '\\textwidth'>>=
 if (!file.exists("data/timings.csv")) {
-network <- data.frame(t(replicate(100, {
-system.time({
-#  xy = gplot.layout.random(network(protein$edges[, 1:2]),
-#                         layout.par = list(dist = "uniang"))
-  plot(network(protein$edges[, 1:2]), coord = gplot.layout.random(network(protein$edges[, 1:2]), layout.par = list(dist = "uniang")))
-  })}
-)))
+  network <- data.frame(t(replicate(100, {
+  system.time({
+  #  xy = gplot.layout.random(network(protein$edges[, 1:2]),
+  #                         layout.par = list(dist = "uniang"))
+    plot(network(protein$edges[, 1:2]), coord = gplot.layout.random(network(protein$edges[, 1:2]), layout.par = list(dist = "uniang")))
+    })}
+  )))
 
-# compare to ggnet2:
-ggnet2 <- data.frame(t(replicate(100, system.time(print(
-  ggnet2(network(protein$edges[,1:2]), size = 2, color = "magenta",
-      mode = "random", layout.par = list(dist = "uniang"),
-      edge.alpha = 0.05)
-)))))
+  # compare to ggnet2:
+  ggnet2 <- data.frame(t(replicate(100, system.time(print(
+    ggnet2(network(protein$edges[,1:2]), size = 2, color = "magenta",
+        mode = "random", layout.par = list(dist = "uniang"),
+        edge.alpha = 0.05)
+  )))))
 
-# compare to geomnet:
-geomnet <- data.frame(t(replicate(100, system.time(print(
-ggplot(data = protein$edges, aes(from_id = from, to_id = to)) +
-  geom_net(alpha = 0.25, ealpha = 0.05, size = 2, colour = "magenta",
-           ecolour = "grey70", linewidth = 0.5,
-           layout = "random", layout.par = list(dist = "uniang")) +
-  theme_net()
-)))))
+  # compare to geomnet:
+  geomnet <- data.frame(t(replicate(100, system.time(print(
+  ggplot(data = protein$edges, aes(from_id = from, to_id = to)) +
+    geom_net(alpha = 0.25, ealpha = 0.05, size = 2, colour = "magenta",
+             ecolour = "grey70", linewidth = 0.5,
+             layout = "random", layout.par = list(dist = "uniang")) +
+    theme_net()
+  )))))
 
-# compare to ggnetwork:
-ggnetwork <- data.frame(t(replicate(100, system.time(print(
-  ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
-       aes(x, y, xend = xend, yend = yend)) +
-  geom_edges(color = "grey70", lwd = 0.5, alpha = 0.05) +
-  geom_nodes(alpha = 0.25, color = "magenta", size = 2) +
-  theme_blank()
-)))))
+  # compare to ggnetwork:
+  ggnetwork <- data.frame(t(replicate(100, system.time(print(
+    ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
+         aes(x, y, xend = xend, yend = yend)) +
+    geom_edges(color = "grey70", lwd = 0.5, alpha = 0.05) +
+    geom_nodes(alpha = 0.25, color = "magenta", size = 2) +
+    theme_blank()
+  )))))
 
-network$type <- "network"
-ggnet2$type <- "ggnet2"
-geomnet$type <- "geomnet"
-ggnetwork$type <- "ggnetwork"
+  network$type <- "network"
+  ggnet2$type <- "ggnet2"
+  geomnet$type <- "geomnet"
+  ggnetwork$type <- "ggnetwork"
 
-timings <- rbind(network, ggnet2, geomnet, ggnetwork)
-write.csv(timings, file = "data/timings.csv", row.names = FALSE)
+  timings <- rbind(network, ggnet2, geomnet, ggnetwork)
+  write.csv(timings, file = "data/timings.csv", row.names = FALSE)
 } else {
   timings <- read.csv("data/timings.csv")
 }
 
-timings$type <- factor(timings$type, levels = rev(c("ggnet2", "geomnet", "ggnetwork", "network")))
-qplot(data = timings, type, elapsed, geom = "boxplot", fill = type, alpha = I(0.6)) +
+# timings$type <- factor(timings$type, levels = rev(c("ggnet2", "geomnet", "ggnetwork", "network")))
+qplot(data = timings, reorder(type, elapsed, median), elapsed, geom = "boxplot", fill = type, alpha = I(0.6)) +
   scale_fill_brewer(palette = "Set2") + theme_bw() +
   xlab("Visualisation Approach") + ylab("System time elapsed (in seconds)") +
-  ylim(c(0, 7.1)) + theme(legend.position = "none") + coord_flip()
+  ylim(c(0, 7.1)) +
+  coord_flip() +
+  theme_classic() +
+  theme(legend.position = "none")
 @
 \includegraphics[width=.5\textwidth]{figure/compare-1.pdf}
 \caption{\label{fig:timings} Comparison of the times needed for calculating and rendering the protein interaction network in the three \pkg{ggplot2} approaches (top three) and the standard plotting routine  of the \pkg{network} package based on 100 evaluations each.  }
@@ -1167,6 +1172,31 @@ Another improvement that I see is that, trying to differentiate between the appr
 }
 
 \fb{I agree with the general observation here. And yes, ggnetwork was inspired by reading the code from geomnet. I had never looked at the internals of ggplot2 before.}
+
+\item %%%%%%%%%%%%%%%%%%
+
+\fb{
+
+Another benefit that emerges from using \pkg{ggplot2} for network visualization has to do with the speed at which it can plot relatively large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{igraph} and \pkg{network} packages.
+
+The first test relies on random undirected networks in which the probability of a tie was set to 0.5. We generated 100 of these networks at different network sizes between 20 and 240 nodes, using increments of 20. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}. The benefits of using \pkg{ggplot2}-based approaches is most obvious when compared to the plotting function included in the \pkg{network} package, which very quickly becomes very slow when network size increases.
+
+}
+
+\begin{figure}[hbtp]
+\includegraphics[width=.5\textwidth]{runtimes/runtimes.pdf}
+\caption{\label{fig.cap:runtimes-random}%
+  Average plotting time of random undirected networks, in seconds: ribbon at minimum and maximum recorded times, solid line at average. The time ranges of the \code{ggnet2} and \code{ggnetwork} approaches are quasi-identical and form the single purple line at the bottom of the plot.%
+}
+\end{figure}
+
+\fb{
+
+The second test relies on the protein interaction network featured in \citet{protein}, which is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. The network has 1,870 proteins that make up the vertices of the network, with a total of 2,240 edges between them, which represent ``direct physical interactions'' between any two proteins \citep[p. 42]{protein}. These interactions and their associated proteins are plotted in Figure~\ref{fig.cap:yeast} using a random distribution algorithm that produces a ``Gaussian donut'' layout. \fb{The network is shown alongside the execution time of 100 similar plots for each plotting approach.}.
+
+}
+
+\fb{-- Include protein figure here, side-to-side with the execution times. Include \pkg{igraph} in the execution times. --}
 
 \item \hh{Should we make recommendations as to what type of user would be happier with either one of the approaches?
 I would think that the users of ggnet2 and ggnetwork are pretty well-versed with networks, and are looking at ggplot2 for  high-quality visualizations that also covers their other visualization needs. Data management and attribute handling is done through network operators on nodes and edges. These users might actually be attracted to ggplot2 because of the additional features open to them.
