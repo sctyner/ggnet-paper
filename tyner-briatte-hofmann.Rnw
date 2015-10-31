@@ -1170,8 +1170,9 @@ if (!file.exists("data/timings.csv")) {
   )))
 
   # compare to ggnet2:
+  net <- network(protein$edges[,1:2])
   ggnet2 <- data.frame(t(replicate(100, system.time(print(
-    ggnet2(network(protein$edges[,1:2]), size = 2, color = "magenta",
+    ggnet2(net, size = 2, color = "magenta",
         mode = "random", layout.par = list(dist = "uniang"),
         edge.alpha = 0.05)
   )))))
@@ -1223,7 +1224,14 @@ qplot(data = timings, reorder(type, elapsed, median), elapsed,
 
 Another benefit that emerges from using \pkg{ggplot2} for network visualization has to do with the speed at which it can plot relatively large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{igraph} and \pkg{network} packages.
 
+<<<<<<< HEAD
 The first test relies on random undirected networks in which the probability of an edge to exist between two nodes was set to 0.5.  \fb{Let me run the same tests at p = 0.25 and tell you exactly. It sure affects the average plotting time, but the number of nodes should stay the most crucial parameter.} We generated 100 of these networks at different network sizes between 20 and 240 nodes, using increments of 20. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}.
+=======
+The first test relies on random undirected networks in which the probability of a tie was set to 0.5. \hh{XXX We have been using `edge' in the paper - I'd stick to that and expand a bit on the explanation: `in which the probability for an edge between any two nodes was set to 0.5.' XXX This makes the networks pretty densily connected - none of our other networks is nearly that connected. How does the runtime vary with different tie probability?   } We generated 100 of these networks at different network sizes between 20 and 240 nodes, using increments of 20. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}. 
+\hh{XXX We need to get the comparison to be fair between all approaches. 
+}
+The benefits of using \pkg{ggplot2}-based approaches is most obvious when compared to the plotting function included in the \pkg{network} package, which very quickly becomes very slow when network size increases.
+>>>>>>> re-do of timings on protein network
 
 Although speed was not the main rationale for our enquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower than when network size increases.
 
