@@ -161,7 +161,7 @@ facilitating its extension through additional geometries (or \samp{geoms}).%
   \footnote{See \url{https://cran.r-project.org/web/packages/ggplot2/NEWS} for the full list of changes in \pkg{ggplot2} 1.1.0, as well as the new package vignette, ``Extending ggplot2'', which explains how the internal \code{ggproto} system of object-oriented programming can be used to create new geoms.} %
   %
 
-In the remainder of this paper, we present three different approaches to network visualization with \pkg{ggplot2}. Section~\ref{sec:background} introduces the basic terminology of networks and illustrates their ubiquity in natural and social life. Section~\ref{sec:implementations} then discusses the logic behind each of the three approaches that we offer. Section~\ref{sec:examples} extends that discussion through several examples ranging from simple to complex networks, for which we provide the code corresponding to each approach alongside its graphical result.
+In the remainder of this paper, we present three different approaches to network visualization with \pkg{ggplot2}. Section~\ref{sec:background} introduces the basic terminology of networks and illustrates their ubiquity in natural and social life. Section~\ref{sec:implementations} then discusses the logic behind each of the three approaches that we offer. Section~\ref{sec:examples} extends that discussion through several examples ranging from simple to complex networks, for which we provide the code corresponding to each approach alongside its graphical result. \hh{We follow with some considerations of runtimes in plotting networks in Section~\ref{sec:speed} before closing with a discussion.}
 
 \section{A quick primer to network structures}
 \label{sec:background}
@@ -1004,6 +1004,8 @@ ggplot(data = ggnetwork(bikes.net),
 %% FB: separated block below into four blocks, as we did for the blood example
 <<geographic_common, echo=TRUE>>=
 data(metro_map)
+metro_map <- subset(metro_map, x <= -77.125 &
+                    y >= 39.07 & y <= 39.13)
 @
 %
 <<geographic_geomnet, echo=TRUE>>=
@@ -1017,9 +1019,10 @@ ggplot(data = metro_map, aes(x = x, y = y)) +
                x = long, y = lat,
                linewidth = n / 15,
                colour = Metro)) +
-  theme_net() +
   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
-  theme(legend.position = "bottom")
+  theme_net() %+replace% theme(aspect.ratio=NULL) +
+  theme(legend.position = "bottom") 
+
 @
 <<geographic_ggnet2, echo=TRUE>>=
 # geographic placement using ggnet2
@@ -1097,7 +1100,8 @@ ggplot(data = ggnetwork(bikes.net, layout = matrix(coords, ncol = 2)),
 % \hh{Talking about speed in the discussion is a good idea, but by the time that we go into the discussion there shouldn't be any more examples. }
 \fb{I understand that the discussion should not introduce additional examples, but I'd still like to move the protein network text to discussion. What I'm suggesting is to lose the protein network as an example of viz-related functionalities (our plots of the network do not introduce any additional functionalities), and just use it as a test support for speed benchmarking at a high network size. See INSERT sentence in discussion for a suggested insert point for the text.}
 
-This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, with a total of 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}. These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}.  We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices. Because all of the approaches result in very similar figures, only one network is shown. The code for all three approaches is shown below:
+This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, with a total of 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}\hh{, resulting in a relatively large  network. Despite its size, each one of the approaches in the \pkg{ggplot2} framework can be drawn in a few seconds. A more in-depth discussion on plotting speed follows in the next section}. \hh{Proteins and the associations between them are plotted in the networks shown in Figure~\ref{fig.cap:yeast}.} %These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}. 
+We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices. Because all of the approaches result in very similar figures, only one network is shown. The code for all three approaches is shown below:
 
 <<yeast_ggnet2, echo=TRUE, eval = FALSE, cache=FALSE>>=
 # plot with ggnet2
@@ -1124,7 +1128,6 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
   theme_blank()
 
 @
-
 \begin{figure}[hbtp]
 \includegraphics[width=\textwidth]{figure/yeast_geom_net-1.pdf}
 %\end{subfigure}
@@ -1132,7 +1135,17 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 \end{figure}
 %\afterpage{\clearpage}
 
-\section{Small consideration of speed}
+\section{Some considerations of speed}\label{sec:speed}
+\hh{XXX what do you think of moving the  speed discussion out of the conclusions? 
+That way we can go into more detail.
+We really have three parts here:
+\begin{enumerate}
+\item the comparison of all three ggplot2 approaches using the protein example.
+\item the comparison of ggnet2 and ggnetwork with igraph and network.
+\item an extension of the previous comparison with different edge density.
+\end{enumerate}
+}
+
 \fb{Note that we have two benchmarking techniques: (1) average plotting time of 100 protein networks, and (2) average plotting time of increasingly large random networks -- see runtimes.r; so, what should we do? include one of these? or both? I'd support leaving the benchmark code out of the paper, because it is not directly about network viz with ggplot2. Alternately, include it as an appendix? If left out, the code can be referred to by linking to the repo; that's what I would support most.}
 
 \hh{Additionally, the \pkg{ggplot2} framework provides us with a considerable speed-up compared to the standard plotting routines that come with the \pkg{network} package. We executed the following code:}
@@ -1206,29 +1219,15 @@ qplot(data = timings, reorder(type, elapsed, median), elapsed,
 \caption{\label{fig:timings} Comparison of the times needed for calculating and rendering the protein interaction network in the three \pkg{ggplot2} approaches (top three) and the standard plotting routine  of the \pkg{network} package based on 100 evaluations each.  }
 \end{figure}
 
-\section{Summary and Discussion}
-
-\hh{XXX We need to come up with a discussion. Let's get started with with some bullet points:}
-\begin{enumerate}
-\item \hh{this is a personal comment, and we don't have to include it in the final summary: I think that this discussion between the three of us helped to make each one of the approaches better.
-Partly, because we had some `Annie' thing going on (I can do anything you can do), e.g.\ the edge coloring in ggnet2 and ggnetwork really forced some discussion on how to best implement edge coloring in geomnet, which resulted  in the idea of the inside group/between group distinction using the \code{group} attribute. From one of your earlier comments, it sounded like that the whole geom idea of geomnet spurred the ggnetwork approach in the first place ... Other things that made it into each one of our approaches are the gaps for the arrows and the curves.
-Another improvement that I see is that, trying to differentiate between the approaches helped to focus on what each approach is best at.
-}
-
-\fb{I agree with the general observation here. And yes, ggnetwork was inspired by reading the code from geomnet. I had never looked at the internals of ggplot2 before.}
-
-\item %%%%%%%%%%%%%%%%%%
-
 \fb{
 
 Another benefit that emerges from using \pkg{ggplot2} for network visualization has to do with the speed at which it can plot relatively large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{igraph} and \pkg{network} packages.
 
-The first test relies on random undirected networks in which the probability of an edge to exist between two nodes was set to 0.5. \hh{XXX We have been using `edge' in the paper - I'd stick to that and expand a bit on the explanation: `in which the probability for an edge between any two nodes was set to 0.5.' XXX This makes the networks pretty densele connected - none of our other networks is nearly that connected. How does the runtime vary with different tie probability?   } \fb{Let me run the same tests at p = 0.25 and tell you exactly. It sure affects the average plotting time, but the number of nodes should stay the most crucial parameter.} We generated 100 of these networks at different network sizes between 20 and 240 nodes, using increments of 20. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}.
+The first test relies on random undirected networks in which the probability of an edge to exist between two nodes was set to 0.5.  \fb{Let me run the same tests at p = 0.25 and tell you exactly. It sure affects the average plotting time, but the number of nodes should stay the most crucial parameter.} We generated 100 of these networks at different network sizes between 20 and 240 nodes, using increments of 20. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}.
 
 Although speed was not the main rationale for our enquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower than when network size increases.
 
 Further testing on a network of [EDGES] interactions between [NODES] proteins yielded the same conclusion. [INSERT protein-based test here.]
-
 }
 
 \begin{figure}[hbtp]
@@ -1272,6 +1271,23 @@ The second test relies on the protein interaction network featured in \citet{pro
 
 \fb{-- Include protein figure here, side-to-side with the execution times. Include \pkg{igraph} in the execution times. --}
 
+
+\section{Summary and Discussion}
+
+\hh{XXX We need to come up with a discussion. Let's get started with with some bullet points:}
+\begin{enumerate}
+\item \hh{this is a personal comment, and we don't have to include it in the final summary: I think that this discussion between the three of us helped to make each one of the approaches better.
+Partly, because we had some `Annie' thing going on (I can do anything you can do), e.g.\ the edge coloring in ggnet2 and ggnetwork really forced some discussion on how to best implement edge coloring in geomnet, which resulted  in the idea of the inside group/between group distinction using the \code{group} attribute. From one of your earlier comments, it sounded like that the whole geom idea of geomnet spurred the ggnetwork approach in the first place ... Other things that made it into each one of our approaches are the gaps for the arrows and the curves.
+Another improvement that I see is that, trying to differentiate between the approaches helped to focus on what each approach is best at.
+}
+
+\fb{I agree with the general observation here. And yes, ggnetwork was inspired by reading the code from geomnet. I had never looked at the internals of ggplot2 before.}
+
+\item %%%%%%%%%%%%%%%%%%
+
+\hh{speed gain}
+
+
 \item \hh{Should we make recommendations as to what type of user would be happier with either one of the approaches?
 I would think that the users of ggnet2 and ggnetwork are pretty well-versed with networks, and are looking at ggplot2 for  high-quality visualizations that also covers their other visualization needs. Data management and attribute handling is done through network operators on nodes and edges. These users might actually be attracted to ggplot2 because of the additional features open to them.
 
@@ -1295,7 +1311,7 @@ I would like to think that both approaches are valid and necessary.
 \item \hh{Which approach is the best? This is a question that we cannot answer overall, but we can give suggestions as to which approach is the best for you, depending on your answers to a couple of questions:
 
 \begin{enumerate}
-\item Do you want to draw graph? if yes, you're off to a  good start, you're in the right place, keep reading. If no, sorry, but you can stop reading now.
+\item Do you want to draw a graph? if yes, you're off to a  good start, you're in the right place, keep reading. If no, sorry, but you can stop reading now.
 \item Do you have the data to draw your network? yes? good, keep reading, if not, find some data.
 \item Do you have experience drawing a network? yes? your packages of choice are ggnet2 or ggnetwork, but keep reading. no? go check out geomnet.
 \item Do you know ggplot2? yes? use ggnetwork. no? ggnet2 is your package.
