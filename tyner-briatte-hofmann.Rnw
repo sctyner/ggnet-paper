@@ -925,10 +925,14 @@ ggplot(data = ggnetwork(lesmis$edges[, 1:2 ], arrow.gap = 0),
 
 \subsection{Bikesharing in Washington D.C.} % ==================================
 
-The data shows the second quartal trips in 2015 taken with bikes from the bike share company Capital Bikeshare\footnote{\url{https://secure.capitalbikeshare.com/}}.
+The data shows trips taken with bikes from the bike share company Capital Bikeshare\footnote{\url{https://secure.capitalbikeshare.com/}} during the second quartal of 2015.
 While this bikesharing company is located in the heart of Washington D.C.\ the company offers a set of bike stations just outside of Washington in Rockville, MD and north of it. Each station is shown as a dot, lines between stations indicate that at least five trips were taken between these two stations; the wider the line, the more trips have been taken between stations. In order to reflect distance between stations, we use as an additional restriction that the fastest trip was at most ten minutes long.
+\hh{Figure~\ref{fig:bikes} shows four renderings of this data. The first is a geographically true representation of the area overlaid by lines between bike stations, the other three are networks drawn with \pgk{geomnet}, \pkg{ggnet2}, and \pkg{ggnetwork}, respectively. 
+The code for these renderings is shown below:}
 
 <<bikes_geom_net, echo=TRUE, warning=FALSE, fig.keep='all'>>=
+# code for geomnet
+# data preparation
 tripnet <- merge(bikes$trips, bikes$stations, by.x = "Start.station",
                  by.y = "name", all = TRUE)
 
@@ -936,6 +940,7 @@ tripnet$Metro = FALSE
 idx <- grep("Metro", tripnet$Start.station)
 tripnet$Metro[idx] <- TRUE
 
+# plot the bike sharing network
 ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
   geom_net(aes(linewidth = n / 15, colour = Metro),
            label = TRUE, vjust = -0.5) +
@@ -944,27 +949,11 @@ ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
   theme(legend.position = "bottom")
 
-data(metro_map)
-
-ggplot(data = metro_map, aes(x = x, y = y)) +
-  geom_raster(fill = metro_map$fill, alpha = 0.75) + 
-  geom_net(data = tripnet, layout = NULL, label = TRUE,
-           vjust = -0.5, ealpha = 0.5,
-           aes(from_id = Start.station,
-               to_id = End.station,
-               x = long, y = lat,
-               linewidth = n / 15,
-               colour = Metro)) +
-  theme_net() +
-  scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
-  theme(legend.position = "bottom")
 @
 
-\fb{Suggestion: move 'comare to...' comment to text? footnote?}
-\hh{XXX we can remove the link - but could you take a look at the map, please - the coordinates in ggnet2 and ggnetwork still do not look right. The map at \url{https://secure.capitalbikeshare.com/map/} shows the exact area covered
-}
 
 <<bikes_prepare, echo = TRUE>>=
+# data preparation for ggnet2 and ggnetwork
 bikes.net <- network(bikes$trips[, 1:2 ], directed = FALSE)
 set.edge.attribute(bikes.net, "n", bikes$trips[, 3 ] / 15)
 bikes.net %v% "station" <-
@@ -985,13 +974,6 @@ ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
        edge.size = "n", color = bikes.col[ bikes.net %v% "station" ],
        label.color = bikes.col[ bikes.net %v% "station" ],
        layout.exp = 1.1)
-# geographic placement
-ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
-       mode = c("lon", "lat"),
-       edge.size = "n",
-       color = bikes.col[ bikes.net %v% "station" ],
-       label.color = bikes.col[ bikes.net %v% "station" ],
-       layout.exp = 1.1)
 @
 
 <<bikes_ggnetwork, echo = TRUE, fig.keep='all'>>=
@@ -1007,15 +989,50 @@ ggplot(data = ggnetwork(bikes.net),
                       values = c("grey40", "darkorange")) +
   theme_blank() +
   theme(legend.position = "bottom", legend.box = "horizontal")
+@
 
-# geographic placement
+\hh{For the geographic representations we also made use of the three packages. Because all three result in the same picture, we only show one of these in figure~\ref{fig:bikes}a. The code is given here:}
+
+\hh{XXX Francois, couple of questions
+\begin{enumerate}
+\item the code for ggnet2 is identical to the F-R layout. Is it possible to do a geographic layout in ggnet2?
+\item I can't get the code for the geographic ggnetwork example to work. could you please take a look at it?
+\end{enumerate}
+}
+<<geographic, echo=TRUE>>=
+# overlay the bike sharing network on geographic map
+
+# geomnet
+data(metro_map)
+ggplot(data = metro_map, aes(x = x, y = y)) +
+  geom_raster(fill = metro_map$fill, alpha = 0.75) + 
+  geom_net(data = tripnet, layout = NULL, label = TRUE,
+           vjust = -0.5, ealpha = 0.5,
+           aes(from_id = Start.station,
+               to_id = End.station,
+               x = long, y = lat,
+               linewidth = n / 15,
+               colour = Metro)) +
+  theme_net() +
+  scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
+  theme(legend.position = "bottom")
+
+# geographic placement ggnet2
+ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
+       mode = c("lon", "lat"),
+       edge.size = "n",
+       color = bikes.col[ bikes.net %v% "station" ],
+       label.color = bikes.col[ bikes.net %v% "station" ],
+       layout.exp = 1.1)
+
+# geographic placement ggnetwork
 coords <- c(bikes.net %v% "lon", bikes.net %v% "lat")
 coords <- matrix(coords, ncol = 2)
 ggplot(data = ggnetwork(bikes.net, layout = coords),
        aes(x, y, xend = xend, yend = yend)) +
   geom_raster(data = metro_map,
-              aes(x = long, y = lat, xend = NULL, yend = NULL),
-              fill = metro_map$color, alpha = 0.75) +
+              aes(x = x, y = y, xend = NULL, yend = NULL),
+              fill = metro_map$fill, alpha = 0.75) +
   geom_edges(aes(size = n), color = "grey40") +
   geom_nodes(aes(color = factor(station)), size = 4) +
   geom_nodetext(aes(label = vertex.names, color = factor(station)),
@@ -1027,28 +1044,44 @@ ggplot(data = ggnetwork(bikes.net, layout = coords),
   theme_blank() +
   theme(legend.position = "bottom", legend.box = "horizontal")
 @
-
 \begin{figure}[hbtp]
-\centering
-\includegraphics[width=.49\textwidth]{figure/bikes_geom_net-1.pdf}
-\includegraphics[width=.49\textwidth]{figure/bikes_geom_net-2.pdf}
-\caption{\label{fig:bikes} Network of bike trips using a Kamada-Kawai layout (left) and a geographically true representation (right) overlaid on a satellite map. Metro stations are shown in orange. In the Kamada-Kawai layout based on the trips taken, metro stations take a much more central position than in the geographically true representation. }
+\begin{subfigure}[t]{.49\textwidth}
+\caption{geographic map}
+\includegraphics[width=\textwidth]{figure/geographic-1.pdf}
+\end{subfigure}
+\begin{subfigure}[t]{.49\textwidth}
+\caption{geomnet}
+\includegraphics[width=\textwidth]{figure/bikes_geom_net-1.pdf}
+\end{subfigure}
+\begin{subfigure}[t]{.49\textwidth}
+\caption{ggnet2}
+\includegraphics[width=\textwidth]{figure/bikes_ggnet2-1.pdf}
+\end{subfigure}
+\begin{subfigure}[t]{.49\textwidth}
+\caption{ggnetwork}
+\includegraphics[width=\textwidth]{figure/bikes_ggnetwork-1.pdf}
+\end{subfigure}
+
+%\centering
+%\includegraphics[width=.49\textwidth]{figure/bikes_geom_net-1.pdf}
+%\includegraphics[width=.49\textwidth]{figure/bikes_geom_net-2.pdf}
+\caption{\label{fig:bikes} Network of bike trips using  a geographically true representation (top left) overlaid on a satellite map, a Kamada-Kawai layout in \pkg{geomnet} (top right), a Fruchterman-Reingold layout in ggnet2 (bottom left) and \pkg{ggnetwork} (bottom right). Metro stations are shown in orange. Both in the Kamada-Kawai and the Fruchterman-Reingold layouts  metro stations take a much more central position than in the geographically true representation. }
 \end{figure}
 %\afterpage{\clearpage}
 
-\begin{figure}[hbtp]
-\centering
-\includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-1.pdf}
-\includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-2.pdf}
-\caption{\label{fig:bikes_ggnet2} ggnet2}
-\end{figure}
+% \begin{figure}[hbtp]
+% \centering
+% \includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-1.pdf}
+% \includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-2.pdf}
+% \caption{\label{fig:bikes_ggnet2} ggnet2}
+% \end{figure}
 
-\begin{figure}[hbtp]
-\centering
-\includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-1.pdf}
-\includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-2.pdf}
-\caption{\label{fig:bikes_ggnetwork} ggnetwork \fb{Problem: standardizing the coordinates to (0,1) distorts the aspect ratio} \hh{have a look at the map - the area covered is actually fairly quadratic. Geographic Lat and Long don't operate on the same scales. } \fb{Still unsure what changes I should bring to make the geographic plot as correct as possible... XYZ} \hh{Shouldn't things on a map have equal distances in x and y? Have a look at the area on the actual map ... it is square - in the image that I'm seeing, the width is about half as wide as it should be.} }
-\end{figure}
+% \begin{figure}[hbtp]
+% \centering
+% \includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-1.pdf}
+% \includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-2.pdf}
+% \caption{\label{fig:bikes_ggnetwork} ggnetwork \fb{Problem: standardizing the coordinates to (0,1) distorts the aspect ratio} \hh{have a look at the map - the area covered is actually fairly quadratic. Geographic Lat and Long don't operate on the same scales. } \fb{Still unsure what changes I should bring to make the geographic plot as correct as possible... XYZ} \hh{Shouldn't things on a map have equal distances in x and y? Have a look at the area on the actual map ... it is square - in the image that I'm seeing, the width is about half as wide as it should be.} }
+% \end{figure}
 
 \subsection{Protein interactions in yeast} % ===================================
 
