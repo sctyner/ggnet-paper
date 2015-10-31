@@ -112,7 +112,7 @@ for (k in 0:9) {
         
   }
   
-  g = list.files(pattern = "csv$") %>%
+  g = list.files(pattern = "runtimes-(.*)csv$") %>%
         lapply(read.csv, stringsAsFactors = FALSE) %>%
         bind_rows %>%
         gather(`Visualization approach`, time, -network_size, -iteration) %>%

@@ -927,7 +927,7 @@ ggplot(data = ggnetwork(lesmis$edges[, 1:2 ], arrow.gap = 0),
 
 The data shows trips taken with bikes from the bike share company Capital Bikeshare\footnote{\url{https://secure.capitalbikeshare.com/}} during the second quartal of 2015.
 While this bikesharing company is located in the heart of Washington D.C.\ the company offers a set of bike stations just outside of Washington in Rockville, MD and north of it. Each station is shown as a dot, lines between stations indicate that at least five trips were taken between these two stations; the wider the line, the more trips have been taken between stations. In order to reflect distance between stations, we use as an additional restriction that the fastest trip was at most ten minutes long.
-\hh{Figure~\ref{fig:bikes} shows four renderings of this data. The first is a geographically true representation of the area overlaid by lines between bike stations, the other three are networks drawn with \pkg{geomnet}, \pkg{ggnet2}, and \pkg{ggnetwork}, respectively. 
+\hh{Figure~\ref{fig:bikes} shows four renderings of this data. The first is a geographically true representation of the area overlaid by lines between bike stations, the other three are networks drawn with \pkg{geomnet}, \pkg{ggnet2}, and \pkg{ggnetwork}, respectively.
 The code for these renderings is shown below:}
 
 <<bikes_geom_net, echo=TRUE, warning=FALSE, fig.keep='all'>>=
@@ -996,7 +996,9 @@ ggplot(data = ggnetwork(bikes.net),
 \hh{XXX Francois, couple of questions
 \begin{enumerate}
 \item the code for ggnet2 is identical to the F-R layout. Is it possible to do a geographic layout in ggnet2?
+\fb{The code is different: \code{mode = c("lon", "lat")}.}
 \item I can't get the code for the geographic ggnetwork example to work. could you please take a look at it?
+\fb{Same thing on my end, fixed by rescaling the coordinates of the raster image. Sorry for that.}
 \end{enumerate}
 }
 <<geographic, echo=TRUE>>=
@@ -1005,7 +1007,7 @@ ggplot(data = ggnetwork(bikes.net),
 # geomnet
 data(metro_map)
 ggplot(data = metro_map, aes(x = x, y = y)) +
-  geom_raster(fill = metro_map$fill, alpha = 0.75) + 
+  geom_raster(fill = metro_map$fill, alpha = 0.75) +
   geom_net(data = tripnet, layout = NULL, label = TRUE,
            vjust = -0.5, ealpha = 0.5,
            aes(from_id = Start.station,
@@ -1028,11 +1030,14 @@ ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
 # geographic placement ggnetwork
 coords <- c(bikes.net %v% "lon", bikes.net %v% "lat")
 coords <- matrix(coords, ncol = 2)
+map_01 <- metro_map
+map_01$x <- scales::rescale(map_01$x)
+map_01$y <- scales::rescale(map_01$y)
 ggplot(data = ggnetwork(bikes.net, layout = coords),
        aes(x, y, xend = xend, yend = yend)) +
-  geom_raster(data = metro_map,
+  geom_raster(data = map_01,
               aes(x = x, y = y, xend = NULL, yend = NULL),
-              fill = metro_map$fill, alpha = 0.75) +
+              fill = map_01$fill, alpha = 0.75) +
   geom_edges(aes(size = n), color = "grey40") +
   geom_nodes(aes(color = factor(station)), size = 4) +
   geom_nodetext(aes(label = vertex.names, color = factor(station)),
@@ -1041,6 +1046,7 @@ ggplot(data = ggnetwork(bikes.net, layout = coords),
   scale_colour_manual("Metro station", labels = c("FALSE", "TRUE"),
                       values = c("grey40", "darkorange")) +
   scale_x_continuous(limits = c(-0.1, 1.1)) +
+  scale_y_continuous(limits = c(-0.1, 1.1)) +
   theme_blank() +
   theme(legend.position = "bottom", legend.box = "horizontal")
 @
@@ -1213,9 +1219,10 @@ Another improvement that I see is that, trying to differentiate between the appr
 
 Another benefit that emerges from using \pkg{ggplot2} for network visualization has to do with the speed at which it can plot relatively large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{igraph} and \pkg{network} packages.
 
-The first test relies on random undirected networks in which the probability of a tie was set to 0.5. \hh{XXX We have been using `edge' in the paper - I'd stick to that and expand a bit on the explanation: `in which the probability for an edge between any two nodes was set to 0.5.' XXX This makes the networks pretty densele connected - none of our other networks is nearly that connected. How does the runtime vary with different tie probability?   } We generated 100 of these networks at different network sizes between 20 and 240 nodes, using increments of 20. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}. 
+The first test relies on random undirected networks in which the probability of an edge to exist between two nodes was set to 0.5. \hh{XXX We have been using `edge' in the paper - I'd stick to that and expand a bit on the explanation: `in which the probability for an edge between any two nodes was set to 0.5.' XXX This makes the networks pretty densele connected - none of our other networks is nearly that connected. How does the runtime vary with different tie probability?   } \fb{Let me run the same tests at p = 0.25 and tell you exactly. It sure affects the average plotting time, but the number of nodes should stay the most crucial parameter.} We generated 100 of these networks at different network sizes between 20 and 240 nodes, using increments of 20. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}.
 \hh{XXX We need to get the comparison to be fair between the three methods. at the moment, the time in geomnet covers a) the extraction of the edgelist from an existing network, b) a re-calculation of the network in a K-K layout, and c) the actual plotting. All of the other routines do just the plotting.
 XXX I'm not sure that we can actually fix this, if the network already exists.  I think this drives the message home again, that there are different motivations behind the three approaches. XXX }
+\fb{The tests are now less biased: the network is generated outside of the system.time call for all functions. Also, all functions compute layouts internally, so I'm not sure what bias is left against geomnet.}
 The benefits of using \pkg{ggplot2}-based approaches is most obvious when compared to the plotting function included in the \pkg{network} package, which very quickly becomes very slow when network size increases.
 
 }
@@ -1224,8 +1231,7 @@ The benefits of using \pkg{ggplot2}-based approaches is most obvious when compar
 \centering
 <<runtimes, eval=TRUE, echo=FALSE>>=
 library(tidyr)
-setwd("runtimes")
-g = list.files(pattern = "csv$") %>%
+g = list.files("runtimes", pattern = "csv$", full.names = TRUE) %>%
   lapply(read.csv, stringsAsFactors = FALSE) %>%
   bind_rows %>%
   gather(`Visualization approach`, time, -network_size, -iteration) %>%
@@ -1239,16 +1245,18 @@ g = ggplot(g, aes(x = network_size, y = mean_time,
   scale_y_continuous(breaks = seq(0, max(g$max), 10)) +
   scale_x_continuous(breaks = seq(20, 240, 40)) +
   labs(y = "Average plotting time (seconds)\n", x = "\nNetwork size") +
-  theme_bw() + 
-  scale_colour_brewer(palette = "Set1") + 
+  theme_bw() +
+  scale_colour_brewer(palette = "Set1") +
   scale_fill_brewer(palette = "Set1") +
-  theme(legend.justification = c(0,1), legend.position = c(0,1))
-setwd("..")
-print(g)
+  theme(panel.grid.minor = element_blank(),
+        legend.text = element_text(size = rel(1)),
+        legend.justification = c(0,1), legend.position = c(0,1))
+
+g
 @
 \includegraphics[width=.5\textwidth]{figure/runtimes-1.pdf}
 \caption{\label{fig.cap:runtimes-random}%
-  Average plotting time of random undirected networks, in seconds: ribbon at minimum and maximum recorded times, solid line at average. The time ranges of the \code{ggnet2} and \code{ggnetwork} approaches are quasi-identical and form the single purple line at the bottom of the plot.%
+  Average plotting time of random undirected networks, in seconds: ribbon at minimum and maximum recorded times, solid line at average. The time ranges of the \code{ggnet2} and \code{ggnetwork} approaches are quasi-identical and form the single purple line at the bottom of the plot. \fb{Can't remember how I styled the figure in the beginning, but I remember trying to match the previous one by using theme\_classic. We need to harmonize them.}%
 }
 \end{figure}
 
@@ -1285,10 +1293,10 @@ I would like to think that both approaches are valid and necessary.
 \begin{enumerate}
 \item Do you want to draw graph? if yes, you're off to a  good start, you're in the right place, keep reading. If no, sorry, but you can stop reading now.
 \item Do you have the data to draw your network? yes? good, keep reading, if not, find some data.
-\item Do you have experience drawing a network? yes? your packages of choice are ggnet2 or ggnetwork, but keep reading. no? go check out geomnet. 
-\item Do you know ggplot2? yes? use ggnetwork. no? ggnet2 is your package. 
+\item Do you have experience drawing a network? yes? your packages of choice are ggnet2 or ggnetwork, but keep reading. no? go check out geomnet.
+\item Do you know ggplot2? yes? use ggnetwork. no? ggnet2 is your package.
 \end{enumerate}
-} 
+}
 \end{enumerate}
 
 \bibliography{tyner-briatte-hofmann}
