@@ -40,6 +40,8 @@ library(ggnetwork)
 library(dplyr)
 library(tidyr)
 
+## pre-loading
+library(scales)
 library(sna)
 
 # note: plot.network might be slower because it actually prints the plots, so to
@@ -57,14 +59,15 @@ for (k in 0:9) {
 
       for (j in 1:10) {
 
-        r = sna::rgraph(i, tprob = 0.5)
+        r = sna::rgraph(i, tprob = 0.2)
       
-        cat("Network size", i, "iteration", sprintf("%3.0f", 10 * k + j), "/ 100\n")
+        cat("Network size", i,
+            "iteration", sprintf("%3.0f", 10 * k + j), "/ 100\n")
 
         n = igraph::graph_from_adjacency_matrix(r, mode = "undirected")
 
         t1 = system.time({
-          plot(n)
+          plot(n, vertex.label = NA)
         })[1]
 
         n = network::network(r, directed = FALSE)
@@ -117,13 +120,15 @@ for (k in 0:9) {
         bind_rows %>%
         gather(`Visualization approach`, time, -network_size, -iteration) %>%
         group_by(network_size, `Visualization approach`) %>%
-        summarise(mean_time = mean(time), min = min(time), max = max(time))
+        summarise(mean_time = mean(time),
+                  q05 = quantile(time, 0.05),
+                  q95 = quantile(time, 0.95))
 
   g = ggplot(g, aes(x = network_size, y = mean_time,
                     fill = `Visualization approach`)) +
-    geom_ribbon(aes(ymin = min, ymax = max), alpha = 1/3) +
+    geom_ribbon(aes(ymin = q05, ymax = q95), alpha = 1/3) +
     geom_line(aes(color = `Visualization approach`)) +
-    scale_y_continuous(breaks = seq(0, max(g$max), 10)) +
+    scale_y_continuous(breaks = seq(0, max(g$q95), 5)) +
     scale_x_continuous(breaks = seq(25, 250, 25)) +
     labs(y = "Average plotting time (seconds)\n", x = "\nNetwork size") +
     theme_classic(18) +
