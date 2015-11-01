@@ -1213,7 +1213,7 @@ qplot(data = timings, reorder(type, elapsed, median), elapsed,
   labs(x = "\nVisualisation approach", y = "Average plotting time (seconds)\n") +
   ylim(c(0, 7.1)) +
   coord_flip() +
-  theme_classic(18) +
+  theme_bw() + # HH: gridlines help with comparisons. significantly.
   theme(legend.position = "none")
 @
 \includegraphics[width=.5\textwidth]{figure/compare-1.pdf}
