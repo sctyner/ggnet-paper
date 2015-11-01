@@ -110,7 +110,9 @@ codefig = list(codefig = TRUE, fig.show = "hide",
 
 <<load_packages, results='hide'>>=
 library(dplyr)
+library(tidyr)
 library(ggplot2) # needs to be version ≥ 1.0.1.9003
+library(scales)
 
 ## ggnet2
 if (!require(ggnet, quietly = TRUE)) {
@@ -130,6 +132,10 @@ if (!require(ggnetwork, quietly = TRUE) ||
   devtools::install_github("briatte/ggnetwork")
 }
 library(ggnetwork)
+
+## pre-load
+library(network)
+library(sna)
 @
 
 % introductory section
@@ -168,7 +174,7 @@ Our efforts \sct{rely upon} the most recent changes to \pkg{ggplot2}, \sct{which
   \footnote{Version 1.1.0, released mid November 2015. See \url{https://cran.r-project.org/web/packages/ggplot2/NEWS} for the full list of changes in \pkg{ggplot2} 1.1.0, as well as the new package vignette, ``Extending ggplot2'', which explains how the internal \code{ggproto} system of object-oriented programming can be used to create new geoms.} %
   %
 
-In the remainder of this paper, we present three different approaches to network visualization with \pkg{ggplot2}. Section~\ref{sec:background} introduces the basic terminology of networks and illustrates their ubiquity in natural and social life. Section~\ref{sec:implementations} then discusses the logic behind each of the three approaches that we offer. Section~\ref{sec:examples} extends that discussion through several examples ranging from simple to complex networks, for which we provide the code corresponding to each approach alongside its graphical result.
+In the remainder of this paper, we present three different approaches to network visualization with \pkg{ggplot2}. Section~\ref{sec:background} introduces the basic terminology of networks and illustrates their ubiquity in natural and social life. Section~\ref{sec:implementations} then discusses the logic behind each of the three approaches that we offer. Section~\ref{sec:examples} extends that discussion through several examples ranging from simple to complex networks, for which we provide the code corresponding to each approach alongside its graphical result. \hh{We follow with some considerations of runtimes in plotting networks in Section~\ref{sec:speed} before closing with a discussion.}
 
 \section{A quick primer to network structures}
 \label{sec:background}
@@ -875,6 +881,8 @@ ggplot(
 
 \subsection{Character co-appearances in \emph{Les Mis\'{e}rables}} % ===========
 
+\fb{Please don't get mad at me: I think we discussed that earlier, but I'm still unable to see what this ex. brings to the paper. What does it show that is not shown in the other examples?}
+
 This next network comes from \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book, and an edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.
 This network is shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}; the corresponding code is shown below. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
 
@@ -939,10 +947,14 @@ ggplot(data = ggnetwork(lesmis$edges[, 1:2 ], arrow.gap = 0),
 
 \subsection{Bikesharing in Washington D.C.} % ==================================
 
-The data shows the second quartal trips in 2015 taken with bikes from the bike share company Capital Bikeshare\footnote{\url{https://secure.capitalbikeshare.com/}}.
+The data shows trips taken with bikes from the bike share company Capital Bikeshare\footnote{\url{https://secure.capitalbikeshare.com/}} during the second quartal of 2015.
 While this bikesharing company is located in the heart of Washington D.C.\ the company offers a set of bike stations just outside of Washington in Rockville, MD and north of it. Each station is shown as a dot, lines between stations indicate that at least five trips were taken between these two stations; the wider the line, the more trips have been taken between stations. In order to reflect distance between stations, we use as an additional restriction that the fastest trip was at most ten minutes long.
+\hh{Figure~\ref{fig:bikes} shows four renderings of this data. The first is a geographically true representation of the area overlaid by lines between bike stations, the other three are networks drawn with \pkg{geomnet}, \pkg{ggnet2}, and \pkg{ggnetwork}, respectively.
+The code for these renderings is shown below:}
 
 <<bikes_geom_net, echo=TRUE, warning=FALSE, fig.keep='all'>>=
+# code for geomnet
+# data preparation
 tripnet <- merge(bikes$trips, bikes$stations, by.x = "Start.station",
                  by.y = "name", all = TRUE)
 
@@ -950,6 +962,7 @@ tripnet$Metro = FALSE
 idx <- grep("Metro", tripnet$Start.station)
 tripnet$Metro[idx] <- TRUE
 
+# plot the bike sharing network
 ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
   geom_net(aes(linewidth = n / 15, colour = Metro),
            label = TRUE, vjust = -0.5) +
@@ -958,27 +971,11 @@ ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
   theme(legend.position = "bottom")
 
-data(metro_map)
-
-ggplot(data = metro_map, aes(x = x, y = y)) +
-  geom_raster(fill = metro_map$fill, alpha = 0.75) + 
-  geom_net(data = tripnet, layout = NULL, label = TRUE,
-           vjust = -0.5, ealpha = 0.5,
-           aes(from_id = Start.station,
-               to_id = End.station,
-               x = long, y = lat,
-               linewidth = n / 15,
-               colour = Metro)) +
-  theme_net() +
-  scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
-  theme(legend.position = "bottom")
 @
 
-\fb{Suggestion: move 'comare to...' comment to text? footnote?}
-\hh{XXX we can remove the link - but could you take a look at the map, please - the coordinates in ggnet2 and ggnetwork still do not look right. The map at \url{https://secure.capitalbikeshare.com/map/} shows the exact area covered
-}
 
 <<bikes_prepare, echo = TRUE>>=
+# data preparation for ggnet2 and ggnetwork
 bikes.net <- network(bikes$trips[, 1:2 ], directed = FALSE)
 set.edge.attribute(bikes.net, "n", bikes$trips[, 3 ] / 15)
 bikes.net %v% "station" <-
@@ -999,13 +996,6 @@ ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
        edge.size = "n", color = bikes.col[ bikes.net %v% "station" ],
        label.color = bikes.col[ bikes.net %v% "station" ],
        layout.exp = 1.1)
-# geographic placement
-ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
-       mode = c("lon", "lat"),
-       edge.size = "n",
-       color = bikes.col[ bikes.net %v% "station" ],
-       label.color = bikes.col[ bikes.net %v% "station" ],
-       layout.exp = 1.1)
 @
 
 <<bikes_ggnetwork, echo = TRUE, fig.keep='all'>>=
@@ -1021,15 +1011,52 @@ ggplot(data = ggnetwork(bikes.net),
                       values = c("grey40", "darkorange")) +
   theme_blank() +
   theme(legend.position = "bottom", legend.box = "horizontal")
+@
 
-# geographic placement
+\hh{For the geographic representations we also made use of the three packages. Because all three result in the same picture, we only show one of these in figure~\ref{fig:bikes}a. The code is given here:}
+
+%% FB: separated block below into four blocks, as we did for the blood example
+<<geographic_common, echo=TRUE>>=
+data(metro_map)
+metro_map <- subset(metro_map, x <= -77.125 &
+                    y >= 39.07 & y <= 39.13)
+@
+%
+<<geographic_geomnet, echo=TRUE>>=
+# geomnet: overlay bike sharing network on geographic map
+ggplot(data = metro_map, aes(x = x, y = y)) +
+  geom_raster(fill = metro_map$fill, alpha = 0.75) +
+  geom_net(data = tripnet, layout = NULL, label = TRUE,
+           vjust = -0.5, ealpha = 0.5,
+           aes(from_id = Start.station,
+               to_id = End.station,
+               x = long, y = lat,
+               linewidth = n / 15,
+               colour = Metro)) +
+  scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
+  theme_net() %+replace% theme(aspect.ratio=NULL) +
+  theme(legend.position = "bottom") 
+
+@
+<<geographic_ggnet2, echo=TRUE>>=
+# geographic placement using ggnet2
+ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
+       mode = c("lon", "lat"),
+       edge.size = "n",
+       color = bikes.col[ bikes.net %v% "station" ],
+       label.color = bikes.col[ bikes.net %v% "station" ],
+       layout.exp = 1.1)
+@
+<<geographic_ggnetwork, echo=TRUE>>=
+# geographic placement using ggnetwork
 coords <- c(bikes.net %v% "lon", bikes.net %v% "lat")
-coords <- matrix(coords, ncol = 2)
-ggplot(data = ggnetwork(bikes.net, layout = coords),
+map_01 <- metro_map
+map_01$x <- scales::rescale(map_01$x)
+map_01$y <- scales::rescale(map_01$y)
+ggplot(data = ggnetwork(bikes.net, layout = matrix(coords, ncol = 2)),
        aes(x, y, xend = xend, yend = yend)) +
-  geom_raster(data = metro_map,
-              aes(x = long, y = lat, xend = NULL, yend = NULL),
-              fill = metro_map$color, alpha = 0.75) +
+  geom_raster(data = map_01, aes(x = x, y = y, xend = NULL, yend = NULL),
+              fill = map_01$fill, alpha = 0.75) +
   geom_edges(aes(size = n), color = "grey40") +
   geom_nodes(aes(color = factor(station)), size = 4) +
   geom_nodetext(aes(label = vertex.names, color = factor(station)),
@@ -1038,38 +1065,57 @@ ggplot(data = ggnetwork(bikes.net, layout = coords),
   scale_colour_manual("Metro station", labels = c("FALSE", "TRUE"),
                       values = c("grey40", "darkorange")) +
   scale_x_continuous(limits = c(-0.1, 1.1)) +
+  scale_y_continuous(limits = c(-0.1, 1.1)) +
   theme_blank() +
   theme(legend.position = "bottom", legend.box = "horizontal")
 @
-
 \begin{figure}[hbtp]
-\centering
-\includegraphics[width=.49\textwidth]{figure/bikes_geom_net-1.pdf}
-\includegraphics[width=.49\textwidth]{figure/bikes_geom_net-2.pdf}
-\caption{\label{fig:bikes} Network of bike trips using a Kamada-Kawai layout (left) and a geographically true representation (right) overlaid on a satellite map. Metro stations are shown in orange. In the Kamada-Kawai layout based on the trips taken, metro stations take a much more central position than in the geographically true representation. }
+\begin{subfigure}[t]{.49\textwidth}
+\caption{geographic map}
+\includegraphics[width=\textwidth]{figure/geographic_geomnet-1.pdf}
+\end{subfigure}
+\begin{subfigure}[t]{.49\textwidth}
+\caption{geomnet}
+\includegraphics[width=\textwidth]{figure/bikes_geom_net-1.pdf}
+\end{subfigure}
+\begin{subfigure}[t]{.49\textwidth}
+\caption{ggnet2}
+\includegraphics[width=\textwidth]{figure/bikes_ggnet2-1.pdf}
+\end{subfigure}
+\begin{subfigure}[t]{.49\textwidth}
+\caption{ggnetwork}
+\includegraphics[width=\textwidth]{figure/bikes_ggnetwork-1.pdf}
+\end{subfigure}
+
+%\centering
+%\includegraphics[width=.49\textwidth]{figure/bikes_geom_net-1.pdf}
+%\includegraphics[width=.49\textwidth]{figure/bikes_geom_net-2.pdf}
+\caption{\label{fig:bikes} Network of bike trips using  a geographically true representation (top left) overlaid on a satellite map, a Kamada-Kawai layout in \pkg{geomnet} (top right), a Fruchterman-Reingold layout in ggnet2 (bottom left) and \pkg{ggnetwork} (bottom right). Metro stations are shown in orange. Both in the Kamada-Kawai and the Fruchterman-Reingold layouts  metro stations take a much more central position than in the geographically true representation. }
 \end{figure}
 %\afterpage{\clearpage}
 
-\begin{figure}[hbtp]
-\centering
-\includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-1.pdf}
-\includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-2.pdf}
-\caption{\label{fig:bikes_ggnet2} ggnet2}
-\end{figure}
+% \begin{figure}[hbtp]
+% \centering
+% \includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-1.pdf}
+% \includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-2.pdf}
+% \caption{\label{fig:bikes_ggnet2} ggnet2}
+% \end{figure}
 
-\begin{figure}[hbtp]
-\centering
-\includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-1.pdf}
-\includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-2.pdf}
-\caption{\label{fig:bikes_ggnetwork} ggnetwork \fb{Problem: standardizing the coordinates to (0,1) distorts the aspect ratio} \hh{have a look at the map - the area covered is actually fairly quadratic. Geographic Lat and Long don't operate on the same scales. } \fb{Still unsure what changes I should bring to make the geographic plot as correct as possible... XYZ} \hh{Shouldn't things on a map have equal distances in x and y? Have a look at the area on the actual map ... it is square - in the image that I'm seeing, the width is about half as wide as it should be.} }
-\end{figure}
+% \begin{figure}[hbtp]
+% \centering
+% \includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-1.pdf}
+% \includegraphics[width=.49\textwidth]{figure/bikes_ggnet2-2.pdf}
+% \caption{\label{fig:bikes_ggnetwork} ggnetwork \fb{Problem: standardizing the coordinates to (0,1) distorts the aspect ratio} \hh{have a look at the map - the area covered is actually fairly quadratic. Geographic Lat and Long don't operate on the same scales. } \fb{Still unsure what changes I should bring to make the geographic plot as correct as possible... XYZ} \hh{Shouldn't things on a map have equal distances in x and y? Have a look at the area on the actual map ... it is square - in the image that I'm seeing, the width is about half as wide as it should be.} }
+% \end{figure}
 
 \subsection{Protein interactions in yeast} % ===================================
 
-\fb{Suggestion: convert this example to a discussion point about speed.}
-\hh{Talking about speed in the discussion is a good idea, but by the time that we go into the discussion there shouldn't be any more examples. }
+% \fb{Suggestion: convert this example to a discussion point about speed.}
+% \hh{Talking about speed in the discussion is a good idea, but by the time that we go into the discussion there shouldn't be any more examples. }
+\fb{I understand that the discussion should not introduce additional examples, but I'd still like to move the protein network text to discussion. What I'm suggesting is to lose the protein network as an example of viz-related functionalities (our plots of the network do not introduce any additional functionalities), and just use it as a test support for speed benchmarking at a high network size. See INSERT sentence in discussion for a suggested insert point for the text.}
 
-This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, with a total of 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}. These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}.  We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices. Because all of the approaches result in very similar figures, only one network is shown. The code for all three approaches is shown below:
+This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, with a total of 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}\hh{, resulting in a relatively large  network. Despite its size, each one of the approaches in the \pkg{ggplot2} framework can be drawn in a few seconds. A more in-depth discussion on plotting speed follows in the next section}. \hh{Proteins and the associations between them are plotted in the networks shown in Figure~\ref{fig.cap:yeast}.} %These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}. 
+We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices. Because all of the approaches result in very similar figures, only one network is shown. The code for all three approaches is shown below:
 
 <<yeast_ggnet2, echo=TRUE, eval = FALSE, cache=FALSE>>=
 # plot with ggnet2
@@ -1096,13 +1142,23 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
   theme_blank()
 
 @
-
 \begin{figure}[hbtp]
 \includegraphics[width=\textwidth]{figure/yeast_geom_net-1.pdf}
 %\end{subfigure}
 \caption{\label{fig.cap:yeast} Protein-protein interaction network in \emph{S. cerevisiae}. The layout is random.}
 \end{figure}
 %\afterpage{\clearpage}
+
+\section{Some considerations of speed}\label{sec:speed}
+\hh{XXX what do you think of moving the  speed discussion out of the conclusions? 
+That way we can go into more detail.
+We really have three parts here:
+\begin{enumerate}
+\item the comparison of all three ggplot2 approaches using the protein example.
+\item the comparison of ggnet2 and ggnetwork with igraph and network.
+\item an extension of the previous comparison with different edge density.
+\end{enumerate}
+}
 
 \fb{Note that we have two benchmarking techniques: (1) average plotting time of 100 protein networks, and (2) average plotting time of increasingly large random networks -- see runtimes.r; so, what should we do? include one of these? or both? I'd support leaving the benchmark code out of the paper, because it is not directly about network viz with ggplot2. Alternately, include it as an appendix? If left out, the code can be referred to by linking to the repo; that's what I would support most.}
 
@@ -1128,8 +1184,9 @@ if (!file.exists("data/timings.csv")) {
   )))
 
   # compare to ggnet2:
+  net <- network(protein$edges[,1:2])
   ggnet2 <- data.frame(t(replicate(100, system.time(print(
-    ggnet2(network(protein$edges[,1:2]), size = 2, color = "magenta",
+    ggnet2(net, size = 2, color = "magenta",
         mode = "random", layout.par = list(dist = "uniang"),
         edge.alpha = 0.05)
   )))))
@@ -1164,17 +1221,78 @@ if (!file.exists("data/timings.csv")) {
 }
 
 # timings$type <- factor(timings$type, levels = rev(c("ggnet2", "geomnet", "ggnetwork", "network")))
-qplot(data = timings, reorder(type, elapsed, median), elapsed, geom = "boxplot", fill = type, alpha = I(0.6)) +
-  scale_fill_brewer(palette = "Set2") + theme_bw() +
-  xlab("Visualisation Approach") + ylab("System time elapsed (in seconds)") +
+qplot(data = timings, reorder(type, elapsed, median), elapsed,
+      fill = type, alpha = I(0.6), geom = "boxplot") +
+  scale_fill_brewer(palette = "Set2") +
+  labs(x = "\nVisualisation approach", y = "Average plotting time (seconds)\n") +
   ylim(c(0, 7.1)) +
   coord_flip() +
-  theme_classic() +
+  theme_bw() + # HH: gridlines help with comparisons. significantly.
   theme(legend.position = "none")
 @
 \includegraphics[width=.5\textwidth]{figure/compare-1.pdf}
 \caption{\label{fig:timings} Comparison of the times needed for calculating and rendering the protein interaction network in the three \pkg{ggplot2} approaches (top three) and the standard plotting routine  of the \pkg{network} package based on 100 evaluations each.  }
 \end{figure}
+
+\fb{
+
+Another benefit that emerges from using \pkg{ggplot2} for network visualization has to do with the speed at which it can plot relatively large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{igraph} and \pkg{network} packages.
+
+<<<<<<< HEAD
+The first test relies on random undirected networks in which the probability of an edge to exist between two nodes was set to 0.5.  \fb{Let me run the same tests at p = 0.25 and tell you exactly. It sure affects the average plotting time, but the number of nodes should stay the most crucial parameter.} We generated 100 of these networks at different network sizes between 20 and 240 nodes, using increments of 20. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}.
+=======
+The first test relies on random undirected networks in which the probability of a tie was set to 0.5. \hh{XXX We have been using `edge' in the paper - I'd stick to that and expand a bit on the explanation: `in which the probability for an edge between any two nodes was set to 0.5.' XXX This makes the networks pretty densily connected - none of our other networks is nearly that connected. How does the runtime vary with different tie probability?   } We generated 100 of these networks at different network sizes between 20 and 240 nodes, using increments of 20. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}. 
+\hh{XXX We need to get the comparison to be fair between all approaches. 
+}
+The benefits of using \pkg{ggplot2}-based approaches is most obvious when compared to the plotting function included in the \pkg{network} package, which very quickly becomes very slow when network size increases.
+>>>>>>> re-do of timings on protein network
+
+Although speed was not the main rationale for our enquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower than when network size increases.
+
+Further testing on a network of [EDGES] interactions between [NODES] proteins yielded the same conclusion. [INSERT protein-based test here.]
+}
+
+\begin{figure}[hbtp]
+\centering
+<<runtimes, eval=TRUE, echo=FALSE>>=
+g = list.files("runtimes", pattern = "runtimes-(.*)csv$", full.names = TRUE) %>%
+        lapply(read.csv, stringsAsFactors = FALSE) %>%
+        bind_rows %>%
+        gather(`Visualization approach`, time, -network_size, -iteration) %>%
+        group_by(network_size, `Visualization approach`) %>%
+        summarise(mean_time = mean(time),
+                  q05 = quantile(time, 0.05),
+                  q95 = quantile(time, 0.95))
+
+ggplot(g, aes(x = network_size, y = mean_time,
+              fill = `Visualization approach`)) +
+  geom_ribbon(aes(ymin = q05, ymax = q95), alpha = 1/3) +
+  geom_line(aes(color = `Visualization approach`)) +
+  scale_color_brewer(palette = "Set2") +
+  scale_fill_brewer(palette = "Set2") +
+  scale_y_continuous(breaks = seq(0, max(g$q95), 5)) +
+  scale_x_continuous(breaks = seq(25, 250, 25)) +
+  labs(y = "Average plotting time (seconds)\n", x = "\nNetwork size") +
+  theme_classic(18) +
+  theme(axis.text = element_text(size = rel(1)),
+        legend.text = element_text(size = rel(1)),
+        legend.justification = c(0,1),
+        legend.position = c(0,1))
+@
+\includegraphics[width=.5\textwidth]{figure/runtimes-1.pdf}
+\caption{\label{fig.cap:runtimes-random}%
+  Average plotting time of random undirected networks, in seconds: ribbon at minimum and maximum recorded times, solid line at average. The time ranges of the \code{ggnet2} and \code{ggnetwork} approaches are quasi-identical and form the single purple line at the bottom of the plot. \fb{Can't remember how I styled the figure in the beginning, but I remember trying to match the previous one by using theme\_classic. We need to harmonize them.}%
+}
+\end{figure}
+
+\fb{
+
+The second test relies on the protein interaction network featured in \citet{protein}, which is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. The network has 1,870 proteins that make up the vertices of the network, with a total of 2,240 edges between them, which represent ``direct physical interactions'' between any two proteins \citep[p. 42]{protein}. These interactions and their associated proteins are plotted in Figure~\ref{fig.cap:yeast} using a random distribution algorithm that produces a ``Gaussian donut'' layout. \fb{The network is shown alongside the execution time of 100 similar plots for each plotting approach.}.
+
+}
+
+\fb{-- Include protein figure here, side-to-side with the execution times. Include \pkg{igraph} in the execution times. --}
+
 
 \section{Summary and Discussion}
 
@@ -1189,56 +1307,8 @@ Another improvement that I see is that, trying to differentiate between the appr
 
 \item %%%%%%%%%%%%%%%%%%
 
-\fb{
+\hh{speed gain}
 
-Another benefit that emerges from using \pkg{ggplot2} for network visualization has to do with the speed at which it can plot relatively large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{igraph} and \pkg{network} packages.
-
-The first test relies on random undirected networks in which the probability of a tie was set to 0.5. \hh{XXX We have been using `edge' in the paper - I'd stick to that and expand a bit on the explanation: `in which the probability for an edge between any two nodes was set to 0.5.' XXX This makes the networks pretty densele connected - none of our other networks is nearly that connected. How does the runtime vary with different tie probability?   } We generated 100 of these networks at different network sizes between 20 and 240 nodes, using increments of 20. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}. 
-\hh{XXX We need to get the comparison to be fair between the three methods. at the moment, the time in geomnet covers a) the extraction of the edgelist from an existing network, b) a re-calculation of the network in a K-K layout, and c) the actual plotting. All of the other routines do just the plotting.
-XXX I'm not sure that we can actually fix this, if the network already exists.  I think this drives the message home again, that there are different motivations behind the three approaches. XXX }
-The benefits of using \pkg{ggplot2}-based approaches is most obvious when compared to the plotting function included in the \pkg{network} package, which very quickly becomes very slow when network size increases.
-
-}
-
-\begin{figure}[hbtp]
-\centering
-<<runtimes, eval=TRUE, echo=FALSE>>=
-library(tidyr)
-setwd("runtimes")
-g = list.files(pattern = "csv$") %>%
-  lapply(read.csv, stringsAsFactors = FALSE) %>%
-  bind_rows %>%
-  gather(`Visualization approach`, time, -network_size, -iteration) %>%
-  group_by(network_size, `Visualization approach`) %>%
-  summarise(mean_time = mean(time), min = min(time), max = max(time))
-
-g = ggplot(g, aes(x = network_size, y = mean_time,
-                  fill = `Visualization approach`)) +
-  geom_ribbon(aes(ymin = min, ymax = max), alpha = 1/3) +
-  geom_line(aes(color = `Visualization approach`)) +
-  scale_y_continuous(breaks = seq(0, max(g$max), 10)) +
-  scale_x_continuous(breaks = seq(20, 240, 40)) +
-  labs(y = "Average plotting time (seconds)\n", x = "\nNetwork size") +
-  theme_bw() + 
-  scale_colour_brewer(palette = "Set1") + 
-  scale_fill_brewer(palette = "Set1") +
-  theme(legend.justification = c(0,1), legend.position = c(0,1))
-setwd("..")
-print(g)
-@
-\includegraphics[width=.5\textwidth]{figure/runtimes-1.pdf}
-\caption{\label{fig.cap:runtimes-random}%
-  Average plotting time of random undirected networks, in seconds: ribbon at minimum and maximum recorded times, solid line at average. The time ranges of the \code{ggnet2} and \code{ggnetwork} approaches are quasi-identical and form the single purple line at the bottom of the plot.%
-}
-\end{figure}
-
-\fb{
-
-The second test relies on the protein interaction network featured in \citet{protein}, which is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. The network has 1,870 proteins that make up the vertices of the network, with a total of 2,240 edges between them, which represent ``direct physical interactions'' between any two proteins \citep[p. 42]{protein}. These interactions and their associated proteins are plotted in Figure~\ref{fig.cap:yeast} using a random distribution algorithm that produces a ``Gaussian donut'' layout. \fb{The network is shown alongside the execution time of 100 similar plots for each plotting approach.}.
-
-}
-
-\fb{-- Include protein figure here, side-to-side with the execution times. Include \pkg{igraph} in the execution times. --}
 
 \item \hh{Should we make recommendations as to what type of user would be happier with either one of the approaches?
 I would think that the users of ggnet2 and ggnetwork are pretty well-versed with networks, and are looking at ggplot2 for  high-quality visualizations that also covers their other visualization needs. Data management and attribute handling is done through network operators on nodes and edges. These users might actually be attracted to ggplot2 because of the additional features open to them.
@@ -1263,12 +1333,12 @@ I would like to think that both approaches are valid and necessary.
 \item \hh{Which approach is the best? This is a question that we cannot answer overall, but we can give suggestions as to which approach is the best for you, depending on your answers to a couple of questions:
 
 \begin{enumerate}
-\item Do you want to draw graph? if yes, you're off to a  good start, you're in the right place, keep reading. If no, sorry, but you can stop reading now.
+\item Do you want to draw a graph? if yes, you're off to a  good start, you're in the right place, keep reading. If no, sorry, but you can stop reading now.
 \item Do you have the data to draw your network? yes? good, keep reading, if not, find some data.
-\item Do you have experience drawing a network? yes? your packages of choice are ggnet2 or ggnetwork, but keep reading. no? go check out geomnet. 
-\item Do you know ggplot2? yes? use ggnetwork. no? ggnet2 is your package. 
+\item Do you have experience drawing a network? yes? your packages of choice are ggnet2 or ggnetwork, but keep reading. no? go check out geomnet.
+\item Do you know ggplot2? yes? use ggnetwork. no? ggnet2 is your package.
 \end{enumerate}
-} 
+}
 \end{enumerate}
 
 \bibliography{tyner-briatte-hofmann}
