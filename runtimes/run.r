@@ -1,12 +1,12 @@
 ## igraph (current: v1.0.1)
 if (!require(igraph, quietly = TRUE)) {
-  install.package("igraph")
+  install.packages("igraph")
 }
 library(igraph)
 
 ## network (current: v1.13.0)
 if (!require(network, quietly = TRUE)) {
-  install.package("network")
+  install.packages("network")
 }
 library(network)
 
