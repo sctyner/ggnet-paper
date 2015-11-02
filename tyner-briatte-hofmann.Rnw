@@ -179,7 +179,7 @@ In the remainder of this paper, we present three different approaches to network
 \section{A quick primer to network structures}
 \label{sec:background}
 
-In its essence, a network is simply a set of points connected in pairs by a set of lines \citep{newman}. Here, we refer to the lines as edges (or ties) and to the points as nodes (or vertices). \sct{We note that our examples are all one-mode networks, where all nodes are of the same kind and are able to connect to each other, however the graphical tools presented can be used to visualize all types of networks.} \sct{XXX I'm not 100\% sure that's true but it seems right.XXX}
+In its essence, a network is simply a set of points connected in pairs by a set of lines \citep{newman}. Here, we refer to the lines as edges (or ties) and to the points as nodes (or vertices). \sct{We note that our examples are all one-mode networks, where all nodes are of the same kind and are able to connect to each other, however the graphical tools presented can be used to visualize \hh{more general} types of networks.} %\sct{XXX I'm not 100\% sure that's true but it seems right.XXX}
 
 The two sets of graphical objects that make up a network, points and segments between them, have been used to encode a huge variety and quantity of information across many different fields of study. For instance, networks of scientific collaboration, a food web of marine animals, and American college football games are all covered in a paper on community detection in networks by \citet{football}. \citet{networkfailures} examine node failure in interdependent networks like power grids.  Social networks such as links between actors found on \url{http://www.imdb.com/} and neural networks, like the completely mapped neural network of the \textit{C. elegans} worm are also extensively studied \citep{smallworld}.
 
@@ -260,10 +260,10 @@ The \code{ggnet2} function also provides a few network-specific options, such as
 
 \subsubsection{Data Structure}
 
-\sct{The package \pkg{geomnet} implements network visualization in a single \pkg{ggplot2} layer. It is available at \url{github.com/sctyner/geomnet} . The package has two main functions:  \code{stat\_net}, which performs all of the calculations, and \code{geom\_net}, which renders the plot. }%Visualizing networks with a single layer as done
+The package \pkg{geomnet} implements network visualization in a single \pkg{ggplot2} layer. It is available at \url{github.com/sctyner/geomnet} . The package has two main functions:  \code{stat\_net}, which performs all of the calculations, and \code{geom\_net}, which renders the plot. 
 The approach in \code{geomnet} is similar to the implementation of other, native \pkg{ggplot2} geoms, such as \code{geom\_smooth}. When using \code{geom\_smooth}, the user does not need to know about any of the internals of the loess function, and similarly, when using \code{geomnet}, the user is not expected to know about the internals of the layout algorithm, but only needs to specify the essential elements necessary for calculating a layout. On the other hand, if users are comfortable with network analysis, the entire body of layout methods provided by the \pkg{sna} package is available to them through the parameters \code{layout} and \code{layout.par}.
 %
-In network analysis there are usually two sources of information: one data set consisting of a description of the actors, represented as the vertices in the network, and another data set detailing the relationship between these actors, the edge dataset. \sct{We make two important assumptions about the way this information is encoded. First, we assume that the vertices are labelled using an `id' column. Second, we assume that the edges are described as connection between vertices via their respective `id' labels in a `from' and a `to' column. Thus, the minimum amount of information needed is a vector of all vertex labels and a two column data frame of to and from vertex ids corresponding to the edges.}  In order for this geometry to work, these two data sets need to be combined into a single data frame. For this, we are using the convention that all of the vertex information is merged into the edge data set using the `from' as the reference column in a full join operations. Generally, there will be some vertices that are sinks in the network because they only show up in the `to' column. We can easily accommodate for these by adding artificial edges in the data set that have missing information for the `to' column.
+In network analysis there are usually two sources of information: one data set consisting of a description of the actors, represented as the vertices in the network, and another data set detailing the relationship between these actors, the edge dataset. We make two important assumptions about the way this information is encoded. First, we assume that the vertices are labelled using an `id' column. Second, we assume that the edges are described as connection between vertices via their respective `id' labels in a `from' and a `to' column. Thus, the minimum amount of information needed is a vector of all vertex labels and a two column data frame of to and from vertex ids corresponding to the edges.  In order for this geometry to work, these two data sets need to be combined into a single data frame. For this, we are using the convention that all of the vertex information is merged into the edge data set using the `from' as the reference column in a full join operations. Generally, there will be some vertices that are sinks in the network because they only show up in the `to' column. We can easily accommodate for these by adding artificial edges in the data set that have missing information for the `to' column.
 
 Fortunately, R provides functionality that allows for an easy way of producing the required result: \code{merge} (in base R), \code{join} \citep[in \CRANpkg{plyr} see][]{plyr} and \code{full\_join} \citep[in \CRANpkg{dplyr}, see][]{dplyr} can be used. In \code{merge} the argument \code{all} needs to be set to \code{TRUE}; in \code{join}, the parameters have to be set to \code{type = "full"} and \code{all = TRUE}. These operations are equivalent to a `full join' in SQL terminology.
 
@@ -291,9 +291,8 @@ Note that the edge specific aesthetics that overwrite node aesthetics are curren
 \item {\bf arrow:} whenever the parameter \code{directed} is set from its default state to \code{TRUE}, arrows are drawn from the `from' to the `to' node, with tips pointing towards the `to' node.  By default, arrows have an absolute size of 10 points. The parameter \code{arrowsize} consists of a positive numeric value that is used as a multiple of the original arrow size, i.e.\ \code{arrowsize = 2} shows arrow tips at twice their original size. In order to avoid overplotting of the arrow tips by the nodes, the parameter \code{arrowgap} can be used. \code{arrowgap} specifies a proportion by which the edge should be shrunk with default of 0.05. A value of 0.5 will result in edges drawn only half way from the `from' node to the `to' node.
 \item {\bf labels:}  \code{label} can be used as either a logical parameter or as a data variable, in which case it is assumed that the associated variable consists of the character strings to be used for labeling the nodes. Again, if \code{colour} is specified for the nodes, the same values are used for the labels, unless \code{ labelcolour} is specified. Other parameter values, such as \code{vjust} and \code{hjust} help in adjusting labels relative to the nodes. The parameters work in the same fashion as in native \pkg{ggplot2} geoms.
 
-\sct{
 \item \bf{self-referencing vertices:} if self-references on vertices are of interest, the parameter \code{selfies} can be set to \code{TRUE}. In this case, an edge has the same vertex id in its from and to columns, and a circle is drawn to represent this loop.
-}
+
 \end{itemize}
 
 \subsection{ggnetwork} % =======================================================
@@ -483,7 +482,7 @@ This network is plotted in Figure~\ref{fig.cap:email}. There are six distinct cl
 
 %% HH: this is not necessarily true anymore, when taking the number of emails exchanged into account. SCT: I agree.
 %It is interesting to observe that, in all of the layouts, the `Security' employee group plays a central role in the email network of the company. This observation holds regardless of the actual network layout used (remember that \code{ggnet2} and \code{ggnetwork} default to the Fruchterman-Reingold algorithm, while \code{geomnet} defaults to the Kamada-Kawai algorithm; both layouts are force-directed, but proceed differently to assign coordinates to the nodes).
-\sct{We can clearly see the varying densities of communications within departments and the more sparse communication between employees in different departments.} We also see that one of the executives only communicates with employees in Facilities, while one of the IT employees frequently communicates with security employees.
+We can clearly see the varying densities of communications within departments and the more sparse communication between employees in different departments. We also see that one of the executives only communicates with employees in Facilities, while one of the IT employees frequently communicates with security employees.
 
 A comparison of the results of \pkg{ggnet}, \pkg{geomnet} and \pkg{ggnetwork} reveals some of the %(subtle) 
 differences that exist between the implementations:
@@ -503,7 +502,7 @@ differences that exist between the implementations:
 
 \end{itemize}
 
-\sct{To visualize how this network may change over time,} we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows email networks associated with each day of the work week. The code for these visualization is below.
+To visualize how this network  changes over time, we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows email networks associated with each day of the work week. The code for these visualization is below.
 
 \begin{figure}[hbt]
 \begin{subfigure}[t]{\textwidth}
@@ -602,7 +601,7 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
   theme_facet(legend.position = "bottom")
 @
 
-Note that the main difference in the visualizations of Figure~\ref{fig:email_facet} stems from whether \emph{one} layout is used across all panels (as for the \code{ggnetwork} example) or whether individual layouts are fit to each of the subsets (as for the \code{ggnet2} and the \code{geomnet} examples). In \code{geomnet} this is controlled via the argument \code{fiteach}. By default  \code{fiteach = TRUE}, but \code{fiteach = FALSE} results in all panels sharing the same layout. Through the facetting it becomes obvious that there are several days where one or more of the departments does not communicate with any of the other departments. There are only two days, day 13 and day 15, without any isolated department communications. Facetting is one of the major benefits of \sct{implementing tools for network visualization} in \pkg{ggplot2}. Facetting allows the user to quickly separate dense networks into smaller subnetworks for easy visual comparison and analyses, \sct{a feature that the other network visualization tools do not have}.
+Note that the main difference in the visualizations of Figure~\ref{fig:email_facet} stems from whether \emph{one} layout is used across all panels (as for the \code{ggnetwork} example) or whether individual layouts are fit to each of the subsets (as for the \code{ggnet2} and the \code{geomnet} examples). In \code{geomnet} this is controlled via the argument \code{fiteach}. By default  \code{fiteach = TRUE}, but \code{fiteach = FALSE} results in all panels sharing the same layout. Through the facetting it becomes obvious that there are several days where one or more of the departments does not communicate with any of the other departments. There are only two days, day 13 and day 15, without any isolated department communications. Facetting is one of the major benefits of implementing tools for network visualization in \pkg{ggplot2}. Facetting allows the user to quickly separate dense networks into smaller subnetworks for easy visual comparison and analyses, a feature that the other network visualization tools do not have.
 
 \subsection{\pkg{ggplot2} theme elements} % ====================================
 
@@ -666,7 +665,7 @@ ggplot(ggnetwork(te.net),
 \end{figure}
 \afterpage{\clearpage}
 
-The inheritance structure is plotted in figure \ref{fig.cap:theme}.  In these plots, it is easy to quickly determine the parent and child vertices. \sct{The parents with the most children are the \code{rect}, \code{text}, and \code{line} elements, so we made their labels larger in order to emphasize their importance. In each case, the label size is a function of the out degree of the vertices.}
+The inheritance structure is plotted in figure \ref{fig.cap:theme}.  In these plots, it is easy to quickly determine the parent and child vertices. The parents with the most children are the \code{rect}, \code{text}, and \code{line} elements, so we made their labels larger in order to emphasize their importance. In each case, the label size is a function of the out degree of the vertices.
 %Using this plot made creation of the \code{theme\_net} object used throughout these examples very simple. We just made set each of the major parent elements, \code{text}, \code{rect}, and \code{line} to \code{element\_blank()} and then set the aspect ratio equal to one.
 
 \subsection{Romantic relationships in \emph{Mad Men}} % ========================
@@ -1135,7 +1134,7 @@ ggplot(data = ggnetwork(bikes.net, layout = matrix(coords, ncol = 2)),
 
 
 \sct{In our examples thus far, we have focused on rather small social or relationship networks and one larger communication network. Now we present an} example of a biological network, which comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 2,113 proteins that make up the vertices of this network, with a total of 4480 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}, resulting in a relatively large  network. Despite its size, each one of the approaches in the \pkg{ggplot2} framework can be drawn in a few seconds \sct{or less}. A more in-depth discussion on plotting speed follows in the next section. The proteins and the interactions between them are plotted in the networks shown in Figure~\ref{fig.cap:yeast}. %These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}. 
-In this visualization, we demonstrate the layout capabilities of our functions by changing the layout to \code{random} and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout \citep{sna}.  Indeed, we see a near circular area in the middle of the graph because the layout parameter has forced all of the vertices to the exterior, leaving a ``donut hole" in the middle. Because all of the approaches result in nearly identical figures, only one network is shown. The code for all three approaches is shown below.
+In this visualization, we demonstrate the layout capabilities of our functions by changing the layout to \code{random} and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout \citep{sna}.  Indeed, we see a near circular area in the middle of the graph because the layout parameter has forced all of the vertices to the exterior, leaving a ``donut hole" in the middle. Because all of the approaches result in nearly identical figures, only one network is shown. The code for all three approaches is given below.
 
 <<yeast_ggnet2, echo=TRUE, eval = FALSE, cache=FALSE>>=
 # plot with ggnet2
@@ -1174,26 +1173,18 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 \hh{XXX So, the testing waters are much more muddy than anticipated. What we can do, though, is to describe the testing scenario(s), and then report our findings with an attempt to summarize. XXX I've added a facetted plot to show the variability in the results that we've seen between the different machines. I made a few changes to the plot, as you can see - using a smooth allows us to see a trend, while the points show variability and give some indication of the distribution (I don't like min and max for that because they are the least robust measures). I also want to see where the actual measurements are taken - that's the reason for showing the points. XXX}
 
 Another benefit that emerges from using \pkg{ggplot2} for network visualization \sct{is} the speed at which it can plot \sct{fairly} large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{network} package. They also show the \pkg{ggplot2} approaches to be largely on par with the speed provided by the \pkg{igraph} package. \sct{We first investigate} average plotting time of the protein network shown in Figure~\ref{fig.cap:yeast}, %
-  \footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes-protein/run.r} for the code to recreate our results.}
+  \footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes-protein/run.r} for the code to recreate results for visualizing the protein interaction network.}
+
 %
-and \sct{then consider} average plotting time of increasingly large random networks.%
+and \sct{then consider} average plotting times of increasingly larger random networks.%
   \footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes/run.r} for code to recreate our results.}
 %
   
-  %\footnote{\hh{The code used for benchmarking can be found at \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes/run.r}. Run time results are found in \url{https://github.com/sctyner/ggnet-paper/tree/master/runtimes}.}}
-
 %so, what should we do? include one of these? or both? I'd support leaving the benchmark code out of the paper, because it is not directly about network viz with ggplot2. Alternately, include it as an appendix? If left out, the code can be referred to by linking to the repo; that's what I would support most.} % $\hh{XXX link to the benchmark code in the repo seems like the best solution -  we should structure the runtime results somewhat and summarize there as well.} DONE - SCT.
 
-%' \hh{Additionally, the \pkg{ggplot2} framework provides us with a considerable speed-up compared to the standard plotting routines that come with the \pkg{network} package. 
-% We executed the following code:}
-%' 
-% <<network-plot, echo=TRUE, eval = FALSE>>=
-% xy = gplot.layout.random(network(protein$edges[, 1:2]),
-%                          layout.par = list(dist = "uniang"))
-% plot(network(protein$edges[, 1:2]), coord = xy)
-% @
-\sct{We plotted the protein interaction network of Figure~\ref{fig.cap:yeast} 100 times using the \pkg{network} and \pkg{igraph} packages, and compared its run time to 100 runs each of the three visualization approaches introduced in this paper. The results are shown in Figure~\ref{fig:timings}. We can see that on average, the \pkg{ggplot2} framework provides a two to three-fold increase in speed over the network package, and that \pkg{geomnet} and \pkg{ggnetwork} are faster than \pkg{igraph}. The three \pkg{ggplot2} approaches also have considerably less variability in time than the \pkg{network} package. 
-}
+We plotted the protein interaction network of Figure~\ref{fig.cap:yeast} 100 times using the \pkg{network} and \pkg{igraph} packages, and compared its run time to 100 runs each of the three visualization approaches introduced in this paper. The results are shown in Figure~\ref{fig:timings}. We can see that on average, the \pkg{ggplot2} framework provides a two to three-fold increase in speed over the network package, and that \pkg{geomnet} and \pkg{ggnetwork} are faster than package \pkg{igraph}. The three \pkg{ggplot2} approaches also have considerably less variability in time than the \pkg{network} package. 
+
+
 \begin{figure}
 \centering
 <<compare, echo = FALSE, eval = TRUE, fig.height = 4, fig.width = 8, out.width = '\\textwidth'>>=
@@ -1267,38 +1258,53 @@ qplot(data = tm, reorder(variable, value, median), value,
   theme_bw() + # HH: gridlines help with comparisons. significantly.
   theme(legend.position = "none")
 @
-\includegraphics[width=.5\textwidth]{figure/compare-1.pdf}
-\caption{\label{fig:timings} Comparison of the times needed for calculating and rendering the protein interaction network in the three \pkg{ggplot2} approaches (top three) and the standard plotting routines  of the \pkg{network} and \pkg{igraph} packages based on 100 evaluations each.  }
+\includegraphics[width=\textwidth]{figure/compare-1.pdf}
+\caption{\label{fig:timings} Comparison of the times needed for calculating and rendering the previously discussed protein interaction network in the three \pkg{ggplot2} approaches and the standard plotting routines  of the \pkg{network} and \pkg{igraph} packages based on 100 evaluations each.  }
 \end{figure}
 
-\sct{
+
+
+%\fb{
+%The second test relies on the protein interaction network featured in \citet{protein}, which is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. The network has 1,870 proteins that make up the vertices of the network, with a total of 2,240 edges between them, which represent ``direct physical interactions'' between any two proteins \citep[p. 42]{protein}. These interactions and their associated proteins are plotted in Figure~\ref{fig.cap:yeast} using a random distribution algorithm that produces a ``Gaussian donut'' layout. \fb{The network is shown alongside the execution time of 100 similar plots for each plotting approach.}.
+%}
+
+%\fb{-- Include protein figure here, side-to-side with the execution times. Include \pkg{igraph} in the execution times. --}
+
+%\hh{XXX what about the code necessary to produce each one of these networks? I like the fact that this example is extremely concise and would allow us to include the code rather than referring to an external link. My alternative would be: XXX}
+
+
+%\hh{Additionally, the \pkg{ggplot2} framework provides us with a considerable speed-up compared to the standard plotting routines that come with the \pkg{network} package. We executed the following code 100 times and compared its run time to 100 runs each of the three visualisation approaches introduced in this paper:}
+%' 
+%' <<network-plot, echo = TRUE, eval = FALSE>>=
+%' # network package
+%' xy = gplot.layout.random(network(protein$edges[, 1:2]), 
+%'                          layout.par = list(dist = "uniang"))
+%' system.time(plot(network(protein$edges[, 1:2]), coord = xy))
+%' @
+%' 
+%' <<igraph-plot, echo = TRUE, eval = FALSE>>=
+%' # igraph package
+%' n = as.matrix(protein$edges[, 1:2])
+%' n = igraph::graph_from_edgelist(n, directed = FALSE)
+%'   
+%' system.time(plot(n, vertex.label = NA, layout = layout_randomly))
+%' @
+%' 
+\hh{XXX  we have a qualitative difference to the next set of results. Where does that come from? The only possibility that I see is the edge probability - which for the protein network is \Sexpr{round(nrow(protein$edges)/choose(length(protein$vertices),2), 3)} (4480 out of over 2.2 Million theoretically possible connections). We need to investigate the effect of edge probability in more detail.
+}
+
+
+
 
 The second test relies on random undirected networks in which the probability of an edge %to exist 
 between two nodes was set to \hh{$p = 0.2$}.
-% \fb{Let me run the same tests at p = 0.25 and tell you exactly. It sure affects the average plotting time, but the number of nodes should stay the most crucial parameter.} 
-We generated 100 of these networks at network sizes from 25 to 250 nodes, using increments of 25. We then computed the average plotting time at each network size.
+We generated 100 of these networks at network sizes from 25 to 250 nodes, using increments of 25. %We then computed the average plotting time at each network size.
 
  %We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}.
 
 %Although speed was not the main rationale for our inquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower than when network size increases.
 
 %Further testing on a network of [EDGES] interactions between [NODES] proteins yielded the same conclusion. [INSERT protein-based test here.]
-}
-
-
-\hh{Figure~\ref{fig.cap:runtimes-random} summarizes the results of these benchmarks using a convenience sample of machines accessible to the authors, including authors' hardware and additional results from friends' and colleagues' machines. 
-Network sizes are plotted horizontally, execution times of 100 runs under each visualization approach are plotted on the $y$-axis. Each panel shows a different machine as indicated by the facet label. Note that each panel is scaled separately to account for differences in the overall speed of these machines.  
-What these plots indicate is that we have surprisingly large variability in relative run times across different machines. 
-However, the results support some  general findings.
-The \pkg{network} plotting routine is by far the slowest across all machines, while the \pkg{igraph} plotting is generally among the fastest. Our three approaches generally feature in between \pkg{igraph} and \pkg{network} with \pkg{ggnet2} being as fast or faster than \pkg{igraph} plotting, followed by \pkg{ggnetwork} and \pkg{geomnet}, which is generally the slowest among the three. These differences \sct{become} more pronounced \sct{as the size of the network increases}. 
-
-
-Although speed was not the main rationale for our inquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower \sct{as} network size increases.
-
-% Further testing on a network of [EDGES] interactions between [NODES] proteins yielded the same conclusion. [INSERT protein-based test here.]
-
-XXX how does edge probability affect these results?
-XXX how do the different layouts affect the results? }
 
 
 
@@ -1355,9 +1361,26 @@ qplot(data=rtm, network_size, value, colour=variable, alpha=I(0.1)) +
 \caption{\label{fig.cap:runtimes-random}%
 %  Average plotting time of random undirected networks, in seconds: ribbon at minimum and maximum recorded times, solid line at average. The time ranges of the \code{ggnet2} and \code{ggnetwork} approaches are quasi-identical and form the single purple line at the bottom of the plot. 
 \hh{Plotting times of random undirected networks of different sizes under each of the available visualization approaches. Note that each panel is scaled independently to highlight relative differences in the visualization approaches rather than speed of different hardware.}
-\fb{Can't remember how I styled the figure in the beginning, but I remember trying to match the previous one by using theme\_classic. We need to harmonize them.} \hh{XXX I'm all for consistency of the figures, but let's please use a theme that has grid lines. They are important for accurate readings. }%
+%\fb{Can't remember how I styled the figure in the beginning, but I remember trying to match the previous one by using theme\_classic. We need to harmonize them.} \hh{XXX I'm all for consistency of the figures, but let's please use a theme that has grid lines. They are important for accurate readings. }%
 }
 \end{figure}
+
+Figure~\ref{fig.cap:runtimes-random} summarizes the results of these benchmarks using a convenience sample of machines accessible to the authors, including authors' hardware and additional results from friends' and colleagues' machines. 
+Network sizes are plotted horizontally, execution times of 100 runs under each visualization approach are plotted on the $y$-axis. Each panel shows a different machine as indicated by the facet label. Note that each panel is scaled separately to account for differences in the overall speed of these machines.  
+What these plots indicate is that we have surprisingly large variability in relative run times across different machines. 
+However, the results support some  general findings.
+The \pkg{network} plotting routine is by far the slowest across all machines, while the \pkg{igraph} plotting is generally among the fastest. Our three approaches generally feature in between \pkg{igraph} and \pkg{network} with \pkg{ggnet2} being as fast or faster than \pkg{igraph} plotting, followed by \pkg{ggnetwork} and \pkg{geomnet}, which is generally the slowest among the three. These differences \sct{become} more pronounced \sct{as the size of the network increases.} 
+
+
+Although speed was not the main rationale for our inquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower \sct{as} network size increases.
+
+\hh{
+XXX how does edge probability affect these results?
+XXX how do the different layouts affect the results? }
+
+
+
+
 
 \section{Summary and Discussion}
 \sct{XXX I am going to attempt to pull all of this together into a complete, coherent discussion section.  I removed all of your colors and just kept mine in most places. XXX}
