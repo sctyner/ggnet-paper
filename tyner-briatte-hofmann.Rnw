@@ -1173,7 +1173,7 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 \section{Some considerations of speed}\label{sec:speed}
 \hh{XXX So, the testing waters are much more muddy than anticipated. What we can do, though, is to describe the testing scenario(s), and then report our findings with an attempt to summarize. XXX I've added a facetted plot to show the variability in the results that we've seen between the different machines. I made a few changes to the plot, as you can see - using a smooth allows us to see a trend, while the points show variability and give some indication of the distribution (I don't like min and max for that because they are the least robust measures). I also want to see where the actual measurements are taken - that's the reason for showing the points. XXX}
 
-Another benefit that emerges from using \pkg{ggplot2} for network visualization has to do with the speed at which it can plot relatively large networks. \hh{In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{network} package \hh{and largely on par with the speed provided by the \pkg{igraph} package}.} \sct{We first investigate} average plotting time of the protein network shown in Figure~\ref{fig.cap:yeast}, %
+Another benefit that emerges from using \pkg{ggplot2} for network visualization \sct{is} the speed at which it can plot \sct{fairly} large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{network} package. They also show the \pgk{ggplot2} approaches to be largely on par with the speed provided by the \pkg{igraph} package}. \sct{We first investigate} average plotting time of the protein network shown in Figure~\ref{fig.cap:yeast}, %
   \footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes-protein/run.r} for the code to recreate our results.}
 %
 and \sct{then consider} average plotting time of increasingly large random networks.%
@@ -1192,133 +1192,8 @@ and \sct{then consider} average plotting time of increasingly large random netwo
 %                          layout.par = list(dist = "uniang"))
 % plot(network(protein$edges[, 1:2]), coord = xy)
 % @
-\sct{We plotted the protein interaction network of Figure~\ref{fig.cap:yeast} 100 times using the \pkg{network} and \pkg{igraph} packages, and compared its run time to 100 runs each of the three visualization approaches introduced in this paper. The results are shown in Figure~\ref{fig:timings}. We can see that on average, the \pkg{ggplot2} framework provides a two to three-fold increase in speed over the network package, and that \pkg{geomnet} and \pkg{ggnetwork} are faster than \pkg{igraph}.
+\sct{We plotted the protein interaction network of Figure~\ref{fig.cap:yeast} 100 times using the \pkg{network} and \pkg{igraph} packages, and compared its run time to 100 runs each of the three visualization approaches introduced in this paper. The results are shown in Figure~\ref{fig:timings}. We can see that on average, the \pkg{ggplot2} framework provides a two to three-fold increase in speed over the network package, and that \pkg{geomnet} and \pkg{ggnetwork} are faster than \pkg{igraph}. The three \pkg{ggplot2} approaches also have considerably less variability in time than the \pkg{network} package. 
 }
-\begin{figure}
-\centering
-<<compare, echo = FALSE, eval = TRUE, fig.height = 4, fig.width = 8, out.width = '\\textwidth'>>=
-g = read.csv("runtimes-protein//runtimes-protein-100.csv", stringsAsFactors = FALSE) %>%
-      gather(`Visualization approach`, time, -iteration)
-
-ggplot(g, aes(x = `Visualization approach`, y = time,
-              fill = `Visualization approach`)) +
-  geom_boxplot() +
-  scale_fill_brewer(palette = "Set2") +
-  coord_flip() +
- labs(x = "\nVisualisation approach", y = "Average plotting time (seconds)\n")  +
-  guides(fill = FALSE) +
-  theme_bw() +
-  theme(legend.position = "none")
-@
-\includegraphics[width=.75\textwidth]{figure/compare-1.pdf}
-\caption{\label{fig:timings} Comparison of the times needed for calculating and rendering the protein interaction network in our three \pkg{ggplot2} approaches and the standard plotting routine of the \pkg{network} and \pkg{sna} packages based on 100 evaluations each.}
-\end{figure}
-
-\sct{
-
-The second test relies on random undirected networks in which the probability of an edge %to exist 
-between two nodes was set to \hh{$p = 0.2$}.
-% \fb{Let me run the same tests at p = 0.25 and tell you exactly. It sure affects the average plotting time, but the number of nodes should stay the most crucial parameter.} 
-We generated 100 of these networks at network sizes from 25 to 250 nodes, using increments of 25. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}.
-
- %We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}.
-
-%Although speed was not the main rationale for our inquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower than when network size increases.
-
-%Further testing on a network of [EDGES] interactions between [NODES] proteins yielded the same conclusion. [INSERT protein-based test here.]
-}
-
-
-\hh{Figure~\ref{fig.cap:runtimes-random} summarizes the results of these benchmarks using a (convenience) sample of machines accessible to the authors (i.e.\ authors' hardware and additional results from friends' and colleagues' machines). 
-Network sizes are plotted horizontally, execution times of 100 runs under each visualization approach are plotted on the $y$-axis. Each panel shows a different machine as indicated by the facet label. Note that each panel is scaled separately to account for differences in the overall speed of these machines.  
-What these plots indicate is that we have surprisingly large variability in relative run times across different machines. 
-However, the results support some  general findings:
-The \pkg{network} plotting routine is by far the slowest across all machines, while the \pkg{igraph} plotting is generally among the fastest. Our three approaches generally feature in between \pkg{igraph} and \pkg{network} with \pkg{ggnet2} veing as fast or faster than \pkg{igraph} plotting, followed by \pkg{ggnetwork} and \pkg{geomnet}, which is generally the slowest among the three. These differences are more pronounced the larger the networks are. 
-
-
-Although speed was not the main rationale for our enquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower than when network size increases.
-
-% Further testing on a network of [EDGES] interactions between [NODES] proteins yielded the same conclusion. [INSERT protein-based test here.]
-
-\hh{XXX how does edge probability affect these results?
-XXX how do the different layouts affect the results? }
-
-
-
-\begin{figure}[hbtp]
-\centering
-<<runtimes, eval=FALSE, echo=FALSE>>=
-g = list.files("runtimes", pattern = "runtimes-(.*)csv$", full.names = TRUE) %>%
-        lapply(read.csv, stringsAsFactors = FALSE) %>%
-        bind_rows %>%
-        gather(`Visualization approach`, time, -network_size, -iteration) %>%
-        group_by(network_size, `Visualization approach`) %>%
-        summarise(mean_time = mean(time),
-                  q05 = quantile(time, 0.05),
-                  q95 = quantile(time, 0.95))
-
-ggplot(g, aes(x = network_size, y = mean_time,
-              fill = `Visualization approach`)) +
-  geom_ribbon(aes(ymin = q05, ymax = q95), alpha = 1/3) +
-  geom_line(aes(color = `Visualization approach`)) +
-  scale_color_brewer(palette = "Set2") +
-  scale_fill_brewer(palette = "Set2") +
-  scale_y_continuous(breaks = seq(0, max(g$q95), 5)) +
-  scale_x_continuous(breaks = seq(25, 250, 25)) +
-  labs(y = "Average plotting time (seconds)\n", x = "\nNetwork size") +
-  theme_classic(18) +
-  theme(axis.text = element_text(size = rel(1)),
-        legend.text = element_text(size = rel(1)),
-        legend.justification = c(0,1),
-        legend.position = c(0,1))
-@
-%\includegraphics[width=.5\textwidth]{figure/runtimes-1.pdf}
-<<runtimes-all, echo=FALSE, fig.width=8, fig.height=8.5>>=
-library(tidyr)
-library(reshape2)
-
-dirs <- list.dirs(path="runtimes", recursive = FALSE)
-rt <- dirs %>%
-  lapply(function(x) paste0(x, "/", list.files(path=x, pattern=".csv$"))) %>%
-  unlist %>%
-  lapply(read.csv, stringsAsFactors = FALSE) %>%
-  bind_rows
-rt$source <- rep(dirs, each=1000)
-rtm <- melt(rt, id.var=c("network_size", "source", "iteration"))
-qplot(data=rtm, network_size, value, colour=variable, alpha=I(0.1)) + 
-  facet_wrap(facets=~source, scales = "free") +
-  scale_colour_brewer("Visualization approach", palette="Set1") + 
-  geom_smooth(alpha = 0.5) +
-  xlab("Network size (edge probability p = 0.2)") +
-  ylab("Time (in seconds)") +
-  theme_bw() + 
-  theme(legend.position="bottom")
-@
-\includegraphics[width=\textwidth]{figure/runtimes-all-1.pdf}
-\caption{\label{fig.cap:runtimes-random}%
-%  Average plotting time of random undirected networks, in seconds: ribbon at minimum and maximum recorded times, solid line at average. The time ranges of the \code{ggnet2} and \code{ggnetwork} approaches are quasi-identical and form the single purple line at the bottom of the plot. 
-\hh{Plotting times of random undirected networks of different sizes under each of the available visualization approaches. Note that each panel is scaled independently to highlight relative differences in the visualization approaches rather than speed of different hardware.}
-\fb{Can't remember how I styled the figure in the beginning, but I remember trying to match the previous one by using theme\_classic. We need to harmonize them.} \hh{XXX I'm all for consistency of the figures, but let's please use a theme that has grid lines. They are important for accurate readings. }%
-}
-\end{figure}
-
-\fb{
-
-The second test relies on the protein interaction network featured in \citet{protein}, which is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. The network has 1,870 proteins that make up the vertices of the network, with a total of 2,240 edges between them, which represent ``direct physical interactions'' between any two proteins \citep[p. 42]{protein}. These interactions and their associated proteins are plotted in Figure~\ref{fig.cap:yeast} using a random distribution algorithm that produces a ``Gaussian donut'' layout. \fb{The network is shown alongside the execution time of 100 similar plots for each plotting approach.}.
-
-}
-
-\fb{-- Include protein figure here, side-to-side with the execution times. Include \pkg{igraph} in the execution times. --}
-
-\hh{Additionally, the \pkg{ggplot2} framework provides us with a considerable speed-up compared to the standard plotting routines that come with the \pkg{network} package. We executed the following code:}
-
-<<network-plot, echo=TRUE, eval = FALSE>>=
-xy = gplot.layout.random(network(protein$edges[, 1:2]),
-                         layout.par = list(dist = "uniang"))
-plot(network(protein$edges[, 1:2]), coord = xy)
-@
-\hh{100 times and compared its run time to 100 runs each of the three visualisation approaches introduced in this paper. The results are shown in Figure~\ref{fig:timings}. The \pkg{ggplot2} framework provides a two to three-fold increase in speed on average.}
-
 \begin{figure}
 \centering
 <<compare, echo = FALSE, eval = TRUE, fig.height = 4, fig.width = 8, out.width = '\\textwidth'>>=
@@ -1394,6 +1269,94 @@ qplot(data = tm, reorder(variable, value, median), value,
 @
 \includegraphics[width=.5\textwidth]{figure/compare-1.pdf}
 \caption{\label{fig:timings} Comparison of the times needed for calculating and rendering the protein interaction network in the three \pkg{ggplot2} approaches (top three) and the standard plotting routines  of the \pkg{network} and \pkg{igraph} packages based on 100 evaluations each.  }
+\end{figure}
+
+\sct{
+
+The second test relies on random undirected networks in which the probability of an edge %to exist 
+between two nodes was set to \hh{$p = 0.2$}.
+% \fb{Let me run the same tests at p = 0.25 and tell you exactly. It sure affects the average plotting time, but the number of nodes should stay the most crucial parameter.} 
+We generated 100 of these networks at network sizes from 25 to 250 nodes, using increments of 25. We then computed the average plotting time at each network size.
+
+ %We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}.
+
+%Although speed was not the main rationale for our inquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower than when network size increases.
+
+%Further testing on a network of [EDGES] interactions between [NODES] proteins yielded the same conclusion. [INSERT protein-based test here.]
+}
+
+
+\hh{Figure~\ref{fig.cap:runtimes-random} summarizes the results of these benchmarks using a convenience sample of machines accessible to the authors, including authors' hardware and additional results from friends' and colleagues' machines. 
+Network sizes are plotted horizontally, execution times of 100 runs under each visualization approach are plotted on the $y$-axis. Each panel shows a different machine as indicated by the facet label. Note that each panel is scaled separately to account for differences in the overall speed of these machines.  
+What these plots indicate is that we have surprisingly large variability in relative run times across different machines. 
+However, the results support some  general findings.
+The \pkg{network} plotting routine is by far the slowest across all machines, while the \pkg{igraph} plotting is generally among the fastest. Our three approaches generally feature in between \pkg{igraph} and \pkg{network} with \pkg{ggnet2} being as fast or faster than \pkg{igraph} plotting, followed by \pkg{ggnetwork} and \pkg{geomnet}, which is generally the slowest among the three. These differences \sct{become} more pronounced \sct{as the size of the network increases}. 
+
+
+Although speed was not the main rationale for our inquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower \sct{as} network size increases.
+
+% Further testing on a network of [EDGES] interactions between [NODES] proteins yielded the same conclusion. [INSERT protein-based test here.]
+
+XXX how does edge probability affect these results?
+XXX how do the different layouts affect the results? }
+
+
+
+\begin{figure}[hbtp]
+\centering
+<<runtimes, eval=FALSE, echo=FALSE>>=
+g = list.files("runtimes", pattern = "runtimes-(.*)csv$", full.names = TRUE) %>%
+        lapply(read.csv, stringsAsFactors = FALSE) %>%
+        bind_rows %>%
+        gather(`Visualization approach`, time, -network_size, -iteration) %>%
+        group_by(network_size, `Visualization approach`) %>%
+        summarise(mean_time = mean(time),
+                  q05 = quantile(time, 0.05),
+                  q95 = quantile(time, 0.95))
+
+ggplot(g, aes(x = network_size, y = mean_time,
+              fill = `Visualization approach`)) +
+  geom_ribbon(aes(ymin = q05, ymax = q95), alpha = 1/3) +
+  geom_line(aes(color = `Visualization approach`)) +
+  scale_color_brewer(palette = "Set2") +
+  scale_fill_brewer(palette = "Set2") +
+  scale_y_continuous(breaks = seq(0, max(g$q95), 5)) +
+  scale_x_continuous(breaks = seq(25, 250, 25)) +
+  labs(y = "Average plotting time (seconds)\n", x = "\nNetwork size") +
+  theme_classic(18) +
+  theme(axis.text = element_text(size = rel(1)),
+        legend.text = element_text(size = rel(1)),
+        legend.justification = c(0,1),
+        legend.position = c(0,1))
+@
+%\includegraphics[width=.5\textwidth]{figure/runtimes-1.pdf}
+<<runtimes-all, echo=FALSE, fig.width=8, fig.height=8.5>>=
+library(tidyr)
+library(reshape2)
+
+dirs <- list.dirs(path="runtimes", recursive = FALSE)
+rt <- dirs %>%
+  lapply(function(x) paste0(x, "/", list.files(path=x, pattern=".csv$"))) %>%
+  unlist %>%
+  lapply(read.csv, stringsAsFactors = FALSE) %>%
+  bind_rows
+rt$source <- rep(dirs, each=1000)
+rtm <- melt(rt, id.var=c("network_size", "source", "iteration"))
+qplot(data=rtm, network_size, value, colour=variable, alpha=I(0.1)) + 
+  facet_wrap(facets=~source, scales = "free") +
+  scale_colour_brewer("Visualization approach", palette="Set1") + 
+  geom_smooth(alpha = 0.5) +
+  xlab("Network size (edge probability p = 0.2)") +
+  ylab("Time (in seconds)") +
+  theme_bw() + 
+  theme(legend.position="bottom")
+@
+\includegraphics[width=\textwidth]{figure/runtimes-all-1.pdf}
+\caption{\label{fig.cap:runtimes-random}%
+%  Average plotting time of random undirected networks, in seconds: ribbon at minimum and maximum recorded times, solid line at average. The time ranges of the \code{ggnet2} and \code{ggnetwork} approaches are quasi-identical and form the single purple line at the bottom of the plot. 
+\hh{Plotting times of random undirected networks of different sizes under each of the available visualization approaches. Note that each panel is scaled independently to highlight relative differences in the visualization approaches rather than speed of different hardware.}
+\fb{Can't remember how I styled the figure in the beginning, but I remember trying to match the previous one by using theme\_classic. We need to harmonize them.} \hh{XXX I'm all for consistency of the figures, but let's please use a theme that has grid lines. They are important for accurate readings. }%
+}
 \end{figure}
 
 \section{Summary and Discussion}
