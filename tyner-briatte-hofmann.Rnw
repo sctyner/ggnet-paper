@@ -1249,7 +1249,7 @@ Further testing on a network of [EDGES] interactions between [NODES] proteins yi
 
 \begin{figure}[hbtp]
 \centering
-<<runtimes, eval=TRUE, echo=FALSE>>=
+<<runtimes, eval=FALSE, echo=FALSE>>=
 g = list.files("runtimes", pattern = "runtimes-(.*)csv$", full.names = TRUE) %>%
         lapply(read.csv, stringsAsFactors = FALSE) %>%
         bind_rows %>%
@@ -1274,7 +1274,27 @@ ggplot(g, aes(x = network_size, y = mean_time,
         legend.justification = c(0,1),
         legend.position = c(0,1))
 @
-\includegraphics[width=.5\textwidth]{figure/runtimes-1.pdf}
+%\includegraphics[width=.5\textwidth]{figure/runtimes-1.pdf}
+<<runtimes-all, echo=FALSE, fig.width=8, fig.height=6>>=
+library(tidyr)
+library(reshape2)
+
+rt <- list.files(path="runtimes") %>%
+  lapply(function(x) paste0("runtimes/", x, "/", list.files(path=sprintf("runtimes/%s",x), pattern=".csv$"))) %>%
+  unlist %>%
+  lapply(read.csv, stringsAsFactors = FALSE) %>%
+  bind_rows
+rt$source <- rep(list.files(path="runtimes"), each=1000)
+rtm <- melt(rt, id.var=c("network_size", "source", "iteration"))
+qplot(data=rtm, network_size, value, colour=variable, facets=~source, alpha=I(0.1)) + 
+  scale_colour_brewer("Visualization approach", palette="Set1") + 
+  geom_smooth(alpha = 0.5) +
+  xlab("Network size (edge probability p = 0.2)") +
+  ylab("Time (in seconds)") +
+  theme_bw() + 
+  theme(legend.position="bottom")
+@
+\includegraphics[width=\textwidth]{figure/runtimes-all-1.pdf}
 \caption{\label{fig.cap:runtimes-random}%
   Average plotting time of random undirected networks, in seconds: ribbon at minimum and maximum recorded times, solid line at average. The time ranges of the \code{ggnet2} and \code{ggnetwork} approaches are quasi-identical and form the single purple line at the bottom of the plot. \fb{Can't remember how I styled the figure in the beginning, but I remember trying to match the previous one by using theme\_classic. We need to harmonize them.}%
 }
