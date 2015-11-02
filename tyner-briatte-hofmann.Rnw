@@ -160,7 +160,7 @@ Our objective is to bring network plotting capabilities to the popular \CRANpkg{
 %This is the audience we are aiming at by making network visualizations a part of \pkg{ggplot2}.
  
   %
-  \sct{XXX I do not think that the line about Python is relevant, as we are submitting this to the R journal. I have commented it out for now.}
+  \sct{XXX I do not think that the line about Python is relevant, as we are submitting this to the R journal. I have commented it out for now. XXX}
   %to the point that it has even inspired a port of its syntax to the Python programming language, which is a rare achievement for an R package.%
   %
   %\footnote{See \url{http://ggplot.yhathq.com/}.} %
@@ -179,13 +179,13 @@ In the remainder of this paper, we present three different approaches to network
 \section{A quick primer to network structures}
 \label{sec:background}
 
-In its essence, a network is simply a set of points connected in pairs by a set of lines \citep{newman}. Here, we refer to the lines as edges (or ties) and to the points as nodes (or vertices). \sct{We note that our examples are all one-mode networks, where all nodes are of the same kind and are able to connect to each other, however the graphical tools presented can be used to visualize all types of networks.} \sct{XXX I'm not 100\% sure that's true but it seems right.}
+In its essence, a network is simply a set of points connected in pairs by a set of lines \citep{newman}. Here, we refer to the lines as edges (or ties) and to the points as nodes (or vertices). \sct{We note that our examples are all one-mode networks, where all nodes are of the same kind and are able to connect to each other, however the graphical tools presented can be used to visualize all types of networks.} \sct{XXX I'm not 100\% sure that's true but it seems right.XXX}
 
 The two sets of graphical objects that make up a network, points and segments between them, have been used to encode a huge variety and quantity of information across many different fields of study. For instance, networks of scientific collaboration, a food web of marine animals, and American college football games are all covered in a paper on community detection in networks by \citet{football}. \citet{networkfailures} examine node failure in interdependent networks like power grids.  Social networks such as links between actors found on \url{http://www.imdb.com/} and neural networks, like the completely mapped neural network of the \textit{C. elegans} worm are also extensively studied \citep{smallworld}.
 
 Networks can vary widely in scope and complexity: the smallest network is simply an edge between two vertices, while one of the most commonly used and most complex networks, the world wide web, has billions of vertices (Web pages) and billions of edges (hyperlinks) connecting them. Additionally, the edges in a network can be directed or undirected: directed edges represent information travelling from one vertex to another, and switching the direction would change the structure of the network. The World Wide Web is an example of a directed network because hyperlinks connect one Web page to another, but not necessarily the other way around. Undirected edges are simply connections between vertices. Co-authorship networks are examples of undirected networks, where nodes are authors and they are connected by an edge if they have written an academic publication together.
 
-\sct{An even more common example is a social network.} A social network is a network that everyone is a part of in one way or another. We do not necessarily refer here to social media like Facebook or LinkedIn, but rather to the connections we form with other people. To demonstrate the functionality of our tools for plotting networks, we have chosen an example of a social network from the popular television show \emph{Mad Men}. This network, which was compiled by \citet{madmen}, is made up of 52 vertices and 87 edges. Each vertex represents a character on the show, and there is an edge between every two characters who have had a romantic relationship.
+\sct{An even more common network example is a social network.} A social network is a network that everyone is a part of in one way or another. We do not necessarily refer here to social media like Facebook or LinkedIn, but rather to the connections we form with other people. To demonstrate the functionality of our tools for plotting networks, we have chosen an example of a social network from the popular television show \emph{Mad Men}. This network, which was compiled by \citet{madmen}, is made up of 52 vertices and 87 edges. Each vertex represents a character on the show, and there is an edge between every two characters who have had a romantic relationship.
 
 \begin{figure}[hbtp]
 \centering
@@ -606,7 +606,7 @@ Note that the main difference in the visualizations of Figure~\ref{fig:email_fac
 
 \subsection{\pkg{ggplot2} theme elements} % ====================================
 
-This example comes from the \code{theme()} help page in the \pkg{ggplot2} documentation \citep{ggplot2}.  It is a directed network which shows the structure of the inheritance of theme options in the construction of a \pkg{ggplot2} plot. There are 53 vertices and 36 edges in this network. Each vertex represents one possible theme option. There is an arrow from one theme option to another if the element represented by the \emph{to} vertex inherits its values from the \emph{from} vertex.  For example, the \code{axis.ticks.x} option inherits its value from the \code{axis.ticks} value, which in turn inherits its value from the \code{line} option.  Thus, setting the \code{line} option to a value such as \code{element\_blank()} sets the entire inheritance tree to \code{element\_blank()}, and no lines appear anywhere on the plot background. Finally, note that the vertices without edges were incorporated into the plot by adding their labels to the edges data frame in both the  \code{from\_id} and \code{to\_id} columns. %before passing the edges data frame to \code{ggplot}.
+This example comes from the \code{theme()} help page in the \pkg{ggplot2} documentation \citep{ggplot2}.  It is a directed network which shows the structure of the inheritance of theme options in the construction of a \pkg{ggplot2} plot. There are 53 vertices and 36 edges in this network. Each vertex represents one possible theme option. There is an arrow from one theme option to another if the element represented by the `to' vertex inherits its values from the `from' vertex.  For example, the \code{axis.ticks.x} option inherits its value from the \code{axis.ticks} value, which in turn inherits its value from the \code{line} option.  Thus, setting the \code{line} option to a value such as \code{element\_blank()} sets the entire inheritance tree to \code{element\_blank()}, and no lines appear anywhere on the plot background. %%% SCT: I removed this sentence because it's not true for all of our functions. %Finally, note that the vertices without edges were incorporated into the plot by adding their labels to the edges data frame in both the  \code{from\_id} and \code{to\_id} columns. %before passing the edges data frame to \code{ggplot}.
 
 \begin{figure}[hbtp]
 \begin{subfigure}[t]{\textwidth}
@@ -666,7 +666,8 @@ ggplot(ggnetwork(te.net),
 \end{figure}
 \afterpage{\clearpage}
 
-The inheritance structure is plotted in figure \ref{fig.cap:theme}.  In this plot, it is easy to quickly determine the parent and child vertices. Using this plot made creation of the \code{theme\_net} object used throughout these examples very simple. We just made set each of the major parent elements, \code{text}, \code{rect}, and \code{line} to \code{element\_blank()} and then set the aspect ratio equal to one.
+The inheritance structure is plotted in figure \ref{fig.cap:theme}.  In these plots, it is easy to quickly determine the parent and child vertices. \sct{The parents with the most children are the \code{rect}, \code{text}, and \code{line} elements, so we made their labels larger in order to emphasize their importance. In each case, the label size is a function of the out degree of the vertices.}
+%Using this plot made creation of the \code{theme\_net} object used throughout these examples very simple. We just made set each of the major parent elements, \code{text}, \code{rect}, and \code{line} to \code{element\_blank()} and then set the aspect ratio equal to one.
 
 \subsection{Romantic relationships in \emph{Mad Men}} % ========================
 
@@ -802,13 +803,13 @@ ggplot(
 \end{figure}
 \afterpage{\clearpage}
 
-This network is shown in figure \ref{fig.cap:madmen2}.  It is a lot more densely connected than the previous Mad Men example.  This network allows us to see much more of the drama in the show. For instance, we can see that Roger made advances towards Betty, his business partner's wife, which is much more scandalous than what appears in the first network.
+This network is shown in figure \ref{fig.cap:madmen2}.  It is much more densely connected than the previous Mad Men example.  This network allows us to see more of the drama in the show. For instance, we can see that Roger made advances towards Betty, his business partner's wife, which is much more scandalous than what appears in the first network.
 
 \subsection{College football} % ================================================
 
 This next example comes from M.E.J. Newman's network data web page \citep{football}.  It is an undirected network consisting of all regular season college football games played between Division I schools in Fall of 2000.  There are 115 vertices and 613 edges: each vertex represents a school, and an edge represents a game played between two schools. There is an additional variable in the vertex data frame corresponding to the conference each team belongs to, and there is an additional variable in the edge data frame that is equal to one if the game occured between teams in the same conference or zero if the game occured between teams in different conferences.
 
-The network of football games is given in figure \ref{fig.cap:football}. Here, we have changed the \code{linetype} aesthetic to correspond to games that occur between teams in the same conference or different conferences.  These lines are dotted and solid, respectively. We have also assigned a different color to each conference, and the vertices and their labels are colored according to their conference. This coloring and changing of the linetypes make the structure of the game network easier to view.  There is one conference consisting of Navy, Notre Dame, Utah State, Central Florida, and Connecticut, which is spread out, whereas most other conferences' teams are all very close to each other because they play within conference much more than they play out of conference.  At the time, these five schools were all independents and did not have a home conference.  Without the coloring capability, we would not have been able to pick out that difference as easily.
+The network of football games is given in figure \ref{fig.cap:football}. Here, we have changed the \code{linetype} aesthetic to correspond to games that occur between teams in the same conference or different conferences.  These lines are dotted and solid, respectively. We have also assigned a different color to each conference, so that the vertices and their labels are colored according to their conference. Additionally, in the first two implementations, the edges between two teams in the same conference share that conference color, while edges between teams in different conferences are a default gray color. This coloring and changing of the linetypes make the structure of the game network easier to view.  There is one conference consisting of Navy, Notre Dame, Utah State, Central Florida, and Connecticut, which is spread out, whereas most other conferences' teams are all very close to each other because they play within conference much more than they play out of conference.  At the time, these five schools were all independents and did not have a home conference.  Without the coloring capability, we would not have been able to pick out that difference as easily.
 
 \begin{figure}[hbtp]
 \begin{subfigure}[t]{\textwidth}
@@ -889,10 +890,12 @@ ggplot(
 
 \subsection{Character co-appearances in \emph{Les Mis\'{e}rables}} % ===========
 
-\fb{Please don't get mad at me: I think we discussed that earlier, but I'm still unable to see what this ex. brings to the paper. What does it show that is not shown in the other examples?}
+\fb{XXX Please don't get mad at me: I think we discussed that earlier, but I'm still unable to see what this ex. brings to the paper. What does it show that is not shown in the other examples? XXX}
 
-This next network comes from \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book, and an edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.
-This network is shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}; the corresponding code is shown below. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
+\sct{XXX Fran\c{c}ois, I agree. The original intent was to demonstrate the ability of the geom to change edge widths based on some weight variable. But, this is also done now in the bike share example, which also happens to be a much cooler and more unique example. I have commented the rest of the Les Mis section out for now. XXX}
+
+%This next network comes from \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book, and an edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.
+%This network is shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}; the corresponding code is shown below. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
 
 % \begin{figure}[hbtp]
 % \caption{\label{tab:lesmis}Code for the three approaches of visualizing the relationships between characters in Les Mis\'{e}rables as shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}.}
@@ -936,29 +939,29 @@ ggplot(data = ggnetwork(lesmis$edges[, 1:2 ], arrow.gap = 0),
 @
 %\end{figure}
 %
-\begin{figure}[hbtp]
-\includegraphics[width=\textwidth]{figure/lesmis_ggnet2-1.pdf}
-\caption{\label{fig.cap:lesmis:ggnet2} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using ggnet2.}
-\end{figure}
-%
-\begin{figure}[hbtp]
-\includegraphics[width=\textwidth]{figure/lesmis_geom_net-1.pdf}
-\caption{\label{fig.cap:lesmis:ggnet} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using geomnet.}
-\end{figure}
-%
-\begin{figure}[hbtp]
-\includegraphics[width=\textwidth]{figure/lesmis_ggnetwork-1.pdf}
-\caption{\label{fig.cap:lesmis:ggnetwork} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using ggnetwork.}
-\end{figure}
+% \begin{figure}[hbtp]
+% \includegraphics[width=\textwidth]{figure/lesmis_ggnet2-1.pdf}
+% \caption{\label{fig.cap:lesmis:ggnet2} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using ggnet2.}
+% \end{figure}
+% %
+% \begin{figure}[hbtp]
+% \includegraphics[width=\textwidth]{figure/lesmis_geom_net-1.pdf}
+% \caption{\label{fig.cap:lesmis:ggnet} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using geomnet.}
+% \end{figure}
+% %
+% \begin{figure}[hbtp]
+% \includegraphics[width=\textwidth]{figure/lesmis_ggnetwork-1.pdf}
+% \caption{\label{fig.cap:lesmis:ggnetwork} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using ggnetwork.}
+% \end{figure}
 %
 %\afterpage{\clearpage}
 
 \subsection{Bikesharing in Washington D.C.} % ==================================
 
-The data shows trips taken with bikes from the bike share company Capital Bikeshare\footnote{\url{https://secure.capitalbikeshare.com/}} during the second quartal of 2015.
-While this bikesharing company is located in the heart of Washington D.C.\ the company offers a set of bike stations just outside of Washington in Rockville, MD and north of it. Each station is shown as a dot, lines between stations indicate that at least five trips were taken between these two stations; the wider the line, the more trips have been taken between stations. In order to reflect distance between stations, we use as an additional restriction that the fastest trip was at most ten minutes long.
-\hh{Figure~\ref{fig:bikes} shows four renderings of this data. The first is a geographically true representation of the area overlaid by lines between bike stations, the other three are networks drawn with \pkg{geomnet}, \pkg{ggnet2}, and \pkg{ggnetwork}, respectively.
-The code for these renderings is shown below:}
+The data shows trips taken with bikes from the bike share company Capital Bikeshare\footnote{\url{https://secure.capitalbikeshare.com/}} during the second quarter of 2015.
+While this bikesharing company is located in the heart of Washington D.C.\ the company offers a set of bike stations just outside of Washington in Rockville, MD and north of it. Each station is shown as a \sct{vertex}, \sct{and edges} between stations indicate that at least five trips were taken between these two stations; the wider the line, the more trips have been taken between stations. In order to reflect distance between stations, we use as an additional restriction that the fastest trip was at most ten minutes long.
+Figure~\ref{fig:bikes} shows four renderings of this data. The first is a geographically true representation of the area overlaid by lines between bike stations, the other three are networks drawn with \pkg{geomnet}, \pkg{ggnet2}, and \pkg{ggnetwork}, respectively.
+The code for these renderings is shown below.
 
 <<bikes_geom_net, echo=TRUE, warning=FALSE, fig.keep='all'>>=
 # code for geomnet
@@ -1021,7 +1024,7 @@ ggplot(data = ggnetwork(bikes.net),
   theme(legend.position = "bottom", legend.box = "horizontal")
 @
 
-\hh{For the geographic representations we also made use of the three packages. Because all three result in the same picture, we only show one of these in figure~\ref{fig:bikes}a. The code is given here:}
+\hh{For the geographic representations we also made use of the three packages. Because all three result in the same picture, we only show one of these in figure~\ref{fig:bikes}a. The code is given here.}
 
 %% FB: separated block below into four blocks, as we did for the blood example
 <<geographic_common, echo=TRUE>>=
@@ -1098,7 +1101,7 @@ ggplot(data = ggnetwork(bikes.net, layout = matrix(coords, ncol = 2)),
 %\centering
 %\includegraphics[width=.49\textwidth]{figure/bikes_geom_net-1.pdf}
 %\includegraphics[width=.49\textwidth]{figure/bikes_geom_net-2.pdf}
-\caption{\label{fig:bikes} Network of bike trips using  a geographically true representation (top left) overlaid on a satellite map, a Kamada-Kawai layout in \pkg{geomnet} (top right), a Fruchterman-Reingold layout in ggnet2 (bottom left) and \pkg{ggnetwork} (bottom right). Metro stations are shown in orange. Both in the Kamada-Kawai and the Fruchterman-Reingold layouts  metro stations take a much more central position than in the geographically true representation. }
+\caption{\label{fig:bikes} Network of bike trips using  a geographically true representation (top left) overlaid on a satellite map, a Kamada-Kawai layout in \pkg{geomnet} (top right), a Fruchterman-Reingold layout in ggnet2 (bottom left) and \pkg{ggnetwork} (bottom right). Metro stations are shown in orange. In both the Kamada-Kawai and the Fruchterman-Reingold layouts, metro stations take a much more central position than in the geographically true representation. }
 \end{figure}
 %\afterpage{\clearpage}
 
@@ -1120,11 +1123,13 @@ ggplot(data = ggnetwork(bikes.net, layout = matrix(coords, ncol = 2)),
 
 % \fb{Suggestion: convert this example to a discussion point about speed.}
 % \hh{Talking about speed in the discussion is a good idea, but by the time that we go into the discussion there shouldn't be any more examples. }
-\fb{I understand that the discussion should not introduce additional examples, but I'd still like to move the protein network text to discussion. What I'm suggesting is to lose the protein network as an example of viz-related functionalities (our plots of the network do not introduce any additional functionalities), and just use it as a test support for speed benchmarking at a high network size. See INSERT sentence in discussion for a suggested insert point for the text.}
-\hh{I'd be more in favor of going the opposite way and to drop the discussion of the protein example from the speed considerations. We don't have a handle on the different results, and by them time we do, the protein network is going to be a distraction. I've seen the INSERT point, and I think we could have a sentence there that refers back, if you want, but moving the whole example there is going to make that section even more complicated.}
+\fb{XXX I understand that the discussion should not introduce additional examples, but I'd still like to move the protein network text to discussion. What I'm suggesting is to lose the protein network as an example of viz-related functionalities (our plots of the network do not introduce any additional functionalities), and just use it as a test support for speed benchmarking at a high network size. See INSERT sentence in discussion for a suggested insert point for the text. XXX}
+\hh{XXX I'd be more in favor of going the opposite way and to drop the discussion of the protein example from the speed considerations. We don't have a handle on the different results, and by them time we do, the protein network is going to be a distraction. I've seen the INSERT point, and I think we could have a sentence there that refers back, if you want, but moving the whole example there is going to make that section even more complicated. XXX}
+\sct{XXX Originally, I added the protein network example for three reasons: first, to demonstrate the layout changes that are possible by passing the layout.par argument to geom\_net; second because it's a pretty well known example of a biological network, which we discuss in the intro; and third, it's a large network, much larger than all of our other ones, and more realistic with respect to what networks many researchers are interested. i.e. more people study networks like this than study networks like the blood, mad men, bikeshare, etc. networks. I think removing it would be detrimental to the paper. I like the idea of keeping it in the examples, adding emphasis to the reasons I put it there in the first place, and referencing it later on. XXX}
 
-This example of a protein interaction network comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 1,870 proteins that make up the vertices of this network, with a total of 2,240 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}\hh{, resulting in a relatively large  network. Despite its size, each one of the approaches in the \pkg{ggplot2} framework can be drawn in a few seconds. A more in-depth discussion on plotting speed follows in the next section}. \hh{Proteins and the associations between them are plotted in the networks shown in Figure~\ref{fig.cap:yeast}.} %These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}. 
-We also demonstrate the layout capabilities by changing the layout to random and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout.  Indeed, we see a nearly round area in the middle of the graph where the layout parameter has forced there to be no vertices. Because all of the approaches result in very similar figures, only one network is shown. The code for all three approaches is shown below:
+
+\sct{In our examples thus far, we have focused on rather small social or relationship networks and one larger communication network. Now we present an} example of a biological network, which comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 2,113 proteins that make up the vertices of this network, with a total of 4480 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}, resulting in a relatively large  network. Despite its size, each one of the approaches in the \pkg{ggplot2} framework can be drawn in a few seconds \sct{or less}. A more in-depth discussion on plotting speed follows in the next section. The proteins and the interactions between them are plotted in the networks shown in Figure~\ref{fig.cap:yeast}. %These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}. 
+In this visualization, we demonstrate the layout capabilities of our functions by changing the layout to \code{random} and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout \citep{sna}.  Indeed, we see a near circular area in the middle of the graph because the layout parameter has forced all of the vertices to the exterior, leaving a ``donut hole" in the middle. Because all of the approaches result in nearly identical figures, only one network is shown. The code for all three approaches is shown below.
 
 <<yeast_ggnet2, echo=TRUE, eval = FALSE, cache=FALSE>>=
 # plot with ggnet2
@@ -1154,97 +1159,63 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 \begin{figure}[hbtp]
 \includegraphics[width=\textwidth]{figure/yeast_geom_net-1.pdf}
 %\end{subfigure}
-\caption{\label{fig.cap:yeast} Protein-protein interaction network in \emph{S. cerevisiae}. The layout is random.}
+\caption{\label{fig.cap:yeast} Protein-protein interaction network in \emph{S. cerevisiae}. The layout is random and follows a Gaussian donut distributuion.}
 \end{figure}
 %\afterpage{\clearpage}
 
 \section{Some considerations of speed}\label{sec:speed}
 \hh{XXX So, the testing waters are much more muddy than anticipated. What we can do, though, is to describe the testing scenario(s), and then report our findings with an attempt to summarize.  }
 
-\fb{Note that we have two benchmarking techniques: (1) average plotting time of 100 protein networks, and (2) average plotting time of increasingly large random networks -- see runtimes.r; so, what should we do? include one of these? or both? I'd support leaving the benchmark code out of the paper, because it is not directly about network viz with ggplot2. Alternately, include it as an appendix? If left out, the code can be referred to by linking to the repo; that's what I would support most.} \hh{XXX link to the benchmark code in the repo seems like the best solution -  we should structure the runtime results somewhat and summarize there as well.}
+Another benefit that emerges from using \pkg{ggplot2} for network visualization has to do with the speed at which it can plot relatively large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{igraph} and \pkg{network} packages. \sct{We first investigate} average plotting time of the protein network shown in Figure~\ref{fig.cap:yeast}, %
+  \footnote{See \url{github.com/sctyner/ggnet-paper/blob/master/runtimes-protein/run.r} for the code to recreate our results.}
+%
+and \sct{then consider} average plotting time of increasingly large random networks.%
+  \footnote{See \url{github.com/sctyner/ggnet-paper/blob/master/runtimes/run.r} for code to recreate our results.}
+%
+  
 
-\hh{Additionally, the \pkg{ggplot2} framework provides us with a considerable speed-up compared to the standard plotting routines that come with the \pkg{network} package. We executed the following code:}
+%so, what should we do? include one of these? or both? I'd support leaving the benchmark code out of the paper, because it is not directly about network viz with ggplot2. Alternately, include it as an appendix? If left out, the code can be referred to by linking to the repo; that's what I would support most.} % $\hh{XXX link to the benchmark code in the repo seems like the best solution -  we should structure the runtime results somewhat and summarize there as well.} DONE - SCT.
 
-<<network-plot, echo=TRUE, eval = FALSE>>=
-xy = gplot.layout.random(network(protein$edges[, 1:2]),
-                         layout.par = list(dist = "uniang"))
-plot(network(protein$edges[, 1:2]), coord = xy)
-@
-\hh{100 times and compared its run time to 100 runs each of the three visualisation approaches introduced in this paper. The results are shown in Figure~\ref{fig:timings}. The \pkg{ggplot2} framework provides a two to three-fold increase in speed on average.}
-
+%' \hh{Additionally, the \pkg{ggplot2} framework provides us with a considerable speed-up compared to the standard plotting routines that come with the \pkg{network} package. 
+% We executed the following code:}
+%' 
+% <<network-plot, echo=TRUE, eval = FALSE>>=
+% xy = gplot.layout.random(network(protein$edges[, 1:2]),
+%                          layout.par = list(dist = "uniang"))
+% plot(network(protein$edges[, 1:2]), coord = xy)
+% @
+\sct{We plotted the protein interaction network of Figure~\ref{fig.cap:yeast} 100 times using the \pkg{network} and \pkg{igraph} packages, and compared its run time to 100 runs each of the three visualization approaches introduced in this paper. The results are shown in Figure~\ref{fig:timings}. We can see that on average, the \pkg{ggplot2} framework provides a two to three-fold increase in speed over the network package, and that \pkg{geomnet} and \pkg{ggnetwork} are faster than \pkg{igraph}.
+}
 \begin{figure}
 \centering
 <<compare, echo = FALSE, eval = TRUE, fig.height = 4, fig.width = 8, out.width = '\\textwidth'>>=
-if (!file.exists("data/timings.csv")) {
-  network <- data.frame(t(replicate(100, {
-  system.time({
-  #  xy = gplot.layout.random(network(protein$edges[, 1:2]),
-  #                         layout.par = list(dist = "uniang"))
-    plot(network(protein$edges[, 1:2]), coord = gplot.layout.random(network(protein$edges[, 1:2]), layout.par = list(dist = "uniang")))
-    })}
-  )))
+g = read.csv("runtimes-protein//runtimes-protein-100.csv", stringsAsFactors = FALSE) %>%
+      gather(`Visualization approach`, time, -iteration)
 
-  # compare to ggnet2:
-  net <- network(protein$edges[,1:2])
-  ggnet2 <- data.frame(t(replicate(100, system.time(print(
-    ggnet2(net, size = 2, color = "magenta",
-        mode = "random", layout.par = list(dist = "uniang"),
-        edge.alpha = 0.05)
-  )))))
-
-  # compare to geomnet:
-  geomnet <- data.frame(t(replicate(100, system.time(print(
-  ggplot(data = protein$edges, aes(from_id = from, to_id = to)) +
-    geom_net(alpha = 0.25, ealpha = 0.05, size = 2, colour = "magenta",
-             ecolour = "grey70", linewidth = 0.5,
-             layout = "random", layout.par = list(dist = "uniang")) +
-    theme_net()
-  )))))
-
-  # compare to ggnetwork:
-  ggnetwork <- data.frame(t(replicate(100, system.time(print(
-    ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
-         aes(x, y, xend = xend, yend = yend)) +
-    geom_edges(color = "grey70", lwd = 0.5, alpha = 0.05) +
-    geom_nodes(alpha = 0.25, color = "magenta", size = 2) +
-    theme_blank()
-  )))))
-
-  network$type <- "network"
-  ggnet2$type <- "ggnet2"
-  geomnet$type <- "geomnet"
-  ggnetwork$type <- "ggnetwork"
-
-  timings <- rbind(network, ggnet2, geomnet, ggnetwork)
-  write.csv(timings, file = "data/timings.csv", row.names = FALSE)
-} else {
-  timings <- read.csv("data/timings.csv")
-}
-
-# timings$type <- factor(timings$type, levels = rev(c("ggnet2", "geomnet", "ggnetwork", "network")))
-qplot(data = timings, reorder(type, elapsed, median), elapsed,
-      fill = type, alpha = I(0.6), geom = "boxplot") +
+ggplot(g, aes(x = `Visualization approach`, y = time,
+              fill = `Visualization approach`)) +
+  geom_boxplot() +
   scale_fill_brewer(palette = "Set2") +
-  labs(x = "\nVisualisation approach", y = "Average plotting time (seconds)\n") +
-  ylim(c(0, 7.1)) +
   coord_flip() +
-  theme_bw() + # HH: gridlines help with comparisons. significantly.
+ labs(x = "\nVisualisation approach", y = "Average plotting time (seconds)\n")  +
+  guides(fill = FALSE) +
+  theme_bw() +
   theme(legend.position = "none")
 @
-\includegraphics[width=.5\textwidth]{figure/compare-1.pdf}
-\caption{\label{fig:timings} Comparison of the times needed for calculating and rendering the protein interaction network in the three \pkg{ggplot2} approaches (top three) and the standard plotting routine  of the \pkg{network} package based on 100 evaluations each.  }
+\includegraphics[width=.75\textwidth]{figure/compare-1.pdf}
+\caption{\label{fig:timings} Comparison of the times needed for calculating and rendering the protein interaction network in our three \pkg{ggplot2} approaches and the standard plotting routine of the \pkg{network} and \pkg{sna} packages based on 100 evaluations each.}
 \end{figure}
 
 \fb{
 
-Another benefit that emerges from using \pkg{ggplot2} for network visualization has to do with the speed at which it can plot relatively large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{igraph} and \pkg{network} packages.
-
-The first test relies on random undirected networks in which the probability of an edge to exist between two nodes was set to 0.5.  \fb{Let me run the same tests at p = 0.25 and tell you exactly. It sure affects the average plotting time, but the number of nodes should stay the most crucial parameter.} We generated 100 of these networks at different network sizes between 20 and 240 nodes, using increments of 20. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}.
+The second test relies on random undirected networks in which the probability of an edge to exist between two nodes was set to 0.2. 
+% \fb{Let me run the same tests at p = 0.25 and tell you exactly. It sure affects the average plotting time, but the number of nodes should stay the most crucial parameter.} 
+We generated 100 of these networks at different network sizes between 20 and 240 nodes, using increments of 20. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}.
 
 
 Although speed was not the main rationale for our enquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower than when network size increases.
 
-Further testing on a network of [EDGES] interactions between [NODES] proteins yielded the same conclusion. [INSERT protein-based test here.]
+% Further testing on a network of [EDGES] interactions between [NODES] proteins yielded the same conclusion. [INSERT protein-based test here.]
 }
 
 \begin{figure}[hbtp]

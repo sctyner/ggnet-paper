@@ -97,7 +97,7 @@ if (!file.exists("runtimes-protein-100.csv")) {
   
 }
 
-g = read.csv("runtimes-protein-100.csv", stringsAsFactors = FALSE) %>%
+g = read.csv("runtimes-protein//runtimes-protein-100.csv", stringsAsFactors = FALSE) %>%
       gather(`Visualization approach`, time, -iteration)
 
 ggplot(g, aes(x = `Visualization approach`, y = time,
