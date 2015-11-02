@@ -1268,7 +1268,7 @@ plot(network(protein$edges[, 1:2]), coord = xy)
 \begin{figure}
 \centering
 <<compare, echo = FALSE, eval = TRUE, fig.height = 4, fig.width = 8, out.width = '\\textwidth'>>=
-if (!file.exists("data/timings.csv")) {
+if (!file.exists("runtimes-protein/runtimes-protein-100.csv")) {
   network <- data.frame(t(replicate(100, {
   system.time({
   #  xy = gplot.layout.random(network(protein$edges[, 1:2]),
@@ -1277,6 +1277,16 @@ if (!file.exists("data/timings.csv")) {
     })}
   )))
 
+    n = as.matrix(protein$edges[, 1:2])
+    n = igraph::graph_from_edgelist(n, directed = FALSE)
+  
+    igraph <- data.frame(t(replicate(3, {
+    system.time({
+      plot(n, vertex.label = NA, layout = layout_randomly)
+      })}
+    )))
+
+    
   # compare to ggnet2:
   net <- network(protein$edges[,1:2])
   ggnet2 <- data.frame(t(replicate(100, system.time(print(
@@ -1309,23 +1319,27 @@ if (!file.exists("data/timings.csv")) {
   ggnetwork$type <- "ggnetwork"
 
   timings <- rbind(network, ggnet2, geomnet, ggnetwork)
-  write.csv(timings, file = "data/timings.csv", row.names = FALSE)
+  write.csv(timings, file = "runtimes-protein/runtimes-protein-100.csv", row.names = FALSE)
 } else {
-  timings <- read.csv("data/timings.csv")
+  timings <- read.csv("runtimes-protein/runtimes-protein-100.csv")
 }
 
+library(reshape2)
+tm <- melt(timings, id.var=1)
+
 # timings$type <- factor(timings$type, levels = rev(c("ggnet2", "geomnet", "ggnetwork", "network")))
-qplot(data = timings, reorder(type, elapsed, median), elapsed,
-      fill = type, alpha = I(0.6), geom = "boxplot") +
-  scale_fill_brewer(palette = "Set2") +
+qplot(data = tm, reorder(variable, value, median), value,
+      fill = variable, colour= variable, alpha = I(0.6), geom = "boxplot") +
+  scale_fill_brewer(palette = "Set1") +
+  scale_colour_brewer(palette = "Set1") +
   labs(x = "\nVisualisation approach", y = "Average plotting time (seconds)\n") +
-  ylim(c(0, 7.1)) +
+  ylim(c(0, NA)) +
   coord_flip() +
   theme_bw() + # HH: gridlines help with comparisons. significantly.
   theme(legend.position = "none")
 @
 \includegraphics[width=.5\textwidth]{figure/compare-1.pdf}
-\caption{\label{fig:timings} Comparison of the times needed for calculating and rendering the protein interaction network in the three \pkg{ggplot2} approaches (top three) and the standard plotting routine  of the \pkg{network} package based on 100 evaluations each.  }
+\caption{\label{fig:timings} Comparison of the times needed for calculating and rendering the protein interaction network in the three \pkg{ggplot2} approaches (top three) and the standard plotting routines  of the \pkg{network} and \pkg{igraph} packages based on 100 evaluations each.  }
 \end{figure}
 
 \section{Summary and Discussion}
