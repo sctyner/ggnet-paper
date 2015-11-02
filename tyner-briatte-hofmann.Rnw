@@ -1173,7 +1173,7 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 \section{Some considerations of speed}\label{sec:speed}
 \hh{XXX So, the testing waters are much more muddy than anticipated. What we can do, though, is to describe the testing scenario(s), and then report our findings with an attempt to summarize. XXX I've added a facetted plot to show the variability in the results that we've seen between the different machines. I made a few changes to the plot, as you can see - using a smooth allows us to see a trend, while the points show variability and give some indication of the distribution (I don't like min and max for that because they are the least robust measures). I also want to see where the actual measurements are taken - that's the reason for showing the points. XXX}
 
-Another benefit that emerges from using \pkg{ggplot2} for network visualization \sct{is} the speed at which it can plot \sct{fairly} large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{network} package. They also show the \pgk{ggplot2} approaches to be largely on par with the speed provided by the \pkg{igraph} package}. \sct{We first investigate} average plotting time of the protein network shown in Figure~\ref{fig.cap:yeast}, %
+Another benefit that emerges from using \pkg{ggplot2} for network visualization \sct{is} the speed at which it can plot \sct{fairly} large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{network} package. They also show the \pkg{ggplot2} approaches to be largely on par with the speed provided by the \pkg{igraph} package. \sct{We first investigate} average plotting time of the protein network shown in Figure~\ref{fig.cap:yeast}, %
   \footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes-protein/run.r} for the code to recreate our results.}
 %
 and \sct{then consider} average plotting time of increasingly large random networks.%
@@ -1360,52 +1360,29 @@ qplot(data=rtm, network_size, value, colour=variable, alpha=I(0.1)) +
 \end{figure}
 
 \section{Summary and Discussion}
-\sct{XXX I am going to attempt to pull all of this together into a complete, coherent discussion section.  I'll remove all of your colors and just keep mine when I've added new material. XXX}
+\sct{XXX I am going to attempt to pull all of this together into a complete, coherent discussion section.  I removed all of your colors and just kept mine in most places. XXX}
 
-\hh{XXX We need to come up with a discussion. Let's get started with with some bullet points:}
-\begin{enumerate}
-\item \hh{this is a personal comment, and we don't have to include it in the final summary: I think that this discussion between the three of us helped to make each one of the approaches better.
-Partly, because we had some `Annie' thing going on (I can do anything you can do), e.g.\ the edge coloring in ggnet2 and ggnetwork really forced some discussion on how to best implement edge coloring in geomnet, which resulted  in the idea of the inside group/between group distinction using the \code{group} attribute. From one of your earlier comments, it sounded like that the whole geom idea of geomnet spurred the ggnetwork approach in the first place ... Other things that made it into each one of our approaches are the gaps for the arrows and the curves.
-Another improvement that I see is that, trying to differentiate between the approaches helped to focus on what each approach is best at.
-}
+\sct{
 
-\fb{I agree with the general observation here. And yes, ggnetwork was inspired by reading the code from geomnet. I had never looked at the internals of ggplot2 before.}
+We realize that, at a glance, these approaches may seem nearly identical. However, we have seen through our collaboration that each one brings unique strengths to the visualization of networks.   Out our three approaches, \pkg{ggnetwork} is most flexible and allows for a re-ordering of layers to emphasize one over the other. The flexibility is useful but does require the user to specify every single part of the network visualization. The \pkg{geomnet} implementation most closely aligns with the existing \pkg{ggplot2} paradigm because it provides a single layer that can be added to other \code{ggplot2} layers.  XXX Need more discussion of differing strengths XXX
 
-\item %%%%%%%%%%%%%%%%%%
+Additionally, many features of our packages would not have been possible, or would have at least been extremely difficult to implement, in the prior version of \pkg{ggplot2}.  The increased flexibility of the current development version as well as the added \code{geom}s \code{geom\_curve} and \code{geom\_label} provided us with a strong, yet flexible, foundation for network visualization.
 
-\hh{speed gain}
+These approaches also benefit from the speed of \pkg{ggplot2}, in many cases making network visualization more efficient. The \pkg{geomnet} approach is the slower of the three because each call to \code{geom\_net} results in a re-calculation of the network and, unless a seed is set, in a new layout. Once a network layout is calculated in \code{ggnet2} or \code{ggnetwork}, however, subsequent calls to these functions are computationally more efficient because the layout has already been computed.  XXX need a little more XXX
 
-
-\item \hh{Should we make recommendations as to what type of user would be happier with either one of the approaches?
-I would think that the users of ggnet2 and ggnetwork are pretty well-versed with networks, and are looking at ggplot2 for  high-quality visualizations that also covers their other visualization needs. Data management and attribute handling is done through network operators on nodes and edges. These users might actually be attracted to ggplot2 because of the additional features open to them.
-
-Out of these two approaches, ggnetwork is more flexible and allows, eg a re-ordering of layers to emphasize one over the other. On the flip side of the flexibility lies, of course, that the user has to specify every single part of the network.
-
-The geomnet approach does not require any knowledge of networks from the user, so the audience would be people who are already familiar with ggplot2 and some of the other `Hadley'-verse, who find themselves dealing with data with a network structure. Data management skills are basic, some familiarity with the split-apply-combine paradigm, for example in form of plyr or dplyr, would be good to make full use of the features.
-
-I would like to think that both approaches are valid and necessary.
-}
-
-\fb{I don't have many ideas about the userbase of each function. All I know is that I get emails from time to time about ggnet and ggnet2. Some are from complete beginners (just got one this morning), others are much more advanced (e.g. Pedro Jordano, who helped me understand bipartite graphs). My guess is that all of them stumbled upon the function by googling for "network + ggplot2".}
-\item{ \hh{internal calculation of the network versus external. Each call to geomnet results in a re-calculation of the network and, unless a seed is set, in a new layout. Once the network is calculated, subsequent calls to ggnet2 and ggnetwork are computationally more efficient.}
-%% paragraph below re-rewritten from comments
-\item \textbf{Discussion of edge weights.}
-
+XXX Add discussion about sna, edgeweights, other plotting functionalities XXX
 \fb{All our approaches rely on \pkg{sna}. A larger range of layouts is available through \pkg{igraph}. However, the parameters of layouts that exist in both packages are sometimes different, e.g. \pkg{igraph} claims to support weights for F-R placement, even though it is unclear from the original article how these are supposed to affect the layout.}
 
-\hh{We definitely need to discuss edge weights in the discussion. I am not sure that I have the same take on packages - I would not assume that not being under active development is equivalent to `dormant'.  }
+\hh{XXX We definitely need to discuss edge weights in the discussion. I am not sure that I have the same take on packages - I would not assume that not being under active development is equivalent to `dormant'.  }
+
+Since the authors come from two different fields, we have seen how each package fulfills the needs of different user bases. We think that users who are well-versed with networks will find \pkg{ggnet2} and \pkg{ggnetwork} more intuitive to use because data management and attribute handling is done through network operators on nodes and edges. These users might actually be looking to \pkg{ggplot2} to create high-quality visualizations that also have many additional visualization features open to them.  The \pkg{geomnet} approach, on the other hand, does not require any knowledge of networks or existing network analysis packages from the user.   Users who are already familiar with \pkg{ggplot2} and some of the other `Hadley'-verse package, and who find themselves dealing with data with a network structure will likely be more attracted to the \pkg{geomnet} implementation of network plotting. The data management skills needed for using \pkg{geomnet}are basic: some familiarity with the split-apply-combine paradigm, in the form of familiarity with \pkg{plyr} or \pkg{dplyr}, would be sufficient in order to make full use of the features of \code{geom\_net}. All in all, the three functionalities we have presented here provide a wealth of resources to users of all skill sets who are looking to create beautiful network visualizations.
+
+We have found that none of our approaches is unequivocally the best. We can, however, provide guidance as to which approach is best for you if you happen to find yourself with network data that needs to be visualized.  If you are experienced with network analysis in existing R packages and don’t have much experience with \pkg{ggplot2}, then look toward \pkg{ggnet}. If you are not as familiar with network analysis packages but are familiar with visualization in \pkg{ggplot2}, then \pkg{gggnetwork} is for you. And if you don’t know much about network analysis but you do know \pkg{ggplot2}, then your best approach will be \pkg{geomnet}. 
+
+Finally, we have discovered that collaborating on this paper has helped us to improve upon our initial versions of each of these packages. For instance, the edge coloring in the \code{ggnet2} function was designed so that edges between two vertices in the same group were colored with that group’s vertex color, and this was implemented in \code{geom\_net} through the traditional \code{ggplot} group operator. Furthermore, the implementation of a \pkg{ggplot2} \code{geom} for networks inspired the creation of the aliased \code{geom}s of the \pkg{ggnetwork} package. The \code{geom\_edges} function in turn inspired the \code{arrow.gap} capability in \code{geom\_net}.   
 
 }
-\item \hh{Which approach is the best? This is a question that we cannot answer overall, but we can give suggestions as to which approach is the best for you, depending on your answers to a couple of questions:
 
-\begin{enumerate}
-\item Do you want to draw a graph? if yes, you're off to a  good start, you're in the right place, keep reading. If no, sorry, but you can stop reading now.
-\item Do you have the data to draw your network? yes? good, keep reading, if not, find some data.
-\item Do you have experience drawing a network? yes? your packages of choice are ggnet2 or ggnetwork, but keep reading. no? go check out geomnet.
-\item Do you know ggplot2? yes? use ggnetwork. no? ggnet2 is your package.
-\end{enumerate}
-}
-\end{enumerate}
 
 \bibliography{tyner-briatte-hofmann}
 
