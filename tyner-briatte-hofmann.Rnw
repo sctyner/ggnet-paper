@@ -1239,7 +1239,7 @@ The \pkg{network} plotting routine is by far the slowest across all machines, wh
 Although speed was not the main rationale for our enquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower than when network size increases.
 
 % Further testing on a network of [EDGES] interactions between [NODES] proteins yielded the same conclusion. [INSERT protein-based test here.]
-=======
+
 \hh{XXX how does edge probability affect these results?
 XXX how do the different layouts affect the results? }
 
