@@ -260,7 +260,7 @@ The \code{ggnet2} function also provides a few network-specific options, such as
 
 \subsubsection{Data Structure}
 
-\sct{The package \pkg{geomnet} implements network visualization in a single ggplot2 layer. It is available at \url{github.com/sctyner/geomnet} . The package has two main functions:  \code{stat\_net}, which performs all of the calculations, and \code{geom\_net}, which renders the plot. }%Visualizing networks with a single layer as done
+\sct{The package \pkg{geomnet} implements network visualization in a single \pkg{ggplot2} layer. It is available at \url{github.com/sctyner/geomnet} . The package has two main functions:  \code{stat\_net}, which performs all of the calculations, and \code{geom\_net}, which renders the plot. }%Visualizing networks with a single layer as done
 The approach in \code{geomnet} is similar to the implementation of other, native \pkg{ggplot2} geoms, such as \code{geom\_smooth}. When using \code{geom\_smooth}, the user does not need to know about any of the internals of the loess function, and similarly, when using \code{geomnet}, the user is not expected to know about the internals of the layout algorithm, but only needs to specify the essential elements necessary for calculating a layout. On the other hand, if users are comfortable with network analysis, the entire body of layout methods provided by the \pkg{sna} package is available to them through the parameters \code{layout} and \code{layout.par}.
 %
 In network analysis there are usually two sources of information: one data set consisting of a description of the actors, represented as the vertices in the network, and another data set detailing the relationship between these actors, the edge dataset. \sct{We make two important assumptions about the way this information is encoded. First, we assume that the vertices are labelled using an `id' column. Second, we assume that the edges are described as connection between vertices via their respective `id' labels in a `from' and a `to' column. Thus, the minimum amount of information needed is a vector of all vertex labels and a two column data frame of to and from vertex ids corresponding to the edges.}  In order for this geometry to work, these two data sets need to be combined into a single data frame. For this, we are using the convention that all of the vertex information is merged into the edge data set using the `from' as the reference column in a full join operations. Generally, there will be some vertices that are sinks in the network because they only show up in the `to' column. We can easily accommodate for these by adding artificial edges in the data set that have missing information for the `to' column.
@@ -1158,17 +1158,9 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 %\afterpage{\clearpage}
 
 \section{Some considerations of speed}\label{sec:speed}
-\hh{XXX what do you think of moving the  speed discussion out of the conclusions? 
-That way we can go into more detail.
-We really have three parts here:
-\begin{enumerate}
-\item the comparison of all three ggplot2 approaches using the protein example.
-\item the comparison of ggnet2 and ggnetwork with igraph and network.
-\item an extension of the previous comparison with different edge density.
-\end{enumerate}
-}
+\hh{XXX So, the testing waters are much more muddy than anticipated. What we can do, though, is to describe the testing scenario(s), and then report our findings with an attempt to summarize.  }
 
-\fb{Note that we have two benchmarking techniques: (1) average plotting time of 100 protein networks, and (2) average plotting time of increasingly large random networks -- see runtimes.r; so, what should we do? include one of these? or both? I'd support leaving the benchmark code out of the paper, because it is not directly about network viz with ggplot2. Alternately, include it as an appendix? If left out, the code can be referred to by linking to the repo; that's what I would support most.}
+\fb{Note that we have two benchmarking techniques: (1) average plotting time of 100 protein networks, and (2) average plotting time of increasingly large random networks -- see runtimes.r; so, what should we do? include one of these? or both? I'd support leaving the benchmark code out of the paper, because it is not directly about network viz with ggplot2. Alternately, include it as an appendix? If left out, the code can be referred to by linking to the repo; that's what I would support most.} \hh{XXX link to the benchmark code in the repo seems like the best solution -  we should structure the runtime results somewhat and summarize there as well.}
 
 \hh{Additionally, the \pkg{ggplot2} framework provides us with a considerable speed-up compared to the standard plotting routines that come with the \pkg{network} package. We executed the following code:}
 
@@ -1246,14 +1238,8 @@ qplot(data = timings, reorder(type, elapsed, median), elapsed,
 
 Another benefit that emerges from using \pkg{ggplot2} for network visualization has to do with the speed at which it can plot relatively large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{igraph} and \pkg{network} packages.
 
-<<<<<<< HEAD
 The first test relies on random undirected networks in which the probability of an edge to exist between two nodes was set to 0.5.  \fb{Let me run the same tests at p = 0.25 and tell you exactly. It sure affects the average plotting time, but the number of nodes should stay the most crucial parameter.} We generated 100 of these networks at different network sizes between 20 and 240 nodes, using increments of 20. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}.
-=======
-The first test relies on random undirected networks in which the probability of a tie was set to 0.5. \hh{XXX We have been using `edge' in the paper - I'd stick to that and expand a bit on the explanation: `in which the probability for an edge between any two nodes was set to 0.5.' XXX This makes the networks pretty densily connected - none of our other networks is nearly that connected. How does the runtime vary with different tie probability?   } We generated 100 of these networks at different network sizes between 20 and 240 nodes, using increments of 20. We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}. 
-\hh{XXX We need to get the comparison to be fair between all approaches. 
-}
-The benefits of using \pkg{ggplot2}-based approaches is most obvious when compared to the plotting function included in the \pkg{network} package, which very quickly becomes very slow when network size increases.
->>>>>>> re-do of timings on protein network
+
 
 Although speed was not the main rationale for our enquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower than when network size increases.
 
