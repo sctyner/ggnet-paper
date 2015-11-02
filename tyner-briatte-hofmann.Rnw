@@ -1360,6 +1360,7 @@ qplot(data=rtm, network_size, value, colour=variable, alpha=I(0.1)) +
 \end{figure}
 
 \section{Summary and Discussion}
+\sct{XXX I am going to attempt to pull all of this together into a complete, coherent discussion section.  I'll remove all of your colors and just keep mine when I've added new material. XXX}
 
 \hh{XXX We need to come up with a discussion. Let's get started with with some bullet points:}
 \begin{enumerate}
