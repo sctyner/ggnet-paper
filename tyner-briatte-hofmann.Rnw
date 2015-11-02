@@ -1171,13 +1171,13 @@ Another benefit that emerges from using \pkg{ggplot2} for network visualization 
 
 The first test relies on random undirected networks in which the probability of an edge %to exist 
 between two nodes was set to \hh{$p = 0.2$}.  %\fb{Let me run the same tests at p = 0.25 and tell you exactly. It sure affects the average plotting time, but the number of nodes should stay the most crucial parameter.} 
-We generated 100 of these networks at network sizes from 25 to 250 nodes, using increments of 25. %We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}.
+We generated 100 of these networks at network sizes from 25 to 250 nodes, using increments of 25.\footnote{\hh{The code used for benchmarking can be found at \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes/run.r}. Run time results are found in \url{https://github.com/sctyner/ggnet-paper/tree/master/runtimes}.}} %We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}.
 
 %Although speed was not the main rationale for our inquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower than when network size increases.
 
 %Further testing on a network of [EDGES] interactions between [NODES] proteins yielded the same conclusion. [INSERT protein-based test here.]
 }
-\footnote{\hh{The code used for benchmarking can be found at \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes/run.r}. Run time results are found in \url{https://github.com/sctyner/ggnet-paper/tree/master/runtimes}.}}
+
 
 \hh{Figure~\ref{fig.cap:runtimes-random} summarizes the results of these benchmarks using a (convenience) sample of machines accessible to the authors (i.e.\ authors' hardware and additional results from friends' and colleagues' machines). 
 Network sizes are plotted horizontally, execution times of 100 runs under each visualization approach are plotted on the $y$-axis. Each panel shows a different machine as indicated by the facet label. Note that each panel is scaled separately to account for differences in the overall speed of these machines.  
@@ -1186,6 +1186,7 @@ However, the results support some  general findings:
 The \pkg{network} plotting routine is by far the slowest across all machines, while the \pkg{igraph} plotting is generally among the fastest. Our three approaches generally feature in between \pkg{igraph} and \pkg{network} with \pkg{ggnet2} veing as fast or faster than \pkg{igraph} plotting, followed by \pkg{ggnetwork} and \pkg{geomnet}, which is generally the slowest among the three. These differences are more pronounced the larger the networks are. 
 
 XXX how does edge probability affect these results?
+XXX how do the different layouts affect the results? 
 }
 
 \begin{figure}[hbtp]
