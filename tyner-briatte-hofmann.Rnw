@@ -891,7 +891,9 @@ ggplot(
 
 \fb{Please don't get mad at me: I think we discussed that earlier, but I'm still unable to see what this ex. brings to the paper. What does it show that is not shown in the other examples?}
 
-This next network comes from \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book, and an edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.
+\hh{not mad :)  what I like about this example is that it is a classic, and it also does not have one single perfect solution. The number of edges and the length of the node labels makes it quite tricky to lay out nicely. I like the fact that we have three different approaches to that. But I'm also not totally opposed to removing the example.}
+
+This example is a classic published by \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book, and an edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.
 This network is shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}; the corresponding code is shown below. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
 
 % \begin{figure}[hbtp]
@@ -1217,7 +1219,7 @@ ggplot(g, aes(x = network_size, y = mean_time,
         legend.position = c(0,1))
 @
 %\includegraphics[width=.5\textwidth]{figure/runtimes-1.pdf}
-<<runtimes-all, echo=FALSE, fig.width=8, fig.height=6>>=
+<<runtimes-all, echo=FALSE, fig.width=8, fig.height=8.5>>=
 library(tidyr)
 library(reshape2)
 
