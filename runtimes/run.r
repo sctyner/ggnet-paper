@@ -11,7 +11,7 @@ if (!require(network, quietly = TRUE)) {
 library(network)
 
 ## ggplot2
-if (!require(ggnetwork, quietly = TRUE) ||
+if (!require(ggplot2, quietly = TRUE) ||
     packageVersion("ggplot2") < "1.0.1.9003") {
   devtools::install_github("hadley/ggplot2")
 }
