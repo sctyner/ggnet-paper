@@ -148,11 +148,10 @@ Coloring the vertices or edges in a graph is a quick way to visualize grouping a
 Many R packages already exist for network analysis and visualization such as \CRANpkg{igraph} by \citet{igraph}, \CRANpkg{sna} by \citet{sna}, and \CRANpkg{network} by \citet{network.jss, network}. Unfortunately, there is no standard format for network visualization across these packages. The user, therefore, must have detailed knowledge of each one of these packages in order to make meaningful changes to the network visualization. Customizing the colors, sizes, etc. of the vertices and edges of the network is done ``by hand'' and differently in each of these packages. For instance, the \pkg{igraph} package allows for coloring vertices by groups but the user has to assign the colors to each vertex individually as opposed to assigning color by a grouping factor variable.
 
 % ggplot2 as an implementation framework
-Our objective is to bring network plotting capabilities to the popular \CRANpkg{ggplot2} package \citep{ggplot2}. Wickham designed it as an implementation of the `grammar of graphics' proposed by \citet{wilkinson:1999}, and \pkg{ggplot2} has since become extremely popular among R users.  %
-  \footnote{In order to give an indication of how  large the user base of \pkg{ggplot2} is, we looked at its usage statistics from January 1, 2015 to October 25, 2015 (see \url{http://cran-logs.rstudio.com/}). Over this period, the \pkg{ggplot2} package was downloaded over 1.3 million times from CRAN, which amounts to over 4,000 downloads per day. The package has been downloaded at least once in 215 countries, and in 21 of those countries, including China, Israel, and Colombia, it has been downloaded over 10,000 times.} %
-\sct{For this audience, we created the \pkg{geomnet} package. We will demonstrate that users of \pkg{ggplot2} who encounter network data will find our package easy to implement. The network packages \pkg{sna}, \pkg{network}, and \pkg{igraph} are also very popular.}
-  %
-  \footnote{
+Our objective is to bring network plotting capabilities to the popular \CRANpkg{ggplot2} package \citep{ggplot2}. Wickham designed it as an implementation of the `grammar of graphics' proposed by \citet{wilkinson:1999}, and \pkg{ggplot2} has since become extremely popular among R users.%
+\footnote{In order to give an indication of how  large the user base of \pkg{ggplot2} is, we looked at its usage statistics from January 1, 2015 to October 25, 2015 (see \url{http://cran-logs.rstudio.com/}). Over this period, the \pkg{ggplot2} package was downloaded over 1.3 million times from CRAN, which amounts to over 4,000 downloads per day. The package has been downloaded at least once in 215 countries, and in 21 of those countries, including China, Israel, and Colombia, it has been downloaded over 10,000 times.} %
+\sct{For this audience, we created the \pkg{geomnet} package. We will demonstrate that users of \pkg{ggplot2} who encounter network data will find our package easy to implement. The network packages \pkg{sna}, \pkg{network}, and \pkg{igraph} are also very popular.}%
+\footnote{
 \sct{  The \pkg{igraph} package, for instance, is frequently in lists of most downloaded CRAN packages. See \url{http://www.r-statistics.com/2013/06/top-100-r-packages-for-2013-jan-may/} for an example.}
   }
   \sct{The frequent users of these packages may find \pkg{ggnet} or \pkg{ggnetwork} more suitable for their needs, since these users are likely more acquainted with their unique features that are used in \pkg{ggnet} and \pkg{ggnetwork}.}
@@ -186,7 +185,7 @@ The two sets of graphical objects that make up a network, points and segments be
 
 Networks can vary widely in scope and complexity: the smallest network is simply an edge between two vertices, while one of the most commonly used and most complex networks, the world wide web, has billions of vertices (Web pages) and billions of edges (hyperlinks) connecting them. Additionally, the edges in a network can be directed or undirected: directed edges represent information travelling from one vertex to another, and switching the direction would change the structure of the network. The World Wide Web is an example of a directed network because hyperlinks connect one Web page to another, but not necessarily the other way around. Undirected edges are simply connections between vertices. Co-authorship networks are examples of undirected networks, where nodes are authors and they are connected by an edge if they have written an academic publication together.
 
-\sct{An even more common network example is a social network.} A social network is a network that everyone is a part of in one way or another. We do not necessarily refer here to social media like Facebook or LinkedIn, but rather to the connections we form with other people. To demonstrate the functionality of our tools for plotting networks, we have chosen an example of a social network from the popular television show \emph{Mad Men}. This network, which was compiled by \citet{madmen}, is made up of 52 vertices and 87 edges. Each vertex represents a character on the show, and there is an edge between every two characters who have had a romantic relationship.
+An even more common network example is a social network. A social network is a network that everyone is a part of in one way or another. We do not necessarily refer here to social media like Facebook or LinkedIn, but rather to the connections we form with other people. To demonstrate the functionality of our tools for plotting networks, we have chosen an example of a social network from the popular television show \emph{Mad Men}. This network, which was compiled by \citet{madmen}, is made up of 52 vertices and 87 edges. Each vertex represents a character on the show, and there is an edge between every two characters who have had a romantic relationship.
 
 \begin{figure}[hbtp]
 \centering
@@ -221,13 +220,12 @@ Figure~\ref{fig.cap:madmen} shows this network. In the plot, we can see one cent
 % ==============================================================================
 
 
-\sct{We present} two basic approaches to using the \pkg{ggplot2} framework for network visualization. First, we implement network visualizations by providing a wrapper function, \code{ggnet2} for the user to visualize a network using \pkg{ggplot2} elements. Second, we implement network visualizations using layering in \pkg{ggplot2}.  For the second approach, we have two ways of creating a network visualization. The first, \pkg{geomnet}, wraps all network structures, including vertices, edges, and vertex labels into a single \code{geom}. The second, \pkg{ggnetwork}, implements each structural component in an independent \code{geom} and layers them to create the visualization. We will discuss all of these approaches in this section.
+We present two basic approaches to using the \pkg{ggplot2} framework for network visualization. First, we implement network visualizations by providing a wrapper function, \code{ggnet2} for the user to visualize a network using \pkg{ggplot2} elements. Second, we implement network visualizations using layering in \pkg{ggplot2}.  For the second approach, we have two ways of creating a network visualization. The first, \pkg{geomnet}, wraps all network structures, including vertices, edges, and vertex labels into a single \code{geom}. The second, \pkg{ggnetwork}, implements each structural component in an independent \code{geom} and layers them to create the visualization. We will discuss all of these approaches in this section.
 
 \subsection{ggnet2} % ==========================================================
 
 The \code{ggnet2} function is an improved version of the \code{ggnet} function, which has been part of the \pkg{GGally} package since 2013 \citep{ggally}. Both functions can be separately installed in the form of a small R package available from \url{https://github.com/briatte/ggnet}, and a detailed introduction to the \code{ggnet2} function is available from within the package as a vignette.%
-  %
-  \footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnet/}.}%
+\footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnet/}.}%
 
 The \code{ggnet2} function offers a large range of network visualization functionalities in a single function call. Although its result is a \pkg{ggplot2} object that can be further styled with \pkg{ggplot2} scales and themes, the syntax of the \code{ggnet2} function is designed to be easily understood by the user. The aesthetics relating to the nodes are controlled by arguments such as \code{node.alpha} or \code{node.color}, while those relating to the edges are controlled by %similarly named
 arguments starting with \samp{edge}. As a consequence, while \code{ggnet2} applies the grammar of graphics to network objects, the function itself still works very much like the plotting functions of the \pkg{igraph} and \pkg{network} packages: a long series of arguments is used to control every possible aspect of how the network should be visualized.
@@ -244,18 +242,16 @@ a vector of global values, or the name of an edge or vertex attribute, in which 
 
 This last functionality builds on one of the strengths of the \pkg{network} class, which can store %meta-
 information on network edges and nodes as attributes that are then accessible to the user through the \code{\%e\%} and \code{\%v\%} operators respectively.%
-  %
-  \footnote{See \citet[p.~22-24]{network}. The equivalent operators in the \pkg{igraph} package are called \code{E} and \code{V}.} %
+%
+\footnote{See \citet[p.~22-24]{network}. The equivalent operators in the \pkg{igraph} package are called \code{E} and \code{V}.} %
   %
   If the \code{ggnet2} function is given the \code{node.alpha = "importance"} argument, it will interpret it as an attempt to map the vertex attribute called \samp{importance} to the transparency level of the nodes. This works exactly like the command \code{net \%v\% "importance"}, which returns the vertex attribute \samp{importance} of the \code{"network"} object \code{net}. % SCT : This sentence seems very redundant. %This same result can also be achieved by passing the more explicit argument \code{node.alpha = net \%v\% "importance"}.
   This functionality allows the \code{ggnet2} function to work in a similar fashion to \pkg{ggplot2} mappings of aesthetics within the \code{aes} operator.
 
 The \code{ggnet2} function also provides a few network-specific options, such as sizing the nodes as a function of their unweighted degree, or using the primary and secondary modes of a bipartite network as an aesthetic mapping for the nodes.%
+\footnote{Bipartite (or 'two-mode') networks are networks with two different kinds of nodes and where all ties are formed between these two kinds. Affiliation networks, which represent the ties between individuals and the groups to which they belong, are examples of such networks \citep[see][p.~53-54 and p.~123-127]{newman}.}%
   %
-  % added to answer Sam's comment about clarity/rephrasing
-  \footnote{Bipartite (or 'two-mode') networks are networks with two different kinds of nodes and where all ties are formed between these two kinds. Affiliation networks, which represent the ties between individuals and the groups to which they belong, are examples of such networks \citep[see][p.~53-54 and p.~123-127]{newman}.}%
-  %
-  \sct{All in all,} the \code{ggnet2} function combines two different kinds of processes: it translates a network object into a data frame suitable for plotting with \pkg{ggplot2}, and it applies network-related aesthetic operations to that data frame, such as coloring the edges in function of the color of the nodes that they connect. \sct{In the next section, we discuss \pkg{geomnet}, which is similarly constructed.}
+All in all, the \code{ggnet2} function combines two different kinds of processes: it translates a network object into a data frame suitable for plotting with \pkg{ggplot2}, and it applies network-related aesthetic operations to that data frame, such as coloring the edges in function of the color of the nodes that they connect. \sct{In the next section, we discuss \pkg{geomnet}, which is similarly constructed.}
 
 \subsection{geomnet} % =========================================================
 
@@ -300,8 +296,8 @@ Note that the edge specific aesthetics that overwrite node aesthetics are curren
 \subsection{ggnetwork} % =======================================================
 
 \pkg{ggnetwork} is a small R package that mimicks the behaviour of \code{geomnet} by defining several geoms to achieve similar results. The package can be installed from \url{https://github.com/briatte/ggnetwork} and is fully documented in the package vignette.%
-  %
-  \footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnetwork/}.}%
+%
+\footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnetwork/}.}%
 
 The approach taken by the \pkg{ggnetwork} package is to alias some of the native geoms of the \pkg{ggplot2} package, an aliased geom is simply a variant of an already existing one. The \pkg{ggplot2} package contains several examples of aliased geoms, such as \code{geom\_histogram}, which is a variant of \code{geom\_bar} see \citep[see][p.~67, Table~4.6]{ggplot2}.
 
@@ -322,8 +318,8 @@ Internally, the \code{ggnetwork} function starts by computing the \code{x} and \
 
 At that stage, the \code{ggnetwork} function, like the \code{geomnet} package, performs a left-join of that augmented edge list with the vertex-level attributes of the %sender
 `from' nodes. It also adds one self-loop per node, in order to ensure that every node is plotted even when their degree is zero---that is, even if the node is not connected to any other node of the network, and is therefore absent from the edge list. The data frame created by this process contains one row per edge as well as one additional row per node, and features all edge-level and vertex-level attributes initially present in the network.%
-  % SCT: I don't think we should have this footnote because it doesn't quite seem necessary.
-  \footnote{One limitation of this process is that it requires some reserved variable names (\code{x}, \code{y}, \code{xend} and \code{yend}), which should not also be present as edge-level or vertex-level attributes (otherwise the function will simply break). Similarly, if an edge attribute and a vertex attribute have the same name, like  \samp{na}, which the \pkg{network} package defines as an attribute for both edges and vertices in order to flag missing data, \code{ggnetwork} will rename them to \samp{na.x} (for the edge-level attribute) and \samp{na.y} (for the vertex-level attribute).} %
+% SCT: I don't think we should have this footnote because it doesn't quite seem necessary.
+\footnote{One limitation of this process is that it requires some reserved variable names (\code{x}, \code{y}, \code{xend} and \code{yend}), which should not also be present as edge-level or vertex-level attributes (otherwise the function will simply break). Similarly, if an edge attribute and a vertex attribute have the same name, like  \samp{na}, which the \pkg{network} package defines as an attribute for both edges and vertices in order to flag missing data, \code{ggnetwork} will rename them to \samp{na.x} (for the edge-level attribute) and \samp{na.y} (for the vertex-level attribute).} %
 
 The \code{ggnetwork} function also accepts the arguments \code{arrow.gap} and \code{by}. \sct{Like in \pkg{geomnet},} \code{arrow.gap} slightly shortens the edges of directed networks in order to avoid overplotting edge arrows and nodes. The argument \code{by} is \sct{intended for} use with plot facets. Passing an edge attribute \sct{as a grouping variable} to the \code{by} argument will cause \code{ggnetwork} to return a data frame in which each node appears as many times as there are unique values of that edge attribute, using the same coordinates for all occurrences. When that same edge attribute is also passed to either \code{facet\_wrap} or \code{facet\_grid}, each edge of the network will show in only one \sct{XXX I replaced facet with panel XXX} panel of the plot, and all nodes will appear in each of the panels at the same position. This makes the panels of the plot comparable to each other, and allows the user to visualize %edge formation
 the network structure as a function of a specific edge attribute, like a temporal attribute.
