@@ -23,7 +23,7 @@ This paper explores three different approaches to visualize networks by building
 
 \item %%%%%%%%%%%%
   \sct{check that the reference commands all make sense. for instance, section 2.1 is referenced at the top of page 3 but the sections aren't labeled with numbers in the paper. Is this something to do with the template for the R Journal? }
-
+\hh{good point - I've changed ref to nameref.}
 \end{enumerate}}
 
 <<setup_knitr, echo=FALSE>>=
@@ -171,15 +171,16 @@ Our objective is to bring network plotting capabilities to the popular \CRANpkg{
 Because the syntax implemented in the \pkg{ggplot2} package is extendable to many different kinds of visualizations, many packages have built additional functionalities on top of the existing package. Examples include the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRANpkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the package \CRANpkg{GGally} by \citet{ggally}, and the \BIOpkg{ggbio} Bioconductor package by \citet{ggbio}, which provides graphics for biological data.
 \sct{These packages have greatly increased the utility of \pkg{ggplot2}, likely increasing its user base greatly. We aim to increase this user base even more by extending the benefits of the grammar of graphics to network visualization.}% Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization.
 Our efforts \sct{rely upon} the most recent changes to \pkg{ggplot2}, \sct{which allow users to more easily extend the package} through additional geometries or \samp{geoms}.%
-  \footnote{Version 1.1.0, released mid November 2015. See \url{https://cran.r-project.org/web/packages/ggplot2/NEWS} for the full list of changes in \pkg{ggplot2} 1.1.0, as well as the new package vignette, ``Extending ggplot2'', which explains how the internal \code{ggproto} system of object-oriented programming can be used to create new geoms.} %
+\footnote{Version 1.1.0, released mid November 2015. See \url{https://cran.r-project.org/web/packages/ggplot2/NEWS} for the full list of changes in \pkg{ggplot2} 1.1.0, as well as the new package vignette, ``Extending ggplot2'', which explains how the internal \code{ggproto} system of object-oriented programming can be used to create new geoms.} %
   %
 
-In the remainder of this paper, we present three different approaches to network visualization with \pkg{ggplot2}. Section~\ref{sec:background} introduces the basic terminology of networks and illustrates their ubiquity in natural and social life. Section~\ref{sec:implementations} then discusses the logic behind each of the three approaches that we offer. Section~\ref{sec:examples} extends that discussion through several examples ranging from simple to complex networks, for which we provide the code corresponding to each approach alongside its graphical result. \hh{We follow with some considerations of runtimes in plotting networks in Section~\ref{sec:speed} before closing with a discussion.}
+In the remainder of this paper, we present three different approaches to network visualization with \pkg{ggplot2}. Section~\nameref{sec:background} introduces the basic terminology of networks and illustrates their ubiquity in natural and social life. Section~\nameref{sec:implementations} then discusses the logic behind each of the three approaches that we offer. Section~\nameref{sec:examples} extends that discussion through several examples ranging from simple to complex networks, for which we provide the code corresponding to each approach alongside its graphical result. We follow with some considerations of runtimes in plotting networks in Section~\nameref{sec:speed} before closing with a discussion.
 
 \section{A quick primer to network structures}
 \label{sec:background}
 
-In its essence, a network is simply a set of points connected in pairs by a set of lines \citep{newman}. Here, we refer to the lines as edges (or ties) and to the points as nodes (or vertices). \sct{We note that our examples are all one-mode networks, where all nodes are of the same kind and are able to connect to each other, however the graphical tools presented can be used to visualize \hh{more general} types of networks.} %\sct{XXX I'm not 100\% sure that's true but it seems right.XXX}
+In its essence, a network is simply a set of points connected in pairs by a set of lines \citep{newman}. Here, we refer to the lines as edges (or ties) and to the points as nodes (or vertices). We note that our examples are all one-mode networks, where all nodes are of the same kind and are able to connect to each other, however the graphical tools presented can be used to visualize more general types of networks. %\sct{XXX I'm not 100\% sure that's true but it seems right.XXX
+% HH: more general is definitely true}
 
 The two sets of graphical objects that make up a network, points and segments between them, have been used to encode a huge variety and quantity of information across many different fields of study. For instance, networks of scientific collaboration, a food web of marine animals, and American college football games are all covered in a paper on community detection in networks by \citet{football}. \citet{networkfailures} examine node failure in interdependent networks like power grids.  Social networks such as links between actors found on \url{http://www.imdb.com/} and neural networks, like the completely mapped neural network of the \textit{C. elegans} worm are also extensively studied \citep{smallworld}.
 
@@ -287,11 +288,12 @@ Corresponding to each layout, the parameter  \code{layout.par} consists of a lis
 
 The parameter \code{curvature} is set to zero by default, but if specified, leads to curved edges using the newly implemented \pkg{ggplot2} geom \code{geom\_curve} instead of the regular \code{geom\_segment}.
 Note that the edge specific aesthetics that overwrite node aesthetics are currently considered as `as.is' values: they do not get a legend and are not scaled within the ggplot2 framework. This is done to avoid any clashes between node and edge scales.
+
+{\bf self-referencing vertices:} some networks contain self references, i.e.\  an edge has the same vertex id in its from and to columns. If the parameter \code{selfies} is set to \code{TRUE}, a circle is drawn next to the vertex to represent this self reference.
+
 %
 \item {\bf arrow:} whenever the parameter \code{directed} is set from its default state to \code{TRUE}, arrows are drawn from the `from' to the `to' node, with tips pointing towards the `to' node.  By default, arrows have an absolute size of 10 points. The parameter \code{arrowsize} consists of a positive numeric value that is used as a multiple of the original arrow size, i.e.\ \code{arrowsize = 2} shows arrow tips at twice their original size. In order to avoid overplotting of the arrow tips by the nodes, the parameter \code{arrowgap} can be used. \code{arrowgap} specifies a proportion by which the edge should be shrunk with default of 0.05. A value of 0.5 will result in edges drawn only half way from the `from' node to the `to' node.
 \item {\bf labels:}  \code{label} can be used as either a logical parameter or as a data variable, in which case it is assumed that the associated variable consists of the character strings to be used for labeling the nodes. Again, if \code{colour} is specified for the nodes, the same values are used for the labels, unless \code{ labelcolour} is specified. Other parameter values, such as \code{vjust} and \code{hjust} help in adjusting labels relative to the nodes. The parameters work in the same fashion as in native \pkg{ggplot2} geoms.
-
-\item \bf{self-referencing vertices:} if self-references on vertices are of interest, the parameter \code{selfies} can be set to \code{TRUE}. In this case, an edge has the same vertex id in its from and to columns, and a circle is drawn to represent this loop.
 
 \end{itemize}
 
@@ -301,7 +303,7 @@ Note that the edge specific aesthetics that overwrite node aesthetics are curren
   %
   \footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnetwork/}.}%
 
-The approach taken by the \pkg{ggnetwork} package is to alias some of the native geoms of the \pkg{ggplot2} package, an aliased geom \sct{is simply} a variant of an already existing one. The \pkg{ggplot2} package contains several examples of aliased geoms, such as \code{geom\_histogram}, which is a variant of \code{geom\_bar} see \citep[see][p.~67, Table~4.6]{ggplot2}.
+The approach taken by the \pkg{ggnetwork} package is to alias some of the native geoms of the \pkg{ggplot2} package, an aliased geom is simply a variant of an already existing one. The \pkg{ggplot2} package contains several examples of aliased geoms, such as \code{geom\_histogram}, which is a variant of \code{geom\_bar} see \citep[see][p.~67, Table~4.6]{ggplot2}.
 
 Following that logic, the \pkg{ggnetwork} package adds four aliased geometries to \pkg{ggplot2}:
 
@@ -1170,14 +1172,13 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 
 \newpage
 \section{Some considerations of speed}\label{sec:speed}
-\hh{XXX So, the testing waters are much more muddy than anticipated. What we can do, though, is to describe the testing scenario(s), and then report our findings with an attempt to summarize. XXX I've added a facetted plot to show the variability in the results that we've seen between the different machines. I made a few changes to the plot, as you can see - using a smooth allows us to see a trend, while the points show variability and give some indication of the distribution (I don't like min and max for that because they are the least robust measures). I also want to see where the actual measurements are taken - that's the reason for showing the points. XXX}
+% \hh{XXX So, the testing waters are much more muddy than anticipated. What we can do, though, is to describe the testing scenario(s), and then report our findings with an attempt to summarize. XXX I've added a facetted plot to show the variability in the results that we've seen between the different machines. I made a few changes to the plot, as you can see - using a smooth allows us to see a trend, while the points show variability and give some indication of the distribution (I don't like min and max for that because they are the least robust measures). I also want to see where the actual measurements are taken - that's the reason for showing the points. XXX}
 
-Another benefit that emerges from using \pkg{ggplot2} for network visualization \sct{is} the speed at which it can plot \sct{fairly} large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{network} package. They also show the \pkg{ggplot2} approaches to be largely on par with the speed provided by the \pkg{igraph} package. \sct{We first investigate} average plotting time of the protein network shown in Figure~\ref{fig.cap:yeast}, %
-  \footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes-protein/run.r} for the code to recreate results for visualizing the protein interaction network.}
-
-%
-and \sct{then consider} average plotting times of increasingly larger random networks.%
-  \footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes/run.r} for code to recreate our results.}
+Another benefit that emerges from using \pkg{ggplot2} for network visualization is the speed at which it can plot fairly large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{network} package. They also show the \pkg{ggplot2} approaches to be largely on par with the speed provided by the \pkg{igraph} package. We first investigate average plotting time
+of the protein network%
+\footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes-protein/run.r} for the code to recreate results for visualizing the protein interaction network.} 
+shown in Figure~\ref{fig.cap:yeast}, and then consider average plotting times of increasingly larger random networks.%
+\footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes/run.r} for code to recreate benchmark results for visualizing random networks.}
 %
 
 %so, what should we do? include one of these? or both? I'd support leaving the benchmark code out of the paper, because it is not directly about network viz with ggplot2. Alternately, include it as an appendix? If left out, the code can be referred to by linking to the repo; that's what I would support most.} % $\hh{XXX link to the benchmark code in the repo seems like the best solution -  we should structure the runtime results somewhat and summarize there as well.} DONE - SCT.
@@ -1370,10 +1371,10 @@ Figure~\ref{fig.cap:runtimes-random} summarizes the results of these benchmarks 
 Network sizes are plotted horizontally, execution times of 100 runs under each visualization approach are plotted on the $y$-axis. Each panel shows a different machine as indicated by the facet label. Note that each panel is scaled separately to account for differences in the overall speed of these machines.
 What these plots indicate is that we have surprisingly large variability in relative run times across different machines.
 However, the results support some  general findings.
-The \pkg{network} plotting routine is by far the slowest across all machines, while the \pkg{igraph} plotting is generally among the fastest. Our three approaches generally feature in between \pkg{igraph} and \pkg{network} with \pkg{ggnet2} being as fast or faster than \pkg{igraph} plotting, followed by \pkg{ggnetwork} and \pkg{geomnet}, which is generally the slowest among the three. These differences \sct{become} more pronounced \sct{as the size of the network increases.}
+The \pkg{network} plotting routine is by far the slowest across all machines, while the \pkg{igraph} plotting is generally among the fastest. Our three approaches generally feature in between \pkg{igraph} and \pkg{network} with \pkg{ggnet2} being as fast or faster than \pkg{igraph} plotting, followed by \pkg{ggnetwork} and \pkg{geomnet}, which is generally the slowest among the three. These differences become more pronounced as the size of the network increases.
 
 
-Although speed was not the main rationale for our inquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower \sct{as} network size increases.
+Although speed was not the main rationale for our inquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower as network size increases.
 
 \hh{
 XXX how does edge probability affect these results?
