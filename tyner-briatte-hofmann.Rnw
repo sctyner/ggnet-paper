@@ -887,79 +887,79 @@ ggplot(
 \end{figure}
 \afterpage{\clearpage}
 
-\subsection{Character co-appearances in \emph{Les Mis\'{e}rables}} % ===========
-
-\fb{XXX Please don't get mad at me: I think we discussed that earlier, but I'm still unable to see what this ex. brings to the paper. What does it show that is not shown in the other examples? XXX}
-
-\sct{XXX Fran\c{c}ois, I can see that. The original intent was to demonstrate the ability of the geom to change edge widths based on some weight variable. But, this is also done now in the bike share example, which also happens to be a much cooler and more unique example. XXX}
-
-%This next network comes from \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book, and an edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.
-%This network is shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}; the corresponding code is shown below. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
-
-\hh{not mad :)  what I like about this example is that it is a classic, and it also does not have one single perfect solution. The number of edges and the length of the node labels makes it quite tricky to lay out nicely. I like the fact that we have three different approaches to that. But I'm also not totally opposed to removing the example.}
-
-% This example is a classic published by \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book, and an edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.
-% This network is shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}; the corresponding code is shown below. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
-
-
-% \begin{figure}[hbtp]
-% \caption{\label{tab:lesmis}Code for the three approaches of visualizing the relationships between characters in Les Mis\'{e}rables as shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}.}
-<<lesmis_ggnet2, echo=TRUE>>=
-# Code for the three visualization approaches of co-appearances
-# plot with ggnet2
-ggnet2(lesmis$edges[, 1:2 ], mode = "fruchtermanreingold",
-       color = "white", label = TRUE, label.color = "grey30",
-       edge.size = lesmis$edges$degree / mean(lesmis$edges$degree),
-       edge.color = "grey60",
-       layout.exp = 0.25)
-@
-
-<<lesmis_geom_net, echo=TRUE, fig.width=9.5>>=
-# plot with geom_net
-# data step: merge vertices and edges
-lesmisnet <- merge(lesmis$edges, lesmis$vertices, by.x = "from",
-                   by.y = "label", all = TRUE)
-lesmisnet$degree[ is.na(lesmisnet$degree) ] <- 0
-
-# create plot
-ggplot(data = lesmisnet, aes(from_id = from, to_id = to,
-                             linewidth = degree / 5 + 0.1 )) +
-  geom_net(aes(size = degree, alpha = degree),
-           colour = "grey30", ecolour = "grey60",
-           layout = "fruchtermanreingold", label = TRUE, vjust = -0.75) +
-  scale_alpha(range = c(0.3, 1)) +
-  theme_net()
-@
-
-%% not sure I understand the aesth. mapping used above, so not using alpha below
-<<lesmis_ggnetwork, echo=TRUE, fig.width=9.5>>=
-# plot with ggnetwork
-ggplot(data = ggnetwork(lesmis$edges[, 1:2 ], arrow.gap = 0),
-       aes(x, y, xend = xend, yend = yend)) +
-  geom_edges(size = lesmis$edges$degree / mean(lesmis$edges$degree),
-             color = "grey60") +
-  geom_nodes(color = "white", size = 6) +
-  geom_nodetext(aes(label = vertex.names), color = "grey30") +
-  theme_blank()
-@
-%\end{figure}
-%
-% \begin{figure}[hbtp]
-% \includegraphics[width=\textwidth]{figure/lesmis_ggnet2-1.pdf}
-% \caption{\label{fig.cap:lesmis:ggnet2} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using ggnet2.}
-% \end{figure}
-% %
-% \begin{figure}[hbtp]
-% \includegraphics[width=\textwidth]{figure/lesmis_geom_net-1.pdf}
-% \caption{\label{fig.cap:lesmis:ggnet} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using geomnet.}
-% \end{figure}
-% %
-% \begin{figure}[hbtp]
-% \includegraphics[width=\textwidth]{figure/lesmis_ggnetwork-1.pdf}
-% \caption{\label{fig.cap:lesmis:ggnetwork} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using ggnetwork.}
-% \end{figure}
-%
-%\afterpage{\clearpage}
+%' \subsection{Character co-appearances in \emph{Les Mis\'{e}rables}} % ===========
+%' 
+%' \fb{XXX Please don't get mad at me: I think we discussed that earlier, but I'm still unable to see what this ex. brings to the paper. What does it show that is not shown in the other examples? XXX}
+%' 
+%' \sct{XXX Fran\c{c}ois, I can see that. The original intent was to demonstrate the ability of the geom to change edge widths based on some weight variable. But, this is also done now in the bike share example, which also happens to be a much cooler and more unique example. XXX}
+%' 
+%' %This next network comes from \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book, and an edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.
+%' %This network is shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}; the corresponding code is shown below. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
+%' 
+%' \hh{not mad :)  what I like about this example is that it is a classic, and it also does not have one single perfect solution. The number of edges and the length of the node labels makes it quite tricky to lay out nicely. I like the fact that we have three different approaches to that. But I'm also not totally opposed to removing the example.}
+%' 
+%' % This example is a classic published by \citet{lesmis}. It is an undirected network of coappearances of characters in Victor Hugo's \emph{Les Mis\'{e}rables}.  There are 77 vertices representing each of the 77 characters in the book, and an edge connects two vertices if those two characters appear in the same chapter of the book.  There are 254 edges in this network. The edges are also weighted by the number of coappearances. The largest weighting is 31, between the characters Jean Valjean and Cosette.
+%' % This network is shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}; the corresponding code is shown below. This network reveals many important character groups, as well as the main characters in the story.  The main characters are the ones with high degree, like Valjean, Cosette, and Javert.  There is an extremely wide edge connecting Valjean and Cosette, which implies that they are strongly connected; in fact, Cosette is Valjean's adopted daughter.
+%' 
+%' 
+%' % \begin{figure}[hbtp]
+%' % \caption{\label{tab:lesmis}Code for the three approaches of visualizing the relationships between characters in Les Mis\'{e}rables as shown in Figures~\ref{fig.cap:lesmis:ggnet2},~\ref{fig.cap:lesmis:ggnet}, and~\ref{fig.cap:lesmis:ggnetwork}.}
+%' <<lesmis_ggnet2, echo=TRUE>>=
+%' # Code for the three visualization approaches of co-appearances
+%' # plot with ggnet2
+%' ggnet2(lesmis$edges[, 1:2 ], mode = "fruchtermanreingold",
+%'        color = "white", label = TRUE, label.color = "grey30",
+%'        edge.size = lesmis$edges$degree / mean(lesmis$edges$degree),
+%'        edge.color = "grey60",
+%'        layout.exp = 0.25)
+%' @
+%' 
+%' <<lesmis_geom_net, echo=TRUE, fig.width=9.5>>=
+%' # plot with geom_net
+%' # data step: merge vertices and edges
+%' lesmisnet <- merge(lesmis$edges, lesmis$vertices, by.x = "from",
+%'                    by.y = "label", all = TRUE)
+%' lesmisnet$degree[ is.na(lesmisnet$degree) ] <- 0
+%' 
+%' # create plot
+%' ggplot(data = lesmisnet, aes(from_id = from, to_id = to,
+%'                              linewidth = degree / 5 + 0.1 )) +
+%'   geom_net(aes(size = degree, alpha = degree),
+%'            colour = "grey30", ecolour = "grey60",
+%'            layout = "fruchtermanreingold", label = TRUE, vjust = -0.75) +
+%'   scale_alpha(range = c(0.3, 1)) +
+%'   theme_net()
+%' @
+%' 
+%' %% not sure I understand the aesth. mapping used above, so not using alpha below
+%' <<lesmis_ggnetwork, echo=TRUE, fig.width=9.5>>=
+%' # plot with ggnetwork
+%' ggplot(data = ggnetwork(lesmis$edges[, 1:2 ], arrow.gap = 0),
+%'        aes(x, y, xend = xend, yend = yend)) +
+%'   geom_edges(size = lesmis$edges$degree / mean(lesmis$edges$degree),
+%'              color = "grey60") +
+%'   geom_nodes(color = "white", size = 6) +
+%'   geom_nodetext(aes(label = vertex.names), color = "grey30") +
+%'   theme_blank()
+%' @
+%' %\end{figure}
+%' %
+%' % \begin{figure}[hbtp]
+%' % \includegraphics[width=\textwidth]{figure/lesmis_ggnet2-1.pdf}
+%' % \caption{\label{fig.cap:lesmis:ggnet2} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using ggnet2.}
+%' % \end{figure}
+%' % %
+%' % \begin{figure}[hbtp]
+%' % \includegraphics[width=\textwidth]{figure/lesmis_geom_net-1.pdf}
+%' % \caption{\label{fig.cap:lesmis:ggnet} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using geomnet.}
+%' % \end{figure}
+%' % %
+%' % \begin{figure}[hbtp]
+%' % \includegraphics[width=\textwidth]{figure/lesmis_ggnetwork-1.pdf}
+%' % \caption{\label{fig.cap:lesmis:ggnetwork} Co-appearance network of characters in Victor Hugo's \emph{Les Mis\'{e}rables} using ggnetwork.}
+%' % \end{figure}
+%' %
+%' %\afterpage{\clearpage}
 
 \subsection{Bikesharing in Washington D.C.} % ==================================
 
