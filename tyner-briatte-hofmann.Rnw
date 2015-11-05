@@ -21,9 +21,9 @@ This paper explores three different approaches to visualize networks by building
 
   \fb{I have included some testing code + prelim. results in the "runtimes" folder.}
 
-\item %%%%%%%%%%%%
-  \sct{check that the reference commands all make sense. for instance, section 2.1 is referenced at the top of page 3 but the sections aren't labeled with numbers in the paper. Is this something to do with the template for the R Journal? }
-\hh{good point - I've changed ref to nameref.}
+% \item %%%%%%%%%%%%
+%   \sct{check that the reference commands all make sense. for instance, section 2.1 is referenced at the top of page 3 but the sections aren't labeled with numbers in the paper. Is this something to do with the template for the R Journal? }
+% \hh{good point - I've changed ref to nameref.}
 \end{enumerate}}
 
 <<setup_knitr, echo=FALSE>>=
@@ -1156,7 +1156,7 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 \end{figure}
 %\afterpage{\clearpage}
 
-\newpage
+%\newpage
 \section{Some considerations of speed}\label{sec:speed}
 % \hh{XXX So, the testing waters are much more muddy than anticipated. What we can do, though, is to describe the testing scenario(s), and then report our findings with an attempt to summarize. XXX I've added a facetted plot to show the variability in the results that we've seen between the different machines. I made a few changes to the plot, as you can see - using a smooth allows us to see a trend, while the points show variability and give some indication of the distribution (I don't like min and max for that because they are the least robust measures). I also want to see where the actual measurements are taken - that's the reason for showing the points. XXX}
 
@@ -1170,6 +1170,8 @@ shown in Figure~\ref{fig.cap:yeast}, and then consider average plotting times of
 %so, what should we do? include one of these? or both? I'd support leaving the benchmark code out of the paper, because it is not directly about network viz with ggplot2. Alternately, include it as an appendix? If left out, the code can be referred to by linking to the repo; that's what I would support most.} % $\hh{XXX link to the benchmark code in the repo seems like the best solution -  we should structure the runtime results somewhat and summarize there as well.} DONE - SCT.
 
 We plotted the protein interaction network of Figure~\ref{fig.cap:yeast} 100 times using the \pkg{network} and \pkg{igraph} packages, and compared their run times to 100 runs each of the three visualization approaches introduced in this paper. The results are shown in Figure~\ref{fig:timings}. We can see that on average, the \pkg{ggplot2} framework provides a two to three-fold increase in speed over the network package, and that \pkg{geomnet} and \pkg{ggnetwork} are faster than package \pkg{igraph}. The three \pkg{ggplot2} approaches also have considerably less variability in time than the \pkg{network} package.
+\hh{Despite the large number of vertices, the protein interaction network has a relatively small number of edges (4480 out of over 2.2 Million theoretically possible connections). Next, we examine networks with a higher edge probability.
+}
 
 
 \begin{figure}
@@ -1277,14 +1279,12 @@ qplot(data = tm, reorder(variable, value, median), value,
 %' system.time(plot(n, vertex.label = NA, layout = layout_randomly))
 %' @
 %'
-\hh{XXX  we have a qualitative difference to the next set of results. Where does that come from? The only possibility that I see is the edge probability - which for the protein network is \Sexpr{round(nrow(protein$edges)/choose(length(protein$vertices),2), 3)} (4480 out of over 2.2 Million theoretically possible connections). We need to investigate the effect of edge probability in more detail.
-}
 
 
 
 
 The second test relies on random undirected networks in which the probability of an edge %to exist
-between two nodes was set to \hh{$p = 0.2$}.
+between two nodes was set to $p = 0.2$.
 We generated 100 of these networks at network sizes from 25 to 250 nodes, using increments of 25. %We then computed the average plotting time at each network size.
 
  %We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}.
@@ -1337,13 +1337,12 @@ g <- lapply(g, function(x) {
 
 qplot(data = g, network_size, time, colour = `Visualization approach`, alpha = I(0.1)) +
   facet_wrap(facets = ~setup, scales = "free_y") +
-  geom_smooth(alpha = 0.5, aes(fill = `Visualization approach`)) +
+  geom_smooth(fill="white") + 
   scale_colour_brewer(palette = "Set1") +
-  scale_fill_brewer(palette = "Set1") +
   xlab("Network size (edge probability p = 0.2)") +
   ylab("Time (in seconds)") +
   theme_bw() +
-  theme(legend.position = "bottom", panel.grid.minor = element_blank())
+  theme(legend.position = "bottom")
 @
 \includegraphics[width=\textwidth]{figure/runtimes-all-1.pdf}
 \caption{\label{fig.cap:runtimes-random}%
@@ -1383,6 +1382,8 @@ These approaches also benefit from the speed of \pkg{ggplot2}, in many cases mak
 
 XXX Add discussion about sna, edgeweights, other plotting functionalities XXX
 \fb{All our approaches rely on \pkg{sna}. A larger range of layouts is available through \pkg{igraph}. However, the parameters of layouts that exist in both packages are sometimes different, e.g. \pkg{igraph} claims to support weights for F-R placement, even though it is unclear from the original article how these are supposed to affect the layout.}
+
+\hh{XXX add some discussion on igraph: it is definitely feasible to tap into the functionality of igraph in a future version of geomnet. igraph has, as of June 2015, gone through a major change of its interface, renaming layout functions and the way parameters are handled. }
 
 \hh{XXX We definitely need to discuss edge weights in the discussion. I am not sure that I have the same take on packages - I would not assume that not being under active development is equivalent to `dormant'.  }
 
