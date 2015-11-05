@@ -21,9 +21,9 @@ This paper explores three different approaches to visualize networks by building
 
   \fb{I have included some testing code + prelim. results in the "runtimes" folder.}
 
-\item %%%%%%%%%%%%
-  \sct{check that the reference commands all make sense. for instance, section 2.1 is referenced at the top of page 3 but the sections aren't labeled with numbers in the paper. Is this something to do with the template for the R Journal? }
-\hh{good point - I've changed ref to nameref.}
+% \item %%%%%%%%%%%%
+%   \sct{check that the reference commands all make sense. for instance, section 2.1 is referenced at the top of page 3 but the sections aren't labeled with numbers in the paper. Is this something to do with the template for the R Journal? }
+% \hh{good point - I've changed ref to nameref.}
 \end{enumerate}}
 
 <<setup_knitr, echo=FALSE>>=
@@ -158,8 +158,9 @@ Our objective is to bring network plotting capabilities to the popular \CRANpkg{
   %
 %  This is the audience we are aiming at by making network visualizations a part of \pkg{ggplot2}.
 Because the syntax implemented in the \pkg{ggplot2} package is extendable to many different kinds of visualizations, many packages have built additional functionalities on top of the existing package. Examples include the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRANpkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the package \CRANpkg{GGally} by \citet{ggally}, and the \BIOpkg{ggbio} Bioconductor package by \citet{ggbio}, which provides graphics for biological data.
-\sct{These packages have expanded the utility of \pkg{ggplot2}, likely resulting in a great increase of its user base. We hope to add to this user base even more by extending the benefits of the grammar of graphics to network visualization.}% Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization.
-Our efforts \sct{rely upon} the most recent changes to \pkg{ggplot2}, \sct{which allow users to more easily extend the package} through additional geometries or \samp{geoms}.%
+These packages have expanded the utility of \pkg{ggplot2}, likely resulting in a great increase of its user base. We hope to add to this user base even more by extending the benefits of the grammar of graphics to network visualization.
+% Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization.
+Our efforts rely upon the most recent changes to \pkg{ggplot2}, which allow users to more easily extend the package through additional geometries or \samp{geoms}.%
 \footnote{Version 1.1.0, released mid November 2015. See \url{https://cran.r-project.org/web/packages/ggplot2/NEWS} for the full list of changes in \pkg{ggplot2} 1.1.0, as well as the new package vignette, ``Extending ggplot2'', which explains how the internal \code{ggproto} system of object-oriented programming can be used to create new geoms.} %
   %
 
@@ -302,7 +303,7 @@ Following that logic, the \pkg{ggnetwork} package adds four aliased geometries t
 
 The four geoms are used to plot nodes, edges, node labels and edge labels, respectively. Two of the geoms that they alias, \code{geom\_curve} and \code{geom\_label}, are part of the new geometries introduced in \pkg{ggplot2} version 1.1.0. All four geoms behave exactly like those that they alias, and take exactly the same arguments. The only exception to that rule is the special case of \code{geom\_edges}, which accepts both the arguments of \code{geom\_segment} and those of \code{geom\_curve}; if its \code{curvature} argument is set to anything but \code{0} (the default), then \code{geom\_edges} behaves exactly like \code{geom\_curve}; otherwise, it behaves exactly like \code{geom\_segment}.
 
-Just like the \code{ggnet2} function, the \pkg{ggnetwork} package takes a single network object as input. \sct{This can be} an object of class \code{"network"} or some data structure coercible to that class, or an object of class \code{"igraph"} when the \pkg{intergraph} package is installed. This object is passed to the `workhorse' function of the package, which is also called \code{ggnetwork} to create a data frame, and then to the \code{data} argument of \code{ggplot()}.
+Just like the \code{ggnet2} function, the \pkg{ggnetwork} package takes a single network object as input. This can be an object of class \code{"network"}, some data structure coercible to that class, or an object of class \code{"igraph"} when the \pkg{intergraph} package is installed. This object is passed to the `workhorse' function of the package, which is also called \code{ggnetwork} to create a data frame, and then to the \code{data} argument of \code{ggplot()}.
 
 Internally, the \code{ggnetwork} function starts by computing the \code{x} and \code{y} coordinates of all nodes in the network with respect to its \code{layout} argument, which defaults to the Fruchterman-Reingold layout algorithm \citep{fruchterman_reingold}. It then extracts the edge list of the network, to which it adds the coordinates of the sender and receiver nodes as well as all edge-level attributes. The result is a data frame with as many rows as there are edges in the network, and where the \code{x}, \code{y}, \code{xend} and \code{yend} hold the coordinates of the network edges.
 
@@ -311,7 +312,7 @@ At that stage, the \code{ggnetwork} function, like the \code{geomnet} package, p
 % SCT: I don't think we should have this footnote because it doesn't quite seem necessary.
 \footnote{One limitation of this process is that it requires some reserved variable names (\code{x}, \code{y}, \code{xend} and \code{yend}), which should not also be present as edge-level or vertex-level attributes (otherwise the function will simply break). Similarly, if an edge attribute and a vertex attribute have the same name, like  \samp{na}, which the \pkg{network} package defines as an attribute for both edges and vertices in order to flag missing data, \code{ggnetwork} will rename them to \samp{na.x} (for the edge-level attribute) and \samp{na.y} (for the vertex-level attribute).} %
 
-The \code{ggnetwork} function also accepts the arguments \code{arrow.gap} and \code{by}. \sct{Like in \pkg{geomnet},} \code{arrow.gap} slightly shortens the edges of directed networks in order to avoid overplotting edge arrows and nodes. The argument \code{by} is \sct{intended for} use with plot facets. Passing an edge attribute \sct{as a grouping variable} to the \code{by} argument will cause \code{ggnetwork} to return a data frame in which each node appears as many times as there are unique values of that edge attribute, using the same coordinates for all occurrences. When that same edge attribute is also passed to either \code{facet\_wrap} or \code{facet\_grid}, each edge of the network will show in only one \sct{XXX I replaced facet with panel XXX} panel of the plot, and all nodes will appear in each of the panels at the same position. This makes the panels of the plot comparable to each other, and allows the user to visualize %edge formation
+The \code{ggnetwork} function also accepts the arguments \code{arrow.gap} and \code{by}. Like in \pkg{geomnet}, \code{arrow.gap} slightly shortens the edges of directed networks in order to avoid overplotting edge arrows and nodes. The argument \code{by} is intended for use with plot facets. Passing an edge attribute as a grouping variable to the \code{by} argument will cause \code{ggnetwork} to return a data frame in which each node appears as many times as there are unique values of that edge attribute, using the same coordinates for all occurrences. When that same edge attribute is also passed to either \code{facet\_wrap} or \code{facet\_grid}, each edge of the network will show in only one panel of the plot, and all nodes will appear in each of the panels at the same position. This makes the panels of the plot comparable to each other, and allows the user to visualize %edge formation
 the network structure as a function of a specific edge attribute, like a temporal attribute.
 
 Both the \code{arrow.gap} and the \code{by} arguments are further illustrated in the remainder of this paper.
@@ -952,7 +953,7 @@ ggplot(
 \subsection{Bikesharing in Washington D.C.} % ==================================
 
 The data shows trips taken with bikes from the bike share company Capital Bikeshare\footnote{\url{https://secure.capitalbikeshare.com/}} during the second quarter of 2015.
-While this bikesharing company is located in the heart of Washington D.C.\ the company offers a set of bike stations just outside of Washington in Rockville, MD and north of it. Each station is shown as a \sct{vertex}, \sct{and edges} between stations indicate that at least five trips were taken between these two stations; the wider the line, the more trips have been taken between stations. In order to reflect distance between stations, we use as an additional restriction that the fastest trip was at most ten minutes long.
+While this bikesharing company is located in the heart of Washington D.C.\ the company offers a set of bike stations just outside of Washington in Rockville, MD and north of it. Each station is shown as a vertex, and edges between stations indicate that at least five trips were taken between these two stations; the wider the line, the more trips have been taken between stations. In order to reflect distance between stations, we use as an additional restriction that the fastest trip was at most ten minutes long.
 Figure~\ref{fig:bikes} shows four renderings of this data. The first is a geographically true representation of the area overlaid by lines between bike stations, the other three are networks drawn with \pkg{geomnet}, \pkg{ggnet2}, and \pkg{ggnetwork}, respectively.
 The code for these renderings is shown below.
 
@@ -1114,15 +1115,14 @@ ggplot(data = ggnetwork(bikes.net, layout = matrix(coords, ncol = 2)),
 
 \subsection{Protein interactions in yeast} % ===================================
 
-% \fb{Suggestion: convert this example to a discussion point about speed.}
-% \hh{Talking about speed in the discussion is a good idea, but by the time that we go into the discussion there shouldn't be any more examples. }
-\fb{XXX I understand that the discussion should not introduce additional examples, but I'd still like to move the protein network text to discussion. What I'm suggesting is to lose the protein network as an example of viz-related functionalities (our plots of the network do not introduce any additional functionalities), and just use it as a test support for speed benchmarking at a high network size. See INSERT sentence in discussion for a suggested insert point for the text. XXX}
-\hh{XXX I'd be more in favor of going the opposite way and to drop the discussion of the protein example from the speed considerations. We don't have a handle on the different results, and by them time we do, the protein network is going to be a distraction. I've seen the INSERT point, and I think we could have a sentence there that refers back, if you want, but moving the whole example there is going to make that section even more complicated. XXX}
-\sct{XXX Originally, I added the protein network example for three reasons: first, to demonstrate the layout changes that are possible by passing the layout.par argument to geom\_net; second because it's a pretty well known example of a biological network, which we discuss in the intro; and third, it's a large network, much larger than all of our other ones, and more realistic with respect to what networks many researchers are interested. i.e. more people study networks like this than study networks like the blood, mad men, bikeshare, etc. networks. I think removing it would be detrimental to the paper. I like the idea of keeping it in the examples, adding emphasis to the reasons I put it there in the first place, and referencing it later on. XXX}
-
-
-\sct{In our examples thus far, we have focused on rather small social or relationship networks and one larger communication network. Now we present an} example of a biological network, which comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 2,113 proteins that make up the vertices of this network, with a total of 4480 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}, resulting in a relatively large  network. Despite its size, each one of the approaches in the \pkg{ggplot2} framework can be drawn in a few hundred milliseconds. A more in-depth discussion on plotting speed follows in the next section. The proteins and the interactions between them are plotted in the networks shown in Figure~\ref{fig.cap:yeast}. %These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}.
-In this visualization, we demonstrate the layout capabilities of our functions by changing the layout to \code{random} and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout \citep{sna}.  Indeed, we see a near circular area in the middle of the graph because the layout parameter has forced all of the vertices to the exterior, leaving a ``donut hole" in the middle. Because all of the approaches result in nearly identical figures, only one network is shown. The code for all three approaches is given below.
+% % \fb{Suggestion: convert this example to a discussion point about speed.}
+% % \hh{Talking about speed in the discussion is a good idea, but by the time that we go into the discussion there shouldn't be any more examples. }
+% \fb{XXX I understand that the discussion should not introduce additional examples, but I'd still like to move the protein network text to discussion. What I'm suggesting is to lose the protein network as an example of viz-related functionalities (our plots of the network do not introduce any additional functionalities), and just use it as a test support for speed benchmarking at a high network size. See INSERT sentence in discussion for a suggested insert point for the text. XXX}
+% \hh{XXX I'd be more in favor of going the opposite way and to drop the discussion of the protein example from the speed considerations. We don't have a handle on the different results, and by them time we do, the protein network is going to be a distraction. I've seen the INSERT point, and I think we could have a sentence there that refers back, if you want, but moving the whole example there is going to make that section even more complicated. XXX}
+% \sct{XXX Originally, I added the protein network example for three reasons: first, to demonstrate the layout changes that are possible by passing the layout.par argument to geom\_net; second because it's a pretty well known example of a biological network, which we discuss in the intro; and third, it's a large network, much larger than all of our other ones, and more realistic with respect to what networks many researchers are interested. i.e. more people study networks like this than study networks like the blood, mad men, bikeshare, etc. networks. I think removing it would be detrimental to the paper. I like the idea of keeping it in the examples, adding emphasis to the reasons I put it there in the first place, and referencing it later on. XXX}
+% 
+In our examples thus far, we have focused on rather small social or relationship networks and one larger communication network. Now we present an example of a biological network, which comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 2,113 proteins that make up the vertices of this network, with a total of 4480 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}, resulting in a relatively large  network. Despite its size, each one of the approaches in the \pkg{ggplot2} framework can be drawn in a few hundred milliseconds. A more in-depth discussion on plotting speed follows in the next section. The proteins and the interactions between them are plotted in the networks shown in Figure~\ref{fig.cap:yeast}. %These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}.
+In this visualization, we demonstrate the layout capabilities of our functions by changing the layout to \code{random} and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout \citep{sna}.  Indeed, we see a near circular area in the middle of the graph because the layout parameter has forced all of the vertices to the exterior, leaving a ``donut hole" in the middle. Because all of the approaches result in nearly identical figures, only one network is shown. The code for all three approaches is given below:
 
 <<yeast_ggnet2, echo=TRUE, eval = FALSE, cache=FALSE>>=
 # plot with ggnet2
@@ -1156,21 +1156,21 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 \end{figure}
 %\afterpage{\clearpage}
 
-\newpage
+%\newpage
 \section{Some considerations of speed}\label{sec:speed}
 % \hh{XXX So, the testing waters are much more muddy than anticipated. What we can do, though, is to describe the testing scenario(s), and then report our findings with an attempt to summarize. XXX I've added a facetted plot to show the variability in the results that we've seen between the different machines. I made a few changes to the plot, as you can see - using a smooth allows us to see a trend, while the points show variability and give some indication of the distribution (I don't like min and max for that because they are the least robust measures). I also want to see where the actual measurements are taken - that's the reason for showing the points. XXX}
 
 Another benefit that emerges from using \pkg{ggplot2} for network visualization is the speed at which it can plot fairly large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{network} package. They also show the \pkg{ggplot2} approaches to be largely on par with the speed provided by the \pkg{igraph} package. We first investigate average plotting time
 of the protein network%
 \footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes-protein/run.r} for the code to recreate results for visualizing the protein interaction network.} 
-shown in Figure~\ref{fig.cap:yeast}, and then consider average plotting times of increasingly larger random networks. \sct{Note that in all tests, default package settings were used.}%
+shown in Figure~\ref{fig.cap:yeast}, and then consider average plotting times of increasingly larger random networks. Note that in all tests, default package settings were used.%
 \footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes/run.r} for code to recreate benchmark results for visualizing random networks.}
 %
 
 %so, what should we do? include one of these? or both? I'd support leaving the benchmark code out of the paper, because it is not directly about network viz with ggplot2. Alternately, include it as an appendix? If left out, the code can be referred to by linking to the repo; that's what I would support most.} % $\hh{XXX link to the benchmark code in the repo seems like the best solution -  we should structure the runtime results somewhat and summarize there as well.} DONE - SCT.
 
 We plotted the protein interaction network of Figure~\ref{fig.cap:yeast} 100 times using the \pkg{network} and \pkg{igraph} packages, and compared their run times to 100 runs each of the three visualization approaches introduced in this paper. The results are shown in Figure~\ref{fig:timings}. We can see that on average, the \pkg{ggplot2} framework provides a two to three-fold increase in speed over the network package, and that \pkg{geomnet} and \pkg{ggnetwork} are faster than package \pkg{igraph}. The three \pkg{ggplot2} approaches also have considerably less variability in time than the \pkg{network} package.
-
+Despite the large number of vertices, the protein interaction network has a relatively small number of edges (4480 out of over 2.2 Million theoretically possible connections resulting in an edge probability of just over 0.0020). Next, we examine networks with a higher edge probability.
 
 \begin{figure}
 \centering
@@ -1277,14 +1277,10 @@ qplot(data = tm, reorder(variable, value, median), value,
 %' system.time(plot(n, vertex.label = NA, layout = layout_randomly))
 %' @
 %'
-\hh{XXX  we have a qualitative difference to the next set of results. Where does that come from? The only possibility that I see is the edge probability - which for the protein network is \Sexpr{round(nrow(protein$edges)/choose(length(protein$vertices),2), 3)} (4480 out of over 2.2 Million theoretically possible connections). We need to investigate the effect of edge probability in more detail.
-}
-
-
 
 
 The second test relies on random undirected networks in which the probability of an edge %to exist
-between two nodes was set to \hh{$p = 0.2$}.
+between two nodes was set to $p = 0.2$.
 We generated 100 of these networks at network sizes from 25 to 250 nodes, using increments of 25. %We then computed the average plotting time at each network size.
 
  %We then computed the average plotting time at each network size, as shown in Figure~\ref{fig.cap:runtimes-random}.
@@ -1337,18 +1333,17 @@ g <- lapply(g, function(x) {
 
 qplot(data = g, network_size, time, colour = `Visualization approach`, alpha = I(0.1)) +
   facet_wrap(facets = ~setup, scales = "free_y") +
-  geom_smooth(alpha = 0.5, aes(fill = `Visualization approach`)) +
+  geom_smooth(fill="white") + 
   scale_colour_brewer(palette = "Set1") +
-  scale_fill_brewer(palette = "Set1") +
   xlab("Network size (edge probability p = 0.2)") +
   ylab("Time (in seconds)") +
   theme_bw() +
-  theme(legend.position = "bottom", panel.grid.minor = element_blank())
+  theme(legend.position = "bottom")
 @
 \includegraphics[width=\textwidth]{figure/runtimes-all-1.pdf}
 \caption{\label{fig.cap:runtimes-random}%
 %  Average plotting time of random undirected networks, in seconds: ribbon at minimum and maximum recorded times, solid line at average. The time ranges of the \code{ggnet2} and \code{ggnetwork} approaches are quasi-identical and form the single purple line at the bottom of the plot.
-\hh{Plotting times of random undirected networks of different sizes under each of the available visualization approaches \sct{using their default settings}. Note that each panel is scaled independently to highlight relative differences in the visualization approaches rather than speed of different hardware.}
+Plotting times of random undirected networks of different sizes under each of the available visualization approaches using their default settings. Note that each panel is scaled independently to highlight relative differences in the visualization approaches rather than speed of different hardware.
 %\fb{Can't remember how I styled the figure in the beginning, but I remember trying to match the previous one by using theme\_classic. We need to harmonize them.} \hh{XXX I'm all for consistency of the figures, but let's please use a theme that has grid lines. They are important for accurate readings. }%
 }
 \end{figure}
@@ -1362,12 +1357,9 @@ The \pkg{network} plotting routine is by far the slowest across all machines, wh
 
 Although speed was not the main rationale for our inquiry into \pkg{ggplot2}-based approaches to network visualization, a speed-based comparison shows a clear advantage of these approaches over the plotting function included in the \pkg{network} package, which very quickly becomes much slower as network size increases.
 
-\hh{
-XXX how does edge probability affect these results?
-XXX how do the different layouts affect the results? }
-
-
-
+% \hh{
+% XXX how does edge probability affect these results?
+% XXX how do the different layouts affect the results? }
 
 
 \section{Summary and Discussion}
@@ -1383,6 +1375,8 @@ These approaches also benefit from the speed of \pkg{ggplot2}, in many cases mak
 
 XXX Add discussion about sna, edgeweights, other plotting functionalities XXX
 \fb{All our approaches rely on \pkg{sna}. A larger range of layouts is available through \pkg{igraph}. However, the parameters of layouts that exist in both packages are sometimes different, e.g. \pkg{igraph} claims to support weights for F-R placement, even though it is unclear from the original article how these are supposed to affect the layout.}
+
+\hh{XXX add some discussion on igraph: it is definitely feasible to tap into the functionality of igraph in a future version of geomnet. igraph has, as of June 2015, gone through a major change of its interface, renaming layout functions and the way parameters are handled. }
 
 \hh{XXX We definitely need to discuss edge weights in the discussion. I am not sure that I have the same take on packages - I would not assume that not being under active development is equivalent to `dormant'.  }
 
