@@ -15,9 +15,9 @@
 \usepackage{color}
 \definecolor{purple}{rgb}{.4,0,.8}
 \definecolor{darkgreen}{rgb}{0.24, 0.7, 0.44}
-\newcommand{\hh}[1]{{\color{magenta} #1}}
-\newcommand{\sct}[1]{{\color{purple} #1}}
-\newcommand{\fb}[1]{{\color{darkgreen} #1}}
+%\newcommand{\hh}[1]{{\color{magenta} #1}}
+%\newcommand{\sct}[1]{{\color{purple} #1}}
+%\newcommand{\fb}[1]{{\color{darkgreen} #1}}
 
 
     \renewcommand{\topfraction}{1}	% max fraction of floats at top

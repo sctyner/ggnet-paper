@@ -4,27 +4,27 @@
 
 \maketitle
 \abstract{
-This paper explores three different approaches to visualize networks by building on the grammar of graphics framework implemented in the \pkg{ggplot2} package. The goal of each approach is to provide the user with the ability to apply the flexibility of \pkg{ggplot2} to the visualization of network data, including through the mapping of network attributes to specific plot aesthetics. We will show that these additions contribute significantly to the study of networks by making visualization of networks intuitive, \sct{both for users who are familiar with \pkg{ggplot2} and for those who are not}.
+This paper explores three different approaches to visualize networks by building on the grammar of graphics framework implemented in the \pkg{ggplot2} package. The goal of each approach is to provide the user with the ability to apply the flexibility of \pkg{ggplot2} to the visualization of network data, including through the mapping of network attributes to specific plot aesthetics. We will show that these additions contribute significantly to the study of networks by making visualization of networks intuitive, both for users who are familiar with \pkg{ggplot2} and for those who are not.
 }
 
-\hh{TODO list:
-
-\begin{enumerate}
-
-\item %%%%%%%%%%%%
-  \hh{start of end phase!!! Proof read. Check examples for consistency.}
-
-  \fb{I have started moving some in-text comments to discussion or out when the problem that they flagged has been solved.}
-
-\item %%%%%%%%%%%%
-  \hh{need to re-run the timing after all the changes are made to the packages. }
-
-  \fb{I have included some testing code + prelim. results in the "runtimes" folder.}
+% \hh{TODO list:
+% 
+% \begin{enumerate}
+% 
+% \item %%%%%%%%%%%%
+%   \hh{start of end phase!!! Proof read. Check examples for consistency.}
+% 
+%   \fb{I have started moving some in-text comments to discussion or out when the problem that they flagged has been solved.}
+% 
+% \item %%%%%%%%%%%%
+%   \hh{need to re-run the timing after all the changes are made to the packages. }
+% 
+%   \fb{I have included some testing code + prelim. results in the "runtimes" folder.}
 
 % \item %%%%%%%%%%%%
 %   \sct{check that the reference commands all make sense. for instance, section 2.1 is referenced at the top of page 3 but the sections aren't labeled with numbers in the paper. Is this something to do with the template for the R Journal? }
 % \hh{good point - I've changed ref to nameref.}
-\end{enumerate}}
+%\end{enumerate}}
 
 <<setup_knitr, echo=FALSE>>=
 library(knitr)
@@ -150,7 +150,7 @@ Many R packages already exist for network analysis and visualization such as \CR
 % ggplot2 as an implementation framework
 Our objective is to bring network plotting capabilities to the popular \CRANpkg{ggplot2} package \citep{ggplot2}. Wickham designed it as an implementation of the `grammar of graphics' proposed by \citet{wilkinson:1999}, and \pkg{ggplot2} has since become extremely popular among R users.%
 \footnote{In order to give an indication of how  large the user base of \pkg{ggplot2} is, we looked at its usage statistics from January 1, 2015 to October 31, 2015 (see \url{http://cran-logs.rstudio.com/}). Over this period, the \pkg{ggplot2} package was downloaded over 1.3 million times from CRAN, which amounts to over 4,500 downloads per day. The package has been downloaded at least once in 216 countries, and in 22 of those countries, including China, Israel, and Colombia, it has been downloaded over 10,000 times.} %
-\sct{XXX I do not think that the line about Python is relevant, as we are submitting this to the R journal. I have commented it out for now. XXX}
+%\sct{XXX I do not think that the line about Python is relevant, as we are submitting this to the R journal. I have commented it out for now. XXX}
   %to the point that it has even inspired a port of its syntax to the Python programming language, which is a rare achievement for an R package.%
   %
   %\footnote{See \url{http://ggplot.yhathq.com/}.} %
@@ -1360,13 +1360,13 @@ Although speed was not the main rationale for our inquiry into \pkg{ggplot2}-bas
 
 
 \section{Summary and Discussion}
-\sct{XXX I am going to attempt to pull all of this together into a complete, coherent discussion section.  I removed all of your colors and just kept mine in most places. XXX}
+%\sct{XXX I am going to attempt to pull all of this together into a complete, coherent discussion section.  I removed all of your colors and just kept mine in most places. XXX}
 
 
 
 At first  glance, the three visualization approaches may seem nearly identical.
 However, %we have seen through our collaboration that HH: should be clear from the paper, too
-each one brings unique strengths to the visualization of networks.   Out of our three approaches, \pkg{ggnetwork} is most flexible and allows for a re-ordering of layers to emphasize one over the other. The flexibility is useful but does require the user to specify every single part of the network visualization. The \pkg{geomnet} implementation most closely aligns with the existing \pkg{ggplot2} paradigm because it provides a single layer that can be added to other \code{ggplot2} layers. \hh{ \pkg{ggnet2} requires the user to know the least about the \pkg{ggplot2} framework, while resulting in a valid and extensible \pkg{ggplot2} object.} %\sct{XXX Need more discussion of differing strengths XXX}
+each one brings unique strengths to the visualization of networks.   Out of our three approaches, \pkg{ggnetwork} is most flexible and allows for a re-ordering of layers to emphasize one over the other. The flexibility is useful but does require the user to specify every single part of the network visualization. The \pkg{geomnet} implementation most closely aligns with the existing \pkg{ggplot2} paradigm because it provides a single layer that can be added to other \code{ggplot2} layers. \pkg{ggnet2} requires the user to know the least about the \pkg{ggplot2} framework, while resulting in a valid and extensible \pkg{ggplot2} object. %\sct{XXX Need more discussion of differing strengths XXX}
 
 %Additionally, 
 Many features of the packages would not have been possible, or would have at least been difficult to implement, in  prior versions of \pkg{ggplot2}.  The increased flexibility of the current development version as well as the added \code{geom}s \code{geom\_curve} and \code{geom\_label} provided us with a strong, yet flexible, foundation for network visualization.
@@ -1381,8 +1381,8 @@ All three approaches rely on the package \pkg{sna} for layouts. \pkg{sna} unlike
 %\hh{XXX We definitely need to discuss edge weights in the discussion. I am not sure that I have the same take on packages - I would not assume that not being under active development is equivalent to `dormant'.  }
 
 We have found that none of our approaches is unequivocally the best. We can, however, provide some guidance as to which approach is best for which type of user. 
-\hh{The main differences between the three packages are in the way that network information is passed into the functions. For packages \pkg{ggnet2} and \pkg{ggnetwork} data management and attribute handling is done through network operators on nodes and edges, while the \pkg{geomnet} approach does not require any knowledge of networks or existing network analysis packages from the user. 
-This likely affects the user base of each package. }
+The main differences between the three packages are in the way that network information is passed into the functions. For packages \pkg{ggnet2} and \pkg{ggnetwork} data management and attribute handling is done through network operators on nodes and edges, while the \pkg{geomnet} approach does not require any knowledge of networks or existing network analysis packages from the user. 
+This likely affects the user base of each package. 
 We think that users who are well-versed with networks will find \pkg{ggnet2} and \pkg{ggnetwork} more intuitive to use. These users might actually be looking to \pkg{ggplot2} to create high-quality visualizations that also have many additional visualization features open to them.
 
 
