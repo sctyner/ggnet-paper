@@ -26,117 +26,10 @@ This paper explores three different approaches to visualize networks by building
 % \hh{good point - I've changed ref to nameref.}
 %\end{enumerate}}
 
-<<setup_knitr, echo=FALSE>>=
-library(knitr)
-opts_chunk$set(
-  tidy = FALSE, echo = FALSE, cache = FALSE, eval = TRUE,
-  message = FALSE, warning = FALSE, highlight = FALSE, background = '#FFFFFF',
-  fig.height = 8, fig.width = 8, fig.align = 'center', fig.show = 'hide'
-)
-
-## From Josh O'Brien's stackoverflow answer:
-## http://stackoverflow.com/questions/11030898/knitr-how-to-align-code-and-plot-side-by-side
-## These two settings control text width in codefig vs. usual code blocks
-partWidth <- 35
-fullWidth <- 60
-options(width = fullWidth)
-
-##  (1) CHUNK HOOK FUNCTION
-##   First, to set R's textual output width on a per-chunk basis, we
-## need to define a hook function which temporarily resets global R's
-## option() settings, just for the current chunk
-knit_hooks$set(r.opts = local({
-    ropts <- NA
-    function(before, options, envir) {
-        if (before) {
-            ropts <<- options(options$r.opts)
-        } else {
-            options(ropts)
-        }
-    }
-}))
-
-## (2) OUTPUT HOOK FUNCTION
-
-##   Define a custom output hook function. This function processes _all_
-## evaluated chunks, but will return the same output as the usual one,
-## UNLESS a 'codefig' argument appeared in the chunk's header.  In that
-## case, wrap the usual textual output in LaTeX code placing it in a
-## narrower adjustbox environment and setting the graphics that it
-## produced in another box beside it.
-
-defaultChunkHook <- environment(knit_hooks[["get"]])$defaults$chunk
-
-codefigChunkHook <- function(x, options) {
-        main <-  defaultChunkHook(x, options)
-        before <-
-            "\\vspace{1em}\n
-             \\begin{adjustbox}{valign=t}\n
-             \\begin{minipage}{.49\\textwidth}\n"
-        after <-
-            paste("\\vspace{1em}\n
-                   \\end{minipage}\n
-                  \\begin{minipage}{.49\\textwidth}\n",
-                   paste0("\\includegraphics[width=\\textwidth]{figure/",
-                          options[["label"]], "-1.pdf}\n
-                          \\end{minipage}\n
-                          \\end{adjustbox}"),
-                          sep = "\n")
-    ## Was a codefig option supplied in chunk header?
-    ## If so, wrap code block and graphical output with needed LaTeX code.
-    if (!is.null(options$codefig)) {
-      return(sprintf("%s %s %s", before, main, after))
-    } else {
-      return(main)
-    }
-}
-
-knit_hooks[["set"]](chunk = codefigChunkHook)
 
 
-## (3) TEMPLATE
-##   codefig=TRUE is just one of several options needed for the
-## side-by-side code block and a figure to come out right. Rather
-## than typing out each of them in every single chunk header, we
-## define a _template_ which bundles them all together. Then we can
-## set all of those options simply by typing opts.label="codefig".
-
-opts_template[["set"]](
-codefig = list(codefig = TRUE, fig.show = "hide",
-               r.opts = list(width = partWidth),
-               tidy.opts = list(width.cutoff = partWidth)))
-@
 
 
-<<load_packages, results='hide'>>=
-library(dplyr)
-library(tidyr)
-library(ggplot2) # needs to be version ≥ 1.0.1.9003
-library(scales)
-
-## ggnet2
-if (!require(ggnet, quietly = TRUE)) {
-  devtools::install_github("briatte/ggnet")
-}
-library(ggnet)
-
-## geom_net
-if (!require(geomnet, quietly = TRUE)) {
-  devtools::install_github("sctyner/geomnet")
-}
-library(geomnet)
-
-## ggnetwork
-if (!require(ggnetwork, quietly = TRUE) ||
-    packageVersion("ggnetwork") < "0.2.1") {
-  devtools::install_github("briatte/ggnetwork")
-}
-library(ggnetwork)
-
-## pre-load
-library(network)
-library(sna)
-@
 
 % introductory section
 \par There are many kinds of networks, and networks are extensively studied across many disciplines \citep{watts2004ars}. For instance, social network analysis is a longstanding and prominent subfield of sociology, and the study of biological networks, such as protein-protein interaction networks or metabolic networks, is a notable subfield of biology \citep{prell2011social, junker2008analysis}. Though these two disciplines and the many others that study networks are themselves extremely different, they can all benefit from good network visualization methods.
@@ -180,20 +73,7 @@ An even more common network example is a social network. A social network is a n
 
 \begin{figure}[hbtp]
 \centering
-<<madmen_geom_net, fig.width=7, fig.height=7.5>>=
-# code for geom_net
-# data step: merge edges and nodes
-MMnet <- merge(madmen$edges, madmen$vertices,
-               by.x = "Name1", by.y = "label", all = TRUE)
-# create plot
-ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
-  geom_net(aes(colour = Gender), size = 4, label = TRUE,
-           vjust = -0.6, ecolour = "grey60") +
-  scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
-  xlim(c(-0.05, 1.05)) +
-  theme_net() +
-  theme(legend.position = "bottom")
-@
+
 \includegraphics[width=0.6\textwidth]{figure/madmen_geom_net-1.pdf}
 \caption{\label{fig.cap:madmen} Graph of the characters in the show Mad Men who are linked by a romantic relationship. }
 \end{figure}
@@ -336,18 +216,22 @@ In this directed network, there are eight vertices and 27 edges.  The vertices r
 % \begin{figure}[hbtp]
 % \caption{\label{tab:blood}Code for the three different approaches showing the blood donation network of figure~\ref{fig.cap:blood}.}
 
-<<blood_common>>=
-data(blood, package = "geomnet")
-@
+
 %
-<<blood_ggnet2,  echo=TRUE, fig.width=6, fig.height=6>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # plot with ggnet2
 ggnet2(network(blood$edges[, 1:2]), mode = "circle", size = 15,
        label = TRUE, arrow.size = 10, arrow.gap = 0.05, vjust = 0.5,
        node.color = "darkred", label.color = "grey80")
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
-<<blood_geom_net, echo=TRUE, fig.width=6, fig.height=6>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # plot with geomnet
 ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
   geom_net(colour = "darkred", layout = "circle", label = TRUE, size = 15,
@@ -355,9 +239,13 @@ ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
            arrowsize = 1.5, linewidth = 0.5, arrowgap = 0.05,
            selfies = TRUE, ecolour = "grey40") +
   theme_net()
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
-<<blood_ggnetwork, echo=TRUE, fig.width=6, fig.height=6>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # plot with ggnetwork
 ggplot(ggnetwork(network(blood$edges[, 1:2]),
                  layout = "circle", arrow.gap = 0.05),
@@ -367,7 +255,9 @@ ggplot(ggnetwork(network(blood$edges[, 1:2]),
   geom_nodes(size = 15, color = "darkred") +
   geom_nodetext(aes(label = vertex.names), color = "grey80") +
   theme_blank()
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
 In this example every vertex has a self-reference, as blood between two people of matching ABO and RhD type can always be exchanged.  The \pkg{geomnet} approach shows these self-references as circles looping back to the vertex, which is controlled by using the parameter setting \code{selfies = TRUE}.
 
@@ -395,7 +285,14 @@ In this example every vertex has a self-reference, as blood between two people o
 \begin{figure}[hbt]
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
-<<email_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
+\vspace{1em}
+
+             \begin{adjustbox}{valign=t}
+
+             \begin{minipage}{.49\textwidth}
+ \begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 em.cet <- as.character(
   email$nodes$CurrentEmploymentType)
 names(em.cet) = email$nodes$label
@@ -413,13 +310,32 @@ ggnet2(em.net, color = "curr_empl_type",
        edge.color = c("color", "grey50"),
        color.legend = "Employment Type") +
   theme(legend.position = "bottom")
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout} \vspace{1em}
+
+                   \end{minipage}
+
+                  \begin{minipage}{.49\textwidth}
+
+\includegraphics[width=\textwidth]{figure/email_ggnet2-1.pdf}
+
+                          \end{minipage}
+
+                          \end{adjustbox}
 
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{geomnet}
-<<email_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
+\vspace{1em}
+
+             \begin{adjustbox}{valign=t}
+
+             \begin{minipage}{.49\textwidth}
+ \begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 emailnet <- merge(
   subset(email$edges, nrecipients < 54),
   email$nodes,
@@ -437,12 +353,31 @@ ggplot(data = emailnet,
   scale_colour_brewer("Employment Type", palette = "Set1") +
   theme_net() +
   theme(legend.position = "bottom")
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout} \vspace{1em}
+
+                   \end{minipage}
+
+                  \begin{minipage}{.49\textwidth}
+
+\includegraphics[width=\textwidth]{figure/email_geom_net-1.pdf}
+
+                          \end{minipage}
+
+                          \end{adjustbox}
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork}
-<<email_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
+\vspace{1em}
+
+             \begin{adjustbox}{valign=t}
+
+             \begin{minipage}{.49\textwidth}
+ \begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 ggplot(ggnetwork(em.net, arrow.gap = 0.02),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges(
@@ -457,7 +392,19 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02),
                      palette = "Set1") +
   theme_blank() +
   theme(legend.position = "bottom")
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout} \vspace{1em}
+
+                   \end{minipage}
+
+                  \begin{minipage}{.49\textwidth}
+
+\includegraphics[width=\textwidth]{figure/email_ggnetwork-1.pdf}
+
+                          \end{minipage}
+
+                          \end{adjustbox}
 \end{subfigure}
 
 \caption{\label{fig.cap:email} Email network within a company over a two week period.}
@@ -512,7 +459,9 @@ To visualize how this network  changes over time, we facet the network by day: e
 \caption{\label{fig:email_facet} The same email network as in figure~\ref{fig.cap:email} facetted by day of the week.}
 \end{figure}
 \afterpage{\clearpage}
-<<email_facet_ggnet2, fig.height=4, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # ggnet2 code for the email network facetted by day as shown in fig.4a
 
 # data preparation
@@ -537,9 +486,13 @@ for (i in 1:length(em.day)) {
           aspect.ratio = 1)
 }
 gridExtra::grid.arrange(grobs = g, nrow = 2)
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
-<<email_facet_geom_net, fig.height=4.5, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # geomnet code for the  email network facetted by day as shown in fig.4b
 
 # data step: making sure that there is one entry for each person on each day
@@ -562,9 +515,13 @@ ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
   theme(legend.position = "bottom",
         panel.border = element_rect(fill = NA, colour = "grey60"),
         plot.margin = unit(c(0, 0, 0, 0), "mm"))
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
-<<email_facet_ggnetwork, fig.height=4, fig.width=8,echo=TRUE, out.width='\\textwidth'>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # ggnetwork code for the  email network facetted by day as shown in fig.4c
 
 # create the network and aesthetics
@@ -588,7 +545,9 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
                      palette = "Set1") +
   facet_wrap(~day, nrow = 2, labeller = "label_both") +
   theme_facet(legend.position = "bottom")
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
 Note that the main difference in the visualizations of Figure~\ref{fig:email_facet} stems from whether \emph{one} layout is used across all panels (as for the \code{ggnetwork} example) or whether individual layouts are fit to each of the subsets (as for the \code{ggnet2} and the \code{geomnet} examples). In \code{geomnet} this is controlled via the argument \code{fiteach}. By default  \code{fiteach = TRUE}, but \code{fiteach = FALSE} results in all panels sharing the same layout. Through the facetting it becomes obvious that there are several days where one or more of the departments does not communicate with any of the other departments. There are only two days, day 13 and day 15, without any isolated department communications. Facetting is one of the major benefits of implementing tools for network visualization in \pkg{ggplot2}. Facetting allows the user to quickly separate dense networks into smaller subnetworks for easy visual comparison and analyses, a feature that the other network visualization tools do not have.
 
@@ -599,19 +558,45 @@ This example comes from the \code{theme()} help page in the \pkg{ggplot2} docume
 \begin{figure}[hbtp]
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
-<<theme_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+\vspace{1em}
+
+             \begin{adjustbox}{valign=t}
+
+             \begin{minipage}{.49\textwidth}
+ \begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 te.net <- network(theme_elements$edges)
 te.net %v% "size" <-
   sqrt(10 * (sna::degree(te.net) + 1))
 
 ggnet2(te.net, label = TRUE, color = "white",
        label.size = "size", layout.exp = 0.15)
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout} \vspace{1em}
+
+                   \end{minipage}
+
+                  \begin{minipage}{.49\textwidth}
+
+\includegraphics[width=\textwidth]{figure/theme_ggnet2-1.pdf}
+
+                          \end{minipage}
+
+                          \end{adjustbox}
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{geomnet}
-<<theme_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE, fig.width=7, fig.height = 7>>=
+\vspace{1em}
+
+             \begin{adjustbox}{valign=t}
+
+             \begin{minipage}{.49\textwidth}
+ \begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # data step: merge nodes and edges and
 # introduce a degree-out variable
 TEnet <- merge(
@@ -632,12 +617,31 @@ ggplot(data = TEnet,
     linewidth = 0.5) +
   theme_net() +
   xlim(c(-0.05, 1.05))
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout} \vspace{1em}
+
+                   \end{minipage}
+
+                  \begin{minipage}{.49\textwidth}
+
+\includegraphics[width=\textwidth]{figure/theme_geom_net-1.pdf}
+
+                          \end{minipage}
+
+                          \end{adjustbox}
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
-<<theme_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+\vspace{1em}
+
+             \begin{adjustbox}{valign=t}
+
+             \begin{minipage}{.49\textwidth}
+ \begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 ggplot(ggnetwork(te.net),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges() +
@@ -647,7 +651,19 @@ ggplot(ggnetwork(te.net),
   scale_size_continuous(range = c(4, 8)) +
   guides(size = FALSE) +
   theme_blank()
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout} \vspace{1em}
+
+                   \end{minipage}
+
+                  \begin{minipage}{.49\textwidth}
+
+\includegraphics[width=\textwidth]{figure/theme_ggnetwork-1.pdf}
+
+                          \end{minipage}
+
+                          \end{adjustbox}
 \end{subfigure}
 
 \caption{\label{fig.cap:theme} Inheritance structure of \pkg{ggplot2} theme elements. This is a recreation of the graph found at \protect\url{http://docs.ggplot2.org/current/theme.html}.}
@@ -663,7 +679,9 @@ The inheritance structure is plotted in figure \ref{fig.cap:theme}.  In these pl
 
 The code for the other two approaches follows below and the corresponding networks are shown in figure~\ref{fig:madmen-2}.
 
-<<madmen_prepare, echo=TRUE>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # data step for both ggnet2 and ggnetwork
 # create undirected network
 mm.net <- network(madmen$edges[, 1:2], directed = FALSE)
@@ -674,15 +692,23 @@ mm.net %v% "gender" <- as.character(
 )
 # gender color palette
 mm.col <- c("female" = "#ff69b4", "male" = "#0099ff")
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
-<<madmen_ggnet2, echo=TRUE, out.width='\\textwidth', fig.width=9, fig.height=9>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
        label = TRUE, label.color = mm.col[ mm.net %v% "gender" ],
        size = 4, vjust = -0.6)
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
-<<madmen_ggnetwork, echo=TRUE,  out.width='\\textwidth', fig.width=9, fig.height=9>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
   geom_edges(color = "grey50") +
   geom_nodes(aes(colour = gender), size = 4) +
@@ -692,7 +718,9 @@ ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
   xlim(c(-0.05, 1.05)) +
   theme_blank() +
   theme(legend.position = "bottom")
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
 \begin{figure}[hbtp]
 \begin{subfigure}[t]{.495\textwidth}
@@ -711,7 +739,9 @@ ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
  There is another Mad Men network given in the \pkg{gcookbook} package \citep{madmen}. It is a directed network, also of romantic relationships between characters, but it additionally includes all advances made by one character that were rejected by the other.  For example, Roger Sterling made advances toward Betty Draper, but Betty refused him,  so there is a directed edge going from Roger to Betty, but not from Betty to Roger.  If the advance is reciprocated, such as between Sal Romano and the Bellhop, there are two directed edges between the two vertices.
 
 \begin{figure}
-<<madmen2_prepare, echo = TRUE>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # data step for ggnet2 and ggnetwork
 # create directed network
 mm.dir <- network(mm.directed$edges, directed = TRUE)
@@ -720,14 +750,23 @@ rownames(mm.directed$vertices) <- mm.directed$vertices$label
 mm.dir %v% "gender" <- as.character(
   mm.directed$vertices[ network.vertex.names(mm.dir), "Gender" ]
 )
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 \caption{\label{mm2:datastep} Data preparation for the directed network of the  Mad Men example in Figures~\ref{mm2:ggnet2} and~\ref{mm2:ggnetwork}.}
 
 \end{figure}
 \begin{figure}[hbtp]
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2\label{mm2:ggnet2}}
-<<madmen2_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+\vspace{1em}
+
+             \begin{adjustbox}{valign=t}
+
+             \begin{minipage}{.49\textwidth}
+ \begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # see fig.7 for data preparation
 
 ggnet2(
@@ -739,12 +778,31 @@ ggnet2(
   layout.exp = 0.15, arrow.size = 7.5,
   arrow.gap = 0.02
 )
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout} \vspace{1em}
+
+                   \end{minipage}
+
+                  \begin{minipage}{.49\textwidth}
+
+\includegraphics[width=\textwidth]{figure/madmen2_ggnet2-1.pdf}
+
+                          \end{minipage}
+
+                          \end{adjustbox}
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{geomnet}
-<<madmen2_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+\vspace{1em}
+
+             \begin{adjustbox}{valign=t}
+
+             \begin{minipage}{.49\textwidth}
+ \begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 MM2net <- merge(
   mm.directed$edges,
   mm.directed$vertices,
@@ -762,12 +820,31 @@ ggplot(data = MM2net,
   xlim(c(-0.1, 1.1)) +
    theme_net() +
   theme(legend.position = "bottom")
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout} \vspace{1em}
+
+                   \end{minipage}
+
+                  \begin{minipage}{.49\textwidth}
+
+\includegraphics[width=\textwidth]{figure/madmen2_geom_net-1.pdf}
+
+                          \end{minipage}
+
+                          \end{adjustbox}
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork \label{mm2:ggnetwork}}
-<<madmen2_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, dependson="madmen2_ggnet2">>=
+\vspace{1em}
+
+             \begin{adjustbox}{valign=t}
+
+             \begin{minipage}{.49\textwidth}
+ \begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # see fig.7 for data preparation
 
 ggplot(
@@ -785,7 +862,19 @@ ggplot(
   scale_color_manual(values = mm.col) +
   theme_blank() +
   theme(legend.position = "bottom")
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout} \vspace{1em}
+
+                   \end{minipage}
+
+                  \begin{minipage}{.49\textwidth}
+
+\includegraphics[width=\textwidth]{figure/madmen2_ggnetwork-1.pdf}
+
+                          \end{minipage}
+
+                          \end{adjustbox}
 \end{subfigure}
 \caption{\label{fig.cap:madmen2} A directed network of relationships in Mad Men.}
 \end{figure}
@@ -802,7 +891,14 @@ The network of football games is given in figure \ref{fig.cap:football}. Here, w
 \begin{figure}[hbtp]
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}\vspace{-.5cm}
-<<football_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+\vspace{1em}
+
+             \begin{adjustbox}{valign=t}
+
+             \begin{minipage}{.49\textwidth}
+ \begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 rownames(football$vertices) <-
   football$vertices$label
 
@@ -820,12 +916,31 @@ ggnet2(fb.net, mode = "fruchtermanreingold",
        color = "conf",  palette = "Paired",
        color.legend = "Conference",
        edge.color = c("color", "grey75"))
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout} \vspace{1em}
+
+                   \end{minipage}
+
+                  \begin{minipage}{.49\textwidth}
+
+\includegraphics[width=\textwidth]{figure/football_ggnet2-1.pdf}
+
+                          \end{minipage}
+
+                          \end{adjustbox}
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
 \caption{geomnet}\vspace{-.5cm}
-<<football_geom_net, size="footnotesize", fig.height=10, opts.label="codefig", echo=TRUE>>=
+\vspace{1em}
+
+             \begin{adjustbox}{valign=t}
+
+             \begin{minipage}{.49\textwidth}
+ \begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # data step: merge vertices and edges
 ftnet <- merge(
   football$edges, football$vertices,
@@ -849,7 +964,19 @@ ggplot(data = ftnet,
   theme(legend.position = "bottom") +
   scale_colour_brewer("Conference", palette = "Paired")  +
   guides(linetype = FALSE)
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout} \vspace{1em}
+
+                   \end{minipage}
+
+                  \begin{minipage}{.49\textwidth}
+
+\includegraphics[width=\textwidth]{figure/football_geom_net-1.pdf}
+
+                          \end{minipage}
+
+                          \end{adjustbox}
 \end{subfigure}
 %
 \begin{subfigure}[t]{\textwidth}
@@ -857,7 +984,14 @@ ggplot(data = ftnet,
 
 %%%%%%%%%%%%%
 % SCT # out of conf. games connected by dotted lines, not the other way around
-<<football_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+\vspace{1em}
+
+             \begin{adjustbox}{valign=t}
+
+             \begin{minipage}{.49\textwidth}
+ \begin{knitrout}\footnotesize
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 ggplot(
   ggnetwork(fb.net, layout = "fruchtermanreingold"),
   aes(x, y, xend = xend, yend = yend)) +
@@ -870,7 +1004,19 @@ ggplot(
     scale_linetype_manual(values = c(2,1)) +
   guides(linetype = FALSE) +
   theme_blank()
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout} \vspace{1em}
+
+                   \end{minipage}
+
+                  \begin{minipage}{.49\textwidth}
+
+\includegraphics[width=\textwidth]{figure/football_ggnetwork-1.pdf}
+
+                          \end{minipage}
+
+                          \end{adjustbox}
 \end{subfigure}
 \caption{\label{fig.cap:football} The network of regular season Division I college football games in the season of fall 2000. The vertices and their labels are colored by conference.}
 \end{figure}
@@ -957,7 +1103,9 @@ While this bikesharing company is located in the heart of Washington D.C.\ the c
 Figure~\ref{fig:bikes} shows four renderings of this data. The first is a geographically true representation of the area overlaid by lines between bike stations, the other three are networks drawn with \pkg{geomnet}, \pkg{ggnet2}, and \pkg{ggnetwork}, respectively.
 The code for these renderings is shown below.
 
-<<bikes_geom_net, echo=TRUE, warning=FALSE, fig.keep='all'>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # code for geomnet
 # data preparation
 tripnet <- merge(bikes$trips, bikes$stations, by.x = "Start.station",
@@ -975,11 +1123,14 @@ ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
   xlim(c(-0.1, 1.1)) +
   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
   theme(legend.position = "bottom")
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
-@
 
-
-<<bikes_prepare, echo = TRUE>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # data preparation for ggnet2 and ggnetwork
 bikes.net <- network(bikes$trips[, 1:2 ], directed = FALSE)
 set.edge.attribute(bikes.net, "n", bikes$trips[, 3 ] / 15)
@@ -993,17 +1144,25 @@ bikes.net %v% "lon" <-
 bikes.net %v% "lat" <-
   bikes$stations[ network.vertex.names(bikes.net), "lat" ]
 bikes.col <- c("grey40", "darkorange")
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
-<<bikes_ggnet2, echo = TRUE, fig.keep='all'>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # Fruchterman-Reingold placement
 ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
        edge.size = "n", color = bikes.col[ bikes.net %v% "station" ],
        label.color = bikes.col[ bikes.net %v% "station" ],
        layout.exp = 1.1)
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
-<<bikes_ggnetwork, echo = TRUE, fig.keep='all'>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # Fruchterman-Reingold placement
 ggplot(data = ggnetwork(bikes.net),
        aes(x, y, xend = xend, yend = yend)) +
@@ -1016,16 +1175,24 @@ ggplot(data = ggnetwork(bikes.net),
                       values = c("grey40", "darkorange")) +
   theme_blank() +
   theme(legend.position = "bottom", legend.box = "horizontal")
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
 For the geographic representations we also made use of the three packages. Because all three approaches result in the same picture, we only show one of these in figure~\ref{fig:bikes}a. The code is given here.
 
 %% FB: separated block below into four blocks, as we did for the blood example
-<<geographic_common, echo=TRUE>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 data(metro_map)
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 %
-<<geographic_geomnet, echo=TRUE>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # geomnet: overlay bike sharing network on geographic map
 ggplot(data = metro_map, aes(x = x, y = y)) +
   geom_raster(fill = metro_map$fill, alpha = 0.75) +
@@ -1039,8 +1206,12 @@ ggplot(data = metro_map, aes(x = x, y = y)) +
   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
   theme_net() %+replace% theme(aspect.ratio=NULL) +
   theme(legend.position = "bottom")
-@
-<<geographic_ggnet2, echo=TRUE>>=
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # geographic placement using ggnet2
 ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
        mode = c("lon", "lat"),
@@ -1048,8 +1219,12 @@ ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
        color = bikes.col[ bikes.net %v% "station" ],
        label.color = bikes.col[ bikes.net %v% "station" ],
        layout.exp = 1.1)
-@
-<<geographic_ggnetwork, echo=TRUE>>=
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # geographic placement using ggnetwork
 coords <- c(bikes.net %v% "lon", bikes.net %v% "lat")
 map_01 <- metro_map
@@ -1070,7 +1245,9 @@ ggplot(data = ggnetwork(bikes.net, layout = matrix(coords, ncol = 2)),
   scale_y_continuous(limits = c(-0.1, 1.1)) +
   theme_blank() +
   theme(legend.position = "bottom", legend.box = "horizontal")
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 \begin{figure}[hbtp]
 \begin{subfigure}[t]{.49\textwidth}
 \caption{geographic map}
@@ -1121,31 +1298,42 @@ ggplot(data = ggnetwork(bikes.net, layout = matrix(coords, ncol = 2)),
 In our examples thus far, we have focused on rather small social or relationship networks and one larger communication network. Now we present an example of a biological network, which comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 2,113 proteins that make up the vertices of this network, with a total of 4480 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}, resulting in a relatively large  network. Despite its size, each one of the approaches in the \pkg{ggplot2} framework can be drawn in a few hundred milliseconds. A more in-depth discussion on plotting speed follows in the next section. The proteins and the interactions between them are plotted in the networks shown in Figure~\ref{fig.cap:yeast}. %These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}.
 In this visualization, we demonstrate the layout capabilities of our functions by changing the layout to \code{random} and setting the distribution to \code{"uniang"}, which is a  ``gaussian donut" layout \citep{sna}.  Indeed, we see a near circular area in the middle of the graph because the layout parameter has forced all of the vertices to the exterior, leaving a ``donut hole" in the middle. Because all of the approaches result in nearly identical figures, only one network is shown. The code for all three approaches is given below:
 
-<<yeast_ggnet2, echo=TRUE, eval = FALSE, cache=FALSE>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # plot with ggnet2
 ggnet2(network(protein$edges[,1:2]), size = 2, color = "magenta",
       mode = "random", layout.par = list(dist = "uniang"),
       edge.alpha = 0.05)
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
-<<yeast_geom_net, echo=TRUE, cache=FALSE>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # plot with geom_net
 ggplot(data = protein$edges, aes(from_id = from, to_id = to)) +
   geom_net(alpha = 0.25, ealpha = 0.05, size = 2, colour = "magenta",
            ecolour = "grey70", linewidth = 0.5,
            layout = "random", layout.par = list(dist = "uniang")) +
   theme_net()
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 
-<<yeast_ggnetwork, echo=TRUE, eval = FALSE,  cache=FALSE>>=
+\begin{knitrout}
+\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
+\begin{verbatim}
 # plot with ggnetwork
 ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges(color = "grey70", lwd = 0.5, alpha = 0.05) +
   geom_nodes(alpha = 0.25, color = "magenta", size = 2) +
   theme_blank()
-
-@
+\end{verbatim}
+\end{kframe}
+\end{knitrout}
 \begin{figure}[hbtp]
 \includegraphics[width=\textwidth]{figure/yeast_geom_net-1.pdf}
 %\end{subfigure}
@@ -1171,77 +1359,7 @@ Despite the large number of vertices, the protein interaction network has a rela
 
 \begin{figure}
 \centering
-<<compare, echo = FALSE, eval = TRUE, fig.height = 4, fig.width = 8, out.width = '\\textwidth'>>=
-if (!file.exists("runtimes-protein/runtimes-protein-100.csv")) {
-  network <- data.frame(t(replicate(100, {
-  system.time({
-  #  xy = gplot.layout.random(network(protein$edges[, 1:2]),
-  #                         layout.par = list(dist = "uniang"))
-    plot(network(protein$edges[, 1:2]), coord = gplot.layout.random(network(protein$edges[, 1:2]), layout.par = list(dist = "uniang")))
-    })}
-  )))
 
-    n = as.matrix(protein$edges[, 1:2])
-    n = igraph::graph_from_edgelist(n, directed = FALSE)
-
-    igraph <- data.frame(t(replicate(3, {
-    system.time({
-      plot(n, vertex.label = NA, layout = layout_randomly)
-      })}
-    )))
-
-
-  # compare to ggnet2:
-  net <- network(protein$edges[,1:2])
-  ggnet2 <- data.frame(t(replicate(100, system.time(print(
-    ggnet2(net, size = 2, color = "magenta",
-        mode = "random", layout.par = list(dist = "uniang"),
-        edge.alpha = 0.05)
-  )))))
-
-  # compare to geomnet:
-  geomnet <- data.frame(t(replicate(100, system.time(print(
-  ggplot(data = protein$edges, aes(from_id = from, to_id = to)) +
-    geom_net(alpha = 0.25, ealpha = 0.05, size = 2, colour = "magenta",
-             ecolour = "grey70", linewidth = 0.5,
-             layout = "random", layout.par = list(dist = "uniang")) +
-    theme_net()
-  )))))
-
-  # compare to ggnetwork:
-  ggnetwork <- data.frame(t(replicate(100, system.time(print(
-    ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
-         aes(x, y, xend = xend, yend = yend)) +
-    geom_edges(color = "grey70", lwd = 0.5, alpha = 0.05) +
-    geom_nodes(alpha = 0.25, color = "magenta", size = 2) +
-    theme_blank()
-  )))))
-
-  network$type <- "network"
-  ggnet2$type <- "ggnet2"
-  geomnet$type <- "geomnet"
-  ggnetwork$type <- "ggnetwork"
-
-  timings <- rbind(network, ggnet2, geomnet, ggnetwork)
-  write.csv(timings, file = "runtimes-protein/runtimes-protein-100.csv", row.names = FALSE)
-} else {
-  timings <- read.csv("runtimes-protein/runtimes-protein-100.csv")
-}
-
-library(reshape2)
-tm <- melt(timings, id.var=1)
-
-# timings$type <- factor(timings$type, levels = rev(c("ggnet2", "geomnet", "ggnetwork", "network")))
-qplot(data = tm, reorder(variable, value, median), value,
-      fill = variable, colour= variable, alpha = I(0.6), geom = "boxplot") +
-  scale_fill_brewer(palette = "Set1") +
-  scale_colour_brewer(palette = "Set1") +
-  labs(x = "\nVisualisation approach", y = "Average plotting time (seconds)\n") +
-  ylim(c(0, NA)) +
-  coord_flip() +
-  theme_bw() + # HH: gridlines help with comparisons. significantly.
-  theme(legend.position = "none")
-@
 \includegraphics[width=\textwidth]{figure/compare-1.pdf}
 \caption{\label{fig:timings} Comparison of the times needed for calculating and rendering the previously discussed protein interaction network in the three \pkg{ggplot2} approaches and the standard plotting routines  of the \pkg{network} and \pkg{igraph} packages based on 100 evaluations each.  }
 \end{figure}
@@ -1290,53 +1408,9 @@ We generated 100 of these networks at network sizes from 25 to 250 nodes, using 
 
 \begin{figure}[hbtp]
 \centering
-<<runtimes, eval=FALSE, echo=FALSE>>=
-g = list.files("runtimes", pattern = "runtimes-(.*)csv$", full.names = TRUE) %>%
-        lapply(read.csv, stringsAsFactors = FALSE) %>%
-        bind_rows %>%
-        gather(`Visualization approach`, time, -network_size, -iteration) %>%
-        group_by(network_size, `Visualization approach`) %>%
-        summarise(mean_time = mean(time),
-                  q05 = quantile(time, 0.05),
-                  q95 = quantile(time, 0.95))
 
-ggplot(g, aes(x = network_size, y = mean_time,
-              fill = `Visualization approach`)) +
-  geom_ribbon(aes(ymin = q05, ymax = q95), alpha = 1/3) +
-  geom_line(aes(color = `Visualization approach`)) +
-  scale_color_brewer(palette = "Set2") +
-  scale_fill_brewer(palette = "Set2") +
-  scale_y_continuous(breaks = seq(0, max(g$q95), 5)) +
-  scale_x_continuous(breaks = seq(25, 250, 25)) +
-  labs(y = "Average plotting time (seconds)\n", x = "\nNetwork size") +
-  theme_classic(18) +
-  theme(axis.text = element_text(size = rel(1)),
-        legend.text = element_text(size = rel(1)),
-        legend.justification = c(0,1),
-        legend.position = c(0,1))
-@
 %\includegraphics[width=.5\textwidth]{figure/runtimes-1.pdf}
-<<runtimes-all, echo=FALSE, fig.width=8, fig.height=7.5>>=
-g <- "runtimes" %>%
-  list.files(pattern = "runtimes-(.*)csv$", recursive = TRUE, full.names = TRUE)
 
-g <- lapply(g, function(x) {
-    cbind(setup = gsub("(.*)runtimes/(.*)-(.*)/(.*)", "\\2", x),
-          read.csv(x, stringsAsFactors = FALSE))
-    }) %>%
-    bind_rows %>%
-  gather(`Visualization approach`, time, -network_size, -iteration, -setup) %>%
-  group_by(network_size, `Visualization approach`)
-
-qplot(data = g, network_size, time, colour = `Visualization approach`, alpha = I(0.1)) +
-  facet_wrap(facets = ~setup, scales = "free_y") +
-  geom_smooth(fill="white") + 
-  scale_colour_brewer(palette = "Set1") +
-  xlab("Network size (edge probability p = 0.2)") +
-  ylab("Time (in seconds)") +
-  theme_bw() +
-  theme(legend.position = "bottom")
-@
 \includegraphics[width=\textwidth]{figure/runtimes-all-1.pdf}
 \caption{\label{fig.cap:runtimes-random}%
 %  Average plotting time of random undirected networks, in seconds: ribbon at minimum and maximum recorded times, solid line at average. The time ranges of the \code{ggnet2} and \code{ggnetwork} approaches are quasi-identical and form the single purple line at the bottom of the plot.
