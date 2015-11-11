@@ -564,7 +564,7 @@ ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
         plot.margin = unit(c(0, 0, 0, 0), "mm"))
 @
 
-<<email_facet_ggnetwork, fig.height=4, fig.width=8,echo=TRUE, out.width='\\textwidth'>>=
+<<email_facet_ggnetwork, fig.height=4.5, fig.width=8,echo=TRUE, out.width='\\textwidth'>>=
 # ggnetwork code for the  email network facetted by day as shown in fig.4c
 
 # create the network and aesthetics
@@ -583,7 +583,7 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
     arrow = arrow(length = unit(5, "pt"),
                   type = "closed")) +
   geom_nodes(aes(color = curr_empl_type),
-             size = 2) +
+             size = 1.5) +
   scale_color_brewer("Employment Type",
                      palette = "Set1") +
   facet_wrap(~day, nrow = 2, labeller = "label_both") +
