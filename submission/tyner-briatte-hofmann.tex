@@ -736,7 +736,7 @@ ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
 \end{figure}
 %\afterpage{\clearpage}
 
- There is another Mad Men network given in the \pkg{gcookbook} package \citep{madmen}. It is a directed network, also of romantic relationships between characters, but it additionally includes all advances made by one character that were rejected by the other.  For example, Roger Sterling made advances toward Betty Draper, but Betty refused him,  so there is a directed edge going from Roger to Betty, but not from Betty to Roger.  If the advance is reciprocated, such as between Sal Romano and the Bellhop, there are two directed edges between the two vertices.
+ There is another Mad Men network given in the \pkg{gcookbook} package \citep{madmen}. It is a directed network, also of romantic relationships between characters, but it additionally includes all advances made by one character that were rejected by the other.  For example, Peggy Olson made advances toward her boss Don Draper, but Don refused her,  so there is a directed edge going from Peggy to Don, but not from Don to Peggy. If the advance is reciprocated, such as between Sal Romano and the Bellhop, there are two directed edges between the two vertices.
 
 \begin{figure}
 \begin{knitrout}
@@ -880,7 +880,7 @@ ggplot(
 \end{figure}
 \afterpage{\clearpage}
 
-This network is shown in figure \ref{fig.cap:madmen2}.  It is much more densely connected than the previous Mad Men example.  This network allows us to see more of the drama in the show. For instance, we can see that Roger made advances towards Betty, his business partner's wife, which is much more scandalous than what appears in the first network.
+This network is shown in figure \ref{fig.cap:madmen2}.  It is much more densely connected than the previous Mad Men example.  This network allows us to see more of the drama in the show. For instance, we can see that Roger made advances towards Betty, his business partner's wife, which is much more scandalous than what appears in the first network. Although this show is known for portraying infidelities and scandal, the network visualizations of sexual relationships and attempted sexual relations reveal that the encounters between characters are actually quite conservative. There is only one relationship between two men (Sal Romano and the Bellhop), and there is only one encounter of any kind between two women (Joyce Ramsay to Peggy Olson). Additionally, the majority of all interactions between men and women are between a man in a position of power and a younger woman, often a secretary.
 
 \subsection{College football} % ================================================
 
