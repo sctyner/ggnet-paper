@@ -1,9 +1,10 @@
-
+# Note that we rely on the development version of ggplot2, to be released to CRAN 
+# in December 2015. 
 
 ## ----load_packages, results='hide'---------------------------------------
 library(dplyr)
 library(tidyr)
-library(ggplot2) # needs to be version ≥ 1.0.1.9003
+library(ggplot2) # needs to be version ≥ 1.0.1.9003. see https://github.com/hadley/ggplot2
 library(scales)
 
 ## ggnet2
