@@ -183,6 +183,9 @@ An even more common network example is a social network. A social network is a n
 <<madmen_geom_net, fig.width=7, fig.height=7.5>>=
 # code for geom_net
 # data step: merge edges and nodes
+library(ggplot2)
+library(geomnet)
+data(madmen)
 MMnet <- merge(madmen$edges, madmen$vertices,
                by.x = "Name1", by.y = "label", all = TRUE)
 # create plot
@@ -339,6 +342,14 @@ In this directed network, there are eight vertices and 27 edges.  The vertices r
 <<blood_common>>=
 data(blood, package = "geomnet")
 @
+<<data_load_blood, eval=FALSE>>=
+library(ggplot2)
+library(geomnet)
+library(ggnetwork)
+library(GGally)
+data(blood, package = "geomnet")
+@
+
 %
 <<blood_ggnet2,  echo=TRUE, fig.width=6, fig.height=6>>=
 # plot with ggnet2
@@ -396,6 +407,11 @@ In this example every vertex has a self-reference, as blood between two people o
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
 <<email_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
+library(ggplot2)
+library(geomnet)
+library(ggnetwork)
+library(GGally)
+data(email, package = 'geomnet')
 em.cet <- as.character(
   email$nodes$CurrentEmploymentType)
 names(em.cet) = email$nodes$label
@@ -600,6 +616,7 @@ This example comes from the \code{theme()} help page in the \pkg{ggplot2} docume
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
 <<theme_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+data(theme_elements, package = "geomnet")
 te.net <- network(theme_elements$edges)
 te.net %v% "size" <-
   sqrt(10 * (sna::degree(te.net) + 1))
@@ -714,6 +731,7 @@ ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
 <<madmen2_prepare, echo = TRUE>>=
 # data step for ggnet2 and ggnetwork
 # create directed network
+data(mm_directed)
 mm.dir <- network(mm.directed$edges, directed = TRUE)
 # gender vertex attribute
 rownames(mm.directed$vertices) <- mm.directed$vertices$label
@@ -803,6 +821,7 @@ The network of football games is given in figure \ref{fig.cap:football}. Here, w
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}\vspace{-.5cm}
 <<football_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+data(football, package = 'geomnet')
 rownames(football$vertices) <-
   football$vertices$label
 
@@ -960,6 +979,7 @@ The code for these renderings is shown below.
 <<bikes_geom_net, echo=TRUE, warning=FALSE, fig.keep='all'>>=
 # code for geomnet
 # data preparation
+data(bikes, package = 'geomnet')
 tripnet <- merge(bikes$trips, bikes$stations, by.x = "Start.station",
                  by.y = "name", all = TRUE)
 
@@ -1123,6 +1143,7 @@ In this visualization, we demonstrate the layout capabilities of our functions b
 
 <<yeast_ggnet2, echo=TRUE, eval = FALSE, cache=FALSE>>=
 # plot with ggnet2
+data(protein, package = 'geomnet')
 ggnet2(network(protein$edges[,1:2]), size = 2, color = "magenta",
       mode = "random", layout.par = list(dist = "uniang"),
       edge.alpha = 0.05)
@@ -1320,7 +1341,7 @@ Many features of the packages would not have been possible, or would have at lea
 These approaches also benefit from the speed of \pkg{ggplot2},  making network visualization more efficient than the existing framework of \pkg{network} for a lot of the benchmark examples. %The \pkg{geomnet} approach is the slower of the three because each call to \code{geom\_net} results in a re-calculation of the network and, unless a seed is set, in a new layout. Once a network layout is calculated in \code{ggnet2} or \code{ggnetwork}, however, subsequent calls to these functions are computationally more efficient because the layout has already been computed.  XXX need a little more XXX
 
 %XXX Add discussion about sna, edgeweights, other plotting functionalities XXX
-All three approaches rely on the package \pkg{sna} for layouts. \pkg{sna}, unlike the \pkg{network} package, supports the use of weights in its edge list.  A larger range of layouts is available through \pkg{igraph}. There are some notable differences between the packages, such as in the parameters used for specific layout algorithms, e.g.\ \pkg{igraph} allows the use of weights for Fruchterman-Reingold placement, even though it is unclear from the original article how these are supposed to affect the layout. In all  three approaches, it is  feasible to tap into \pkg{igraph}'s functionality in a future version.
+All three approaches rely on the package \pkg{sna} for layouts. \sct{This allows the user to access the many layout algorithms available for networks, and in the event that new layouts are implemented in \pkg{sna}, our packages will accommodatethem seamlessly.} \pkg{sna}, unlike the \pkg{network} package, supports the use of weights in its edge list.  A larger range of layouts is available through \pkg{igraph}. There are some notable differences between the packages, such as in the parameters used for specific layout algorithms, e.g.\ \pkg{igraph} allows the use of weights for Fruchterman-Reingold placement, even though it is unclear from the original article how these are supposed to affect the layout. In all  three approaches, it is  feasible to tap into \pkg{igraph}'s functionality in a future version.
 
 %\hh{XXX add some discussion on igraph: it is definitely feasible to tap into the functionality of igraph in a future version of geomnet. igraph has, as of June 2015, gone through a major change of its interface, renaming layout functions and the way parameters are handled. }
 
