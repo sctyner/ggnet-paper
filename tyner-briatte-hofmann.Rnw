@@ -1,5 +1,5 @@
 % !TeX root = RJwrapper.tex
-\title{Network Visualizations in \pkg{ggplot2}}
+\title{Network Visualization with \pkg{ggplot2}}
 \author{by Sam Tyner, Fran\c{c}ois Briatte and  Heike Hofmann}
 
 \maketitle
