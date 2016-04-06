@@ -137,15 +137,34 @@ library(ggnetwork)
 library(network)
 library(sna)
 @
+% From reviewer 1: "There is a niche in computer
+% science called "graph drawing", which has been around for decades and
+% which is concerned with layout algorithms for networks. This is import
+% because it is all but a new insight that network layouts are important
+% and there is even a whole scientific specialty that is concerned with
+% this. Yet the authors do not engage with this literature at all. They
+% should mention "graph drawing" and refer to some of the classic
+% works. A good starting point is the 2001 Springer book by Kaufmann and
+% Wagner with the title "Drawing Graphs", or the table of contents of
+% the "Journal of Graph Algorithms and Applications", or the book
+% "Layout of Graph Visualizations" by Ulrik Brandes (1999), along with
+% the many innovations in graph drawing produced since then by people
+% like Ulrik Brandes and others. All of this seems to be ignored by the
+% authors."
+% \sct{I've come around to the idea of mentioning something about this in passing. i.e. we could mention that our purpose was not to engage with the theory of graph drawing but rather to engage with the current visualization methods to make them easier to access by users}
+
+
 
 % starting point: network analysis is ubiquituous in science
 \par There are many kinds of networks, and networks are extensively studied across many disciplines \citep{watts2004ars}. For instance, social network analysis is a longstanding and prominent subfield of sociology, and the study of biological networks, such as protein-protein interaction networks or metabolic networks, is a notable subfield of biology \citep{prell2011social, junker2008analysis}. Though these two disciplines and the many others that study networks are themselves extremely different, they can all benefit from good network visualization methods.
 
 % problem: many network packages exist, but are not easy to use
-Many R packages already exist to manipulate network objects, such as \CRANpkg{igraph} by \citet{igraph}, \CRANpkg{sna} by \citet{sna}, and \CRANpkg{network} by \citet{network} (see also \citet{network.jss}). These packages, however, rely on idiosyncratic visualization syntaxes, which means that the user must acquire detailed knowledge of each one of these packages in order to build meaningful network visualizations with them. These packages further require to repeat all graphic parameters (such as colors, coordinates and sizes) in every network visualization, with no possibility to use precomputed layers of these parameters, or to map these parameters to network attributes.
+Many R packages already exist to manipulate network objects, such as \CRANpkg{igraph} by \citet{igraph}, \CRANpkg{sna} by \citet{sna}, and \CRANpkg{network} by \citet{network} (see also \citet{network.jss}). \sct{Though t}hese packages \sct{have network visualization capabilities, visualization is not their primary purpose. This leads to visualization techniques in that require } %however, rely on idiosyncratic visualization syntaxes, which means that the user must acquire 
+detailed knowledge of each one of these packages \sct{and their syntaxes} in order to build meaningful network visualizations with them. \sct{XXX I'm not sure what you're trying to say in this next sentence, Francois. Could you explain a bit in a comment? XXX} These packages further require to repeat all graphic parameters (such as colors, coordinates and sizes) in every network visualization, with no possibility to use precomputed layers of these parameters, or to map these parameters to network attributes. \sct{To contrast, the packages we have written have one primary purpose: to provide a means of creating beautiful network visualizations within a framework that is accessible to and used by many.}
 
 % solution: ggplot2 as an implementation framework
-In this article, our objective is to bring network plotting capabilities to the popular \CRANpkg{ggplot2} package \citep{ggplot2}, which was designed as an implementation of the `grammar of graphics' proposed by \citet{wilkinson:1999}, and which has become extremely popular among R users.%
+%\sct{This is redundant} In this article, 
+Our objective is to bring network plotting capabilities to the popular \CRANpkg{ggplot2} package \citep{ggplot2}. \sct{This package} was designed as an implementation of the `grammar of graphics' proposed by \citet{wilkinson:1999}, and it has become extremely popular among R users.%
   %
   \footnote{In order to give an indication of how  large the user base of \pkg{ggplot2} is, we looked at its usage statistics from January 1, 2015 to October 31, 2015 (see \url{http://cran-logs.rstudio.com/}). Over this period, the \pkg{ggplot2} package was downloaded over 1.3 million times from CRAN, which amounts to over 4,500 downloads per day. Over 700 R packages list \pkg{ggplot2} as a dependency or as a suggestion.} %
 %\sct{XXX I do not think that the line about Python is relevant, as we are submitting this to the R journal. I have commented it out for now. XXX}
@@ -155,11 +174,12 @@ In this article, our objective is to bring network plotting capabilities to the 
   % see also: port of ggplot2 to plotly? \url{https://plot.ly/ggplot2/} %% -- hh
   %
 %  This is the audience we are aiming at by making network visualizations a part of \pkg{ggplot2}.
-Because the syntax implemented in the \pkg{ggplot2} package is extendable to many different kinds of visualizations, many packages have built additional functionalities on top of the existing package. Examples include the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRANpkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the package \CRANpkg{GGally} by \citet{ggally}, and the \BIOpkg{ggbio} Bioconductor package by \citet{ggbio}, which provides graphics for biological data.
-These packages have expanded the utility of \pkg{ggplot2}, likely resulting in a great increase of its user base. We hope to add to this user base even more by extending the benefits of the grammar of graphics to network visualization.
+Because the syntax implemented in the \pkg{ggplot2} package is extendable to many different kinds of visualizations, many packages have built additional functionalities on top of the existing package. Examples include the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRANpkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the package \CRANpkg{GGally} by \citet{ggally}, and the \BIOpkg{ggbio} and \BIOpkg{ggtree} Bioconductor packages by \citet{ggbio} and \citet{ggtree}, which both provide visualizations for biological data.
+These packages have expanded the utility of \pkg{ggplot2}, likely resulting in a great increase of its user base. We hope to add to this user base even more by %extending 
+\sct{applying} the benefits of the grammar of graphics to network visualization.
 % Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization.
 Our efforts rely upon the most recent changes to \pkg{ggplot2}, which allow users to more easily extend the package through additional geometries or \samp{geoms}.%
-\footnote{Version 1.1.0, released mid November 2015. See \url{https://cran.r-project.org/web/packages/ggplot2/NEWS} for the full list of changes in \pkg{ggplot2} 1.1.0, as well as the new package vignette, ``Extending ggplot2'', which explains how the internal \code{ggproto} system of object-oriented programming can be used to create new geoms.} %
+\footnote{Version 2.1.0, released 1 March 2016. See \url{https://cran.r-project.org/web/packages/ggplot2/news.html} for the full list of changes in \pkg{ggplot2} 2.1.0, as well as the new package vignette, ``Extending ggplot2'', which explains how the internal \code{ggproto} system of object-oriented programming can be used to create new geoms.} %
   %
 
 In the remainder of this paper, we present three different approaches to network visualization with \pkg{ggplot2}. Section~\nameref{sec:background} introduces the basic terminology of networks and illustrates their ubiquity in natural and social life. Section~\nameref{sec:implementations} then discusses the logic behind each of the three approaches that we offer. Section~\nameref{sec:examples} extends that discussion through several examples ranging from simple to complex networks, for which we provide the code corresponding to each approach alongside its graphical result. We follow with some considerations of runtimes in plotting networks in Section~\nameref{sec:speed} before closing with a discussion.
@@ -306,7 +326,7 @@ Following that logic, the \pkg{ggnetwork} package adds four aliased geometries t
   \item \code{geom\_edgetext}, an alias to \code{geom\_label}.
 \end{itemize}
 
-The four geoms are used to plot nodes, edges, node labels and edge labels, respectively. Two of the geoms that they alias, \code{geom\_curve} and \code{geom\_label}, are part of the new geometries introduced in \pkg{ggplot2} version 1.1.0. All four geoms behave exactly like those that they alias, and take exactly the same arguments. The only exception to that rule is the special case of \code{geom\_edges}, which accepts both the arguments of \code{geom\_segment} and those of \code{geom\_curve}; if its \code{curvature} argument is set to anything but \code{0} (the default), then \code{geom\_edges} behaves exactly like \code{geom\_curve}; otherwise, it behaves exactly like \code{geom\_segment}.
+The four geoms are used to plot nodes, edges, node labels and edge labels, respectively. Two of the geoms that they alias, \code{geom\_curve} and \code{geom\_label}, are part of the new geometries introduced in \pkg{ggplot2} version 2.1.0. All four geoms behave exactly like those that they alias, and take exactly the same arguments. The only exception to that rule is the special case of \code{geom\_edges}, which accepts both the arguments of \code{geom\_segment} and those of \code{geom\_curve}; if its \code{curvature} argument is set to anything but \code{0} (the default), then \code{geom\_edges} behaves exactly like \code{geom\_curve}; otherwise, it behaves exactly like \code{geom\_segment}.
 
 Just like the \code{ggnet2} function, the \pkg{ggnetwork} package takes a single network object as input. This can be an object of class \code{"network"}, some data structure coercible to that class, or an object of class \code{"igraph"} when the \pkg{intergraph} package is installed. This object is passed to the `workhorse' function of the package, which is also called \code{ggnetwork} to create a data frame, and then to the \code{data} argument of \code{ggplot()}.
 
@@ -505,7 +525,7 @@ differences that exist between the implementations:
   In the first two layouts of Figure~\ref{fig.cap:email}, edges between employees who share the same employment type are given the color of that employment type, while edges between employees belonging to different types are plotted in grey. This feature is particularly useful to visualize the amount of within-group connectedness in a network. By contrast, in the last layout, edges are colored according to the sender's employment type, because the \code{ggnetwork} package does not support coloring edges as a function of node-level attributes.
 
 	\item %
-	  Finally, in the last two layouts of Figure~\ref{fig.cap:email}, the \code{curvature} argument has been set to 0.05, resulting in slightly curved edges in both plots. This feature, which takes advantage of the \code{geom\_curve} geometry released in \pkg{ggplot2} 1.1.0, makes it possible to visualize which edges correspond to reciprocal connections; in an email communication network, as one might expect, most edges fall into that category.
+	  Finally, in the last two layouts of Figure~\ref{fig.cap:email}, the \code{curvature} argument has been set to 0.05, resulting in slightly curved edges in both plots. This feature, which takes advantage of the \code{geom\_curve} geometry released in \pkg{ggplot2} 2.1.0, makes it possible to visualize which edges correspond to reciprocal connections; in an email communication network, as one might expect, most edges fall into that category.
 
 \end{itemize}
 
