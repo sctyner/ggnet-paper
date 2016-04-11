@@ -7,25 +7,6 @@
 This paper explores three different approaches to visualize networks by building on the grammar of graphics framework implemented in the \pkg{ggplot2} package. The goal of each approach is to provide the user with the ability to apply the flexibility of \pkg{ggplot2} to the visualization of network data, including through the mapping of network attributes to specific plot aesthetics. We will show that these additions contribute significantly to the study of networks by making visualization of networks intuitive, both for users who are familiar with \pkg{ggplot2} and for those who are not.
 }
 
-% \hh{TODO list:
-%
-% \begin{enumerate}
-%
-% \item %%%%%%%%%%%%
-%   \hh{start of end phase!!! Proof read. Check examples for consistency.}
-%
-%   \fb{I have started moving some in-text comments to discussion or out when the problem that they flagged has been solved.}
-%
-% \item %%%%%%%%%%%%
-%   \hh{need to re-run the timing after all the changes are made to the packages. }
-%
-%   \fb{I have included some testing code + prelim. results in the "runtimes" folder.}
-
-% \item %%%%%%%%%%%%
-%   \sct{check that the reference commands all make sense. for instance, section 2.1 is referenced at the top of page 3 but the sections aren't labeled with numbers in the paper. Is this something to do with the template for the R Journal? }
-% \hh{good point - I've changed ref to nameref.}
-%\end{enumerate}}
-
 <<setup_knitr, echo=FALSE>>=
 library(knitr)
 opts_chunk$set(
