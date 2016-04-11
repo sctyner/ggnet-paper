@@ -349,12 +349,13 @@ Both the \code{arrow.gap} and the \code{by} arguments are further illustrated in
 % ==============================================================================
 
 
-In this section, we demonstrate the current capabilities of \code{ggnet2}, \code{geomnet}, and \code{ggnetwork} in a series of side by side examples. While the output is similar for each method of network visualization, the code and implementations differ across the three methods.
-For each of these examples, we are going to present the code necessary to produce the network, and discuss each application in detail.
+In this section, we demonstrate \sct{some of XXX to appease the reviewers want for an example of everything XXX } the current capabilities of \code{ggnet2}, \code{geomnet}, and \code{ggnetwork} in a series of side by side examples. While the output is %similar
+\sct{nearly identical} for each method of network visualization, the code and implementations differ across the three methods.
+For each of these examples, we are going to present the code necessary to produce the network \sct{visualization in each of the three packages}, and discuss each application in detail.
 
 \subsection{Blood donation}  % =================================================
 
-In this directed network, there are eight vertices and 27 edges.  The vertices represent the eight different blood types in humans that are most important for donation: the ABO blood types A, B, AB, and O, combined with the RhD positive (+) and negative (-) types. The edges are directed: a person whose blood type is that of a \emph{from} vertex can to donate blood to a person whose blood type is that of a corresponding \emph{to} vertex.  This network is shown in Figure~\ref{fig.cap:blood}. The code to produce each one of the networks is shown below:
+\sct{We begin with a very simple example that most should be familiar with: blood donation.} In this directed network, there are eight vertices and 27 edges.  The vertices represent the eight different blood types in humans that are most important for donation: the ABO blood types A, B, AB, and O, combined with the RhD positive (+) and negative (-) types. The edges are directed: a person whose blood type is that of a \emph{from} vertex can to donate blood to a person whose blood type is that of a corresponding \emph{to} vertex.  This network is shown in Figure~\ref{fig.cap:blood}. The code to produce each one of the networks is shown below:
 
 % \begin{figure}[hbtp]
 % \caption{\label{tab:blood}Code for the three different approaches showing the blood donation network of figure~\ref{fig.cap:blood}.}
@@ -362,7 +363,8 @@ In this directed network, there are eight vertices and 27 edges.  The vertices r
 <<blood_common>>=
 data(blood, package = "geomnet")
 @
-<<data_load_blood, eval=FALSE>>=
+<<data_load_blood, eval=FALSE, echo = TRUE>>=
+# run first to run all examples
 library(ggplot2)
 library(geomnet)
 library(ggnetwork)
@@ -419,7 +421,7 @@ In this example every vertex has a self-reference, as blood between two people o
 \end{figure}
 %%\afterpage{\clearpage}
 
-\code{colour} and \code{size} aesthetics in Figure~\ref{fig.cap:blood} are set to identity values to change the size and color of all vertices. We have also used the \code{layout} and \code{label} arguments to change the default layout to a circle layout and to print the blood types, respectively. The circle layout places blood types of the same ABO type next to each other and spreads the vertices out far enough to distinguish between the various ``in" and ``out" types.  We can tell clearly from this plot that the O- type is the universal donor: it has an out-degree of seven and an in-degree of zero. Additionally, we can see that the AB+ type is the universal recipient, with an in-degree of seven and an out-degree of zero. Anyone looking at this plot can quickly determine which type(s) of blood they can receive and which type(s) can receive their blood.
+\code{colour} and \code{size} aesthetics in Figure~\ref{fig.cap:blood} are set to identity values to change the size and color of all vertices. We have also used the \code{layout} and \code{label} arguments to change the default \sct{Kamada-Kawai} layout to a circle layout and to print the blood types, respectively. The circle layout places blood types of the same ABO type next to each other and spreads the vertices out far enough to distinguish between the various ``in" and ``out" types.  We can tell clearly from this plot that the O- type is the universal donor: it has an out-degree of seven and an in-degree of zero. Additionally, we can see that the AB+ type is the universal recipient, with an in-degree of seven and an out-degree of zero. Anyone looking at this plot can quickly determine which type(s) of blood they can receive and which type(s) can receive their blood.
 
 \subsection{Email network} % ===================================================
 
@@ -503,7 +505,7 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02),
 The email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a directed network of emails between company employees with 55 vertices and 9,063 edges. Each vertex represents an employee of the company, and each edge represents an email sent from one employee to another. The arrow of the directed edge points to the recipient(s) of the email. The network contains two business weeks of emails across the entire company. In order to better visualize the structure of the communication network between employees, emails that were sent out to all employees are removed.
 
 % let's have all of the interpretation in a single place to simplify the flow
-This network is plotted in Figure~\ref{fig.cap:email}. There are six distinct clusters in this network which almost perfectly correspond to the six different types of employees in this company: administration, engineering, executive, facilities, information technology, and security.
+This network is plotted in Figure~\ref{fig.cap:email}. \sct{In each example, we have colored the vertices by the variable \code{CurrentEmploymentType}, which contains the department in the company of which each employee is a par.} There are six distinct clusters in this network which almost perfectly correspond to the six different types of employees in this company: administration, engineering, executive, facilities, information technology, and security.
 
 %% HH: this is not necessarily true anymore, when taking the number of emails exchanged into account. SCT: I agree.
 %It is interesting to observe that, in all of the layouts, the `Security' employee group plays a central role in the email network of the company. This observation holds regardless of the actual network layout used (remember that \code{ggnet2} and \code{ggnetwork} default to the Fruchterman-Reingold algorithm, while \code{geomnet} defaults to the Kamada-Kawai algorithm; both layouts are force-directed, but proceed differently to assign coordinates to the nodes).
@@ -517,7 +519,9 @@ differences that exist between the implementations:
   %% this paragraph has been fixed to reflect your (sct + hh) remarks -- fb
 
   \item %
-  In the \code{ggnet2} implementation, the opacity of the edges between employees in the same cluster is higher than it is for the edges between employees in different clusters. This is due to the fact that the email network does not feature edge weights: instead, every email between two employees is represented by a different edge, resulting in edge overplotting. As the \code{edge.alpha} argument has been set to a value smaller than one, multiple emails between two employees create more opaque edges between them. This effect is not visible in the layouts created by \pkg{geomnet} and \code{ggnetwork} because both implementations draw a single segment for each directed edge, regardless of how many of these edges exist in the network data.
+  In the \code{ggnet2} implementation, the opacity of the edges between employees in the same cluster is higher than it is for the edges between employees in different clusters. This is due to the fact that the email network does not feature edge weights: instead, every email between two employees is represented by a different edge, resulting in edge overplotting. As the \code{edge.alpha} argument has been set to a value smaller than one, multiple emails between two employees create more opaque edges between them. \sct{Multiple emails are also taken into account in the \CRANpkg{geomnet} package. When there is more than one edge connecting two vertices, the \code{stat_net} function adds a weight variable to the edgelist, which automatically get passed to the layout algorithms and are taken into account accordingly. In \CRANpkg{ggnetwork}, XXX Francois, take over? XXX} 
+  % XXX SCT - this next sentence is not totally accurate because geomnet creates weights in sna that are taken in the layout function automatically. I replaced it with above XXX 
+%This effect is not visible in the layouts created by \pkg{geomnet} and \code{ggnetwork} because both implementations draw a single segment for each directed edge, regardless of how many of these edges exist in the network data.
 
   \item %
   In the first two layouts of Figure~\ref{fig.cap:email}, edges between employees who share the same employment type are given the color of that employment type, while edges between employees belonging to different types are plotted in grey. This feature is particularly useful to visualize the amount of within-group connectedness in a network. By contrast, in the last layout, edges are colored according to the sender's employment type, because the \code{ggnetwork} package does not support coloring edges as a function of node-level attributes.
