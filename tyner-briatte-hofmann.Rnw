@@ -630,7 +630,7 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
   theme_facet(legend.position = "bottom")
 @
 
-Note that the main difference in the visualizations of Figure~\ref{fig:email_facet} stems from whether \emph{one} layout is used across all panels (as for the \code{ggnetwork} example) or whether individual layouts are fit to each of the subsets (as for the \code{ggnet2} and the \code{geomnet} examples). In \code{geomnet} this is controlled via the argument \code{fiteach}. By default  \code{fiteach = TRUE}, but \code{fiteach = FALSE} results in all panels sharing the same layout. Through the facetting it becomes obvious that there are several days where one or more of the departments does not communicate with any of the other departments. There are only two days, day 13 and day 15, without any isolated department communications. Facetting is one of the major benefits of implementing tools for network visualization in \pkg{ggplot2}. Facetting allows the user to quickly separate dense networks into smaller subnetworks for easy visual comparison and analyses, a feature that the other network visualization tools do not have.
+Note that the main difference in the visualizations of Figure~\ref{fig:email_facet} stems from whether \emph{one} layout is used across all panels (as for the \code{ggnetwork} example) or whether individual layouts are fit to each of the subsets (as for the \code{ggnet2} and the \code{geomnet} examples). In \code{geomnet} this is controlled via the argument \code{fiteach}. By default  \code{fiteach = TRUE}, but \code{fiteach = FALSE} results in all panels sharing the same layout. \sct{Having the same layout in each panel makes seeing specific differences in ties between nodes easier, while having a different layout in each panel emphasizes the overall structural differences between the subnetworks.} Through the facetting it becomes obvious that there are several days where one or more of the departments does not communicate with any of the other departments. There are only two days, day 13 and day 15, without any isolated department communications. Facetting is one of the major benefits of implementing tools for network visualization in \pkg{ggplot2}. Facetting allows the user to quickly separate dense networks into smaller subnetworks for easy visual comparison and analyses, a feature that the other network visualization tools do not have.
 
 \subsection{\pkg{ggplot2} theme elements} % ====================================
 
@@ -695,7 +695,7 @@ ggplot(ggnetwork(te.net),
 \end{figure}
 \afterpage{\clearpage}
 
-The inheritance structure is plotted in figure \ref{fig.cap:theme}.  In these plots, it is easy to quickly determine the parent and child vertices. The parents with the most children are the \code{rect}, \code{text}, and \code{line} elements, so we made their labels larger in order to emphasize their importance. In each case, the label size is a function of the out degree of the vertices.
+The inheritance structure is plotted in figure \ref{fig.cap:theme}.  In these plots, it is easy to quickly determine the parent and child vertices, \sct{and to view which theme elements are unrelated to all others.} The parents with the most children are the \code{rect}, \code{text}, and \code{line} elements, so we made their labels larger in order to emphasize their importance. In each case, the label size is a function of the out degree of the vertices.
 %Using this plot made creation of the \code{theme\_net} object used throughout these examples very simple. We just made set each of the major parent elements, \code{text}, \code{rect}, and \code{line} to \code{element\_blank()} and then set the aspect ratio equal to one.
 
 \subsection{Romantic relationships in \emph{Mad Men}} % ========================
@@ -703,8 +703,25 @@ The inheritance structure is plotted in figure \ref{fig.cap:theme}.  In these pl
   The following code creates the network example given in Figure~\ref{fig.cap:madmen} in the introduction. We changed the vertex size and edge color for all vertices and edges, included vertex labels, and colored the vertices according to the character's gender.
 
 The code for the other two approaches follows below and the corresponding networks are shown in figure~\ref{fig:madmen-2}.
-
-<<madmen_prepare, echo=TRUE>>=
+<<codefromfirstmmnet, echo=TRUE, eval=FALSE>>=
+# code for geom_net
+library(ggplot2)
+library(geomnet)
+data(madmen)
+# data step: merge edges and nodes
+MMnet <- merge(madmen$edges, madmen$vertices,
+               by.x = "Name1", by.y = "label", all = TRUE)
+# create plot
+ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
+  geom_net(aes(colour = Gender), size = 4, label = TRUE,
+           vjust = -0.6, ecolour = "grey60") +
+  scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
+  xlim(c(-0.05, 1.05)) +
+  theme_net() +
+  theme(legend.position = "bottom")
+@
+% changed below to echo = FALSE. I think it's in the wrong spot. 
+<<madmen_prepare, echo=FALSE>>=
 # data step for both ggnet2 and ggnetwork
 # create undirected network
 mm.net <- network(madmen$edges[, 1:2], directed = FALSE)
@@ -750,9 +767,9 @@ ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
 %\afterpage{\clearpage}
 
  There is another Mad Men network given in the \pkg{gcookbook} package \citep{madmen}. It is a directed network, also of romantic relationships between characters, but it additionally includes all advances made by one character that were rejected by the other.  For example, Peggy Olson made advances toward her boss Don Draper, but Don refused her,  so there is a directed edge going from Peggy to Don, but not from Don to Peggy.  If the advance is reciprocated, such as between Sal Romano and the Bellhop, there are two directed edges between the two vertices.
-
-\begin{figure}
-<<madmen2_prepare, echo = TRUE>>=
+% XXX SCT: I'm getting rid of this figure and adding it to the rest of the code in fig 8
+%\begin{figure}
+<<madmen2_prepare, echo = FALSE>>=
 # data step for ggnet2 and ggnetwork
 # create directed network
 data(mm_directed)
@@ -763,15 +780,22 @@ mm.dir %v% "gender" <- as.character(
   mm.directed$vertices[ network.vertex.names(mm.dir), "Gender" ]
 )
 @
-\caption{\label{mm2:datastep} Data preparation for the directed network of the  Mad Men example in Figures~\ref{mm2:ggnet2} and~\ref{mm2:ggnetwork}.}
+%\caption{\label{mm2:datastep} Data preparation for the directed network of the  Mad Men example in Figures~\ref{mm2:ggnet2} and~\ref{mm2:ggnetwork}.}
 
-\end{figure}
+%\end{figure}
 \begin{figure}[hbtp]
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2\label{mm2:ggnet2}}
 <<madmen2_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
-# see fig.7 for data preparation
-
+# data step for ggnet2 and ggnetwork
+# create directed network
+data(mm_directed)
+mm.dir <- network(mm.directed$edges, directed = TRUE)
+# gender vertex attribute
+rownames(mm.directed$vertices) <- mm.directed$vertices$label
+mm.dir %v% "gender" <- as.character(
+  mm.directed$vertices[ network.vertex.names(mm.dir), "Gender" ]
+)
 ggnet2(
   mm.dir, mode = "fruchtermanreingold", size = 3,
   color = mm.col[ mm.dir %v% "gender" ],
@@ -810,8 +834,6 @@ ggplot(data = MM2net,
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork \label{mm2:ggnetwork}}
 <<madmen2_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, dependson="madmen2_ggnet2">>=
-# see fig.7 for data preparation
-
 ggplot(
   ggnetwork(mm.dir,
             layout = "fruchtermanreingold"),
