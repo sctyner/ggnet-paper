@@ -96,10 +96,11 @@ library(ggplot2) # needs to be version ≥ 1.0.1.9003
 library(scales)
 
 ## ggnet2
-if (!require(ggnet, quietly = TRUE)) {
-  devtools::install_github("briatte/ggnet")
-}
-library(ggnet)
+# if (!require(ggnet, quietly = TRUE)) {
+#   devtools::install_github("briatte/ggnet")
+# }
+# library(ggnet)
+library(GGally)
 
 ## geom_net
 if (!require(geomnet, quietly = TRUE)) {
@@ -789,7 +790,7 @@ mm.dir %v% "gender" <- as.character(
 <<madmen2_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
 # data step for ggnet2 and ggnetwork
 # create directed network
-data(mm_directed)
+data(mm_directed, package = "geomnet")
 mm.dir <- network(mm.directed$edges, directed = TRUE)
 # gender vertex attribute
 rownames(mm.directed$vertices) <- mm.directed$vertices$label
