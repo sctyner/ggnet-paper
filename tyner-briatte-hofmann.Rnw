@@ -560,7 +560,7 @@ To visualize how this network  changes over time, we facet the network by day: e
 em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
 em.day <- lapply(unique(em.day$day),
                  function(x) subset(em.day, day == x)[, 1:2 ])
-em.day <- lapply(em.day, network, directed = TRUE)
+em.day <- lapply(em.day, network, directed = FALSE)
 for (i in 1:length(em.day)) {
   em.day[[ i ]] %v% "curr_empl_type" <-
     em.cet[ network.vertex.names(em.day[[ i ]]) ]
@@ -791,12 +791,15 @@ mm.dir %v% "gender" <- as.character(
 # data step for ggnet2 and ggnetwork
 # create directed network
 data(mm_directed, package = "geomnet")
-mm.dir <- network(mm.directed$edges, directed = TRUE)
+mm.dir <- network(mm.directed$edges, 
+                  directed = FALSE)
 # gender vertex attribute
-rownames(mm.directed$vertices) <- mm.directed$vertices$label
-mm.dir %v% "gender" <- as.character(
-  mm.directed$vertices[ network.vertex.names(mm.dir), "Gender" ]
-)
+rownames(mm.directed$vertices) <- 
+  mm.directed$vertices$label
+mm.dir %v% "gender" <- 
+  as.character(
+    mm.directed$vertices[ network.vertex.names(mm.dir), "Gender" ]
+    )
 ggnet2(
   mm.dir, mode = "fruchtermanreingold", size = 3,
   color = mm.col[ mm.dir %v% "gender" ],
@@ -1085,9 +1088,9 @@ ggplot(data = ggnetwork(bikes.net),
   theme(legend.position = "bottom", legend.box = "horizontal")
 @
 
-For the geographic representations we also made use of the three packages. Because all three approaches result in the same picture, we only show one of these in figure~\ref{fig:bikes}a. The code \sct{for creating the map in all 3 packages} is given here.
+For the geographic representations we also made use of the three packages. Because all three approaches result in the same picture, we only show one of these in figure~\ref{fig:bikes}a. The code \sct{for creating the map} is given here:
 
-%% XXX ST: ggmap is compatible with ggplot2 again. The code below relfects that. Francois, can you make sure the code is correct under this new specification?
+%% XXX ST: ggmap is compatible with ggplot2 again. The code below reflects that. Francois, can you make sure the code is correct under this new specification?
 <<geographic_common, echo=TRUE>>=
 library(ggmap)
 metro_map <- get_map(location = c(left = -77.22257, bottom = 39.05721, 
@@ -1108,37 +1111,37 @@ ggmap(metro_map) +
   theme_net() %+replace% theme(aspect.ratio=NULL) +
   theme(legend.position = "bottom")
 @
-<<geographic_ggnet2, echo=TRUE>>=
-# geographic placement using ggnet2
-ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
-       mode = c("lon", "lat"),
-       edge.size = "n",
-       color = bikes.col[ bikes.net %v% "station" ],
-       label.color = bikes.col[ bikes.net %v% "station" ],
-       layout.exp = 1.1)
-@
-<<geographic_ggnetwork, echo=TRUE>>=
-# geographic placement using ggnetwork
-coords <- c(bikes.net %v% "lon", bikes.net %v% "lat")
-map_01 <- metro_map
-map_01$x <- scales::rescale(map_01$x)
-map_01$y <- scales::rescale(map_01$y)
-ggplot(data = ggnetwork(bikes.net, layout = matrix(coords, ncol = 2)),
-       aes(x, y, xend = xend, yend = yend)) +
-  geom_raster(data = map_01, aes(x = x, y = y, xend = NULL, yend = NULL),
-              fill = map_01$fill, alpha = 0.75) +
-  geom_edges(aes(size = n), color = "grey40") +
-  geom_nodes(aes(color = factor(station)), size = 4) +
-  geom_nodetext(aes(label = vertex.names, color = factor(station)),
-                vjust = -0.5) +
-  scale_size_continuous("Trips", breaks = c(2, 4, 6), labels = c(30, 60, 90)) +
-  scale_colour_manual("Metro station", labels = c("FALSE", "TRUE"),
-                      values = c("grey40", "darkorange")) +
-  scale_x_continuous(limits = c(-0.1, 1.1)) +
-  scale_y_continuous(limits = c(-0.1, 1.1)) +
-  theme_blank() +
-  theme(legend.position = "bottom", legend.box = "horizontal")
-@
+%' <<geographic_ggnet2, echo=TRUE>>=
+%' # geographic placement using ggnet2
+%' ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
+%'        mode = c("lon", "lat"),
+%'        edge.size = "n",
+%'        color = bikes.col[ bikes.net %v% "station" ],
+%'        label.color = bikes.col[ bikes.net %v% "station" ],
+%'        layout.exp = 1.1)
+%' @
+%' <<geographic_ggnetwork, echo=TRUE>>=
+%' # geographic placement using ggnetwork
+%' coords <- c(bikes.net %v% "lon", bikes.net %v% "lat")
+%' map_01 <- metro_map
+%' attr(map_01, "bb") <- data.frame(ll.lat=0, ll.lon=1, ur.lat=0, ur.lon=1)
+%' 
+%' ggplot(data = ggnetwork(bikes.net, layout = matrix(coords, ncol = 2)),
+%'        aes(x, y, xend = xend, yend = yend)) +
+%'   geom_raster(data = map_01, aes(x = x, y = y, xend = NULL, yend = NULL),
+%'               fill = map_01$fill, alpha = 0.75) +
+%'   geom_edges(aes(size = n), color = "grey40") +
+%'   geom_nodes(aes(color = factor(station)), size = 4) +
+%'   geom_nodetext(aes(label = vertex.names, color = factor(station)),
+%'                 vjust = -0.5) +
+%'   scale_size_continuous("Trips", breaks = c(2, 4, 6), labels = c(30, 60, 90)) +
+%'   scale_colour_manual("Metro station", labels = c("FALSE", "TRUE"),
+%'                       values = c("grey40", "darkorange")) +
+%'   scale_x_continuous(limits = c(-0.1, 1.1)) +
+%'   scale_y_continuous(limits = c(-0.1, 1.1)) +
+%'   theme_blank() +
+%'   theme(legend.position = "bottom", legend.box = "horizontal")
+%' @
 \begin{figure}[hbtp]
 \begin{subfigure}[t]{.49\textwidth}
 \caption{geographic map}
