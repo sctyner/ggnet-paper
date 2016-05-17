@@ -202,8 +202,9 @@ MMnet <- merge(madmen$edges, madmen$vertices,
                by.x = "Name1", by.y = "label", all = TRUE)
 # create plot
 ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
-  geom_net(aes(colour = Gender), size = 4, label = TRUE,
-           vjust = -0.6, ecolour = "grey60") +
+  geom_net(aes(colour = Gender), size = 1, label = TRUE,
+           vjust = -0.6, ecolour = "grey60", directed = TRUE, 
+           arrowgap = 0.02, arrowsize=0, ealpha=0.5) +
   scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
   xlim(c(-0.05, 1.05)) +
   theme_net() +
@@ -928,7 +929,9 @@ ggplot(data = ftnet,
 % SCT # out of conf. games connected by dotted lines, not the other way around
 <<football_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
 ggplot(
-  ggnetwork(fb.net, layout = "fruchtermanreingold"),
+  ggnetwork(
+    fb.net, 
+    layout = "fruchtermanreingold"),
   aes(x, y, xend = xend, yend = yend)) +
   geom_edges(
     aes(linetype = as.factor(same.conf)),
@@ -936,7 +939,7 @@ ggplot(
   geom_nodes(aes(color = conf), size = 4) +
   scale_color_brewer("Conference",
                      palette = "Paired") +
-    scale_linetype_manual(values = c(2,1)) +
+  scale_linetype_manual(values = c(2,1)) +
   guides(linetype = FALSE) +
   theme_blank()
 @
