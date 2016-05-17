@@ -204,7 +204,7 @@ MMnet <- merge(madmen$edges, madmen$vertices,
 ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
   geom_net(aes(colour = Gender), size = 1, label = TRUE,
            vjust = -0.6, ecolour = "grey60", directed = TRUE, 
-           arrowgap = 0.02, arrowsize=0, ealpha=0.5) +
+           arrowgap = 0.02, arrowsize = 0, ealpha = 0.5) +
   scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
   xlim(c(-0.05, 1.05)) +
   theme_net() +
@@ -1038,37 +1038,37 @@ elist <- data.frame(Davis.Southern.women.2mode)
 names(elist) <- c("Lady", "Event")
 @
 \hh{The edge list for the Southern women's data consists of women attending events:}
-<<data_davis_list, echo=TRUE>>=
+<<data_davis_list, dependson='davis_data_1', echo=TRUE>>=
 head(elist)
 @
 \hh{In order to distinguish between nodes from different types, we have to add an additional identifier element, so that we can distinguish between woman $L1$ and the first event, $E1$.}
-<<davis_data_2, echo=TRUE>>=
+<<davis_data_2, dependson='davis_data_1', echo=TRUE>>=
 elist$Lady <- paste("L", elist$Lady, sep="")
 elist$Event <- paste("E", elist$Event, sep="")
 
 davis <- elist
 names(davis) <- c("from", "to")
 davis <- rbind(davis, data.frame(from=davis$to, to=davis$from))
-davis$type <- factor(c(rep("Lady", nrow(net)), rep("Event", nrow(net))))
+davis$type <- factor(c(rep("Lady", nrow(elist)), rep("Event", nrow(elist))))
 @
 
 \begin{figure}
+
 <<davis_geom_net, dependson='davis_data_2', size="footnotesize", opts.label="codefig", echo=TRUE>>=
 davis$lcolour <- 
   c("white", "black")[as.numeric(davis$type)]
-ggplot(data=davis) + 
+ggplot(data = davis) + 
   geom_net(
-    aes(from_id=from, to_id=to, colour=type, 
-        shape=type), 
-    size = 15, label= TRUE, 
+    aes(from_id = from, to_id = to, 
+        colour = type, shape = type), 
+    size = 15, label = TRUE, ealpha = 0.5,
     labelcolour = davis$lcolour) +
   theme_net() + 
-  scale_colour_brewer("Type of node", palette="Set2") +
+  scale_colour_brewer("Type of node", palette = "Set2") +
   scale_shape("Type of node") +
-  theme(legend.position="bottom")
-
+  theme(legend.position = "bottom")
 @
-\caption{\label{fig:davis:geomnet}}
+\caption{\label{fig:davis:geomnet}Graph of the Southern women data using a Kamada-Kawai layout in \pkg{geomnet}. Women are represented as orange triangles, events as green circles. }
 \end{figure}
 
 \subsection{Bikesharing in Washington D.C.} % ==================================
