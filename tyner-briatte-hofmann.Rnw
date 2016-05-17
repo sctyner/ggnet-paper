@@ -139,7 +139,7 @@ library(sna)
 \begin{itemize}
 \item mention weights in networks. Thresholding of weights is then a subsetting routine - could maybe go into the conclusion? 
 \item in the intro: emphasize the goal of the paper: visualizations of networks within the ggplot2 framework and nothing but visualizations.
-\item cite \CRANpkg{ndtv} package by \cite{ndtv} - this has some fancy animations of truly dynamic networks 
+\item cite \CRANpkg{ndtv} package by \cite{ndtv} - this has some fancy animations of  dynamic temporal networks -- should probably go into the email example
 \end{itemize}
 XXX}
 
@@ -1068,6 +1068,7 @@ ggplot(data = davis) +
     aes(from_id = from, to_id = to, 
         colour = type, shape = type), 
     size = 15, label = TRUE, ealpha = 0.5,
+    vjust = 0.5, hjust = 0.5,
     labelcolour = davis$lcolour) +
   theme_net() + 
   scale_colour_brewer("Type of node", palette = "Set2") +
