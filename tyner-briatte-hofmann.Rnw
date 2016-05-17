@@ -1022,6 +1022,55 @@ ggplot(
 %' %
 %' %\afterpage{\clearpage}
 
+\subsection{Southern Women} % ==============================
+\hh{In a two-mode or bipartite network two classes of nodes exist and edges only connect nodes from different classes. 
+One of the classic examples for a two-mode network is the network of 18 Southern women attending 14 social events as collected by \citet{davis} and published e.g.\ as part of the \CRANpkg{tnet} package \citep{tnet}, i.e.\ a woman is linked by an edge to an event if she attended it. 
+One of the questions for these type of networks is gain insight in the interplay between the two different sets of nodes. 
+
+The data for the example of the Southern women is reported as edge list in form of `lady $X$ attending event $Y$'.
+With a bit of data preparation as detailed below, we can visualize the graph as shown in Figure~\ref{fig:davis:geomnet}. The two different types of nodes are shown by different shapes and colors. We see the familiar relationship between events and groups of women attending these events. Women attending the same events then form a tighter knit subset, while events are also thought of as more similar, if they are attended by the same women. This defines the cluster of events E1 through E5, which are only attended by women 1 through 9, while events E6 through E9 are attended by (almost) everybody making them the core group of events.   }
+
+<<davis_data_1, echo=TRUE>>=
+library(tnet)
+
+data(tnet)
+elist <- data.frame(Davis.Southern.women.2mode)
+names(elist) <- c("Lady", "Event")
+@
+\hh{The edge list for the Southern women's data consists of women attending events:}
+<<data_davis_list, echo=TRUE>>=
+head(elist)
+@
+\hh{In order to distinguish between nodes from different types, we have to add an additional identifier element, so that we can distinguish between woman $L1$ and the first event, $E1$.}
+<<davis_data_2, echo=TRUE>>=
+elist$Lady <- paste("L", elist$Lady, sep="")
+elist$Event <- paste("E", elist$Event, sep="")
+
+davis <- elist
+names(davis) <- c("from", "to")
+davis <- rbind(davis, data.frame(from=davis$to, to=davis$from))
+davis$type <- factor(c(rep("Lady", nrow(net)), rep("Event", nrow(net))))
+@
+
+\begin{figure}
+<<davis_geom_net, dependson='davis_data_2', size="footnotesize", opts.label="codefig", echo=TRUE>>=
+davis$lcolour <- 
+  c("white", "black")[as.numeric(davis$type)]
+ggplot(data=davis) + 
+  geom_net(
+    aes(from_id=from, to_id=to, colour=type, 
+        shape=type), 
+    size = 15, label= TRUE, 
+    labelcolour = davis$lcolour) +
+  theme_net() + 
+  scale_colour_brewer("Type of node", palette="Set2") +
+  scale_shape("Type of node") +
+  theme(legend.position="bottom")
+
+@
+\caption{\label{fig:davis:geomnet}}
+\end{figure}
+
 \subsection{Bikesharing in Washington D.C.} % ==================================
 
 The data shows trips taken with bikes from the bike share company Capital Bikeshare\footnote{\url{https://secure.capitalbikeshare.com/}} during the second quarter of 2015.
@@ -1234,9 +1283,10 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 
 Another benefit that emerges from using \pkg{ggplot2} for network visualization is the speed at which it can plot fairly large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{network} package. They also show the \pkg{ggplot2} approaches to be largely on par with the speed provided by the \pkg{igraph} package. We first investigate average plotting time
 of the protein network%
-\footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes-protein/run.r} for the code to recreate results for visualizing the protein interaction network.}
+%\footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes-protein/run.r} for the code to recreate results for visualizing the protein interaction network.}
 shown in Figure~\ref{fig.cap:yeast}, and then consider average plotting times of increasingly larger random networks. Note that in all tests, default package settings were used.%
-\footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes/run.r} for code to recreate benchmark results for visualizing random networks.}
+\hh{The code to create benchmark results for both of these situations is provided in the online supplement.} 
+%\footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes/run.r} for code to recreate benchmark results for visualizing random networks.}
 %
 
 %so, what should we do? include one of these? or both? I'd support leaving the benchmark code out of the paper, because it is not directly about network viz with ggplot2. Alternately, include it as an appendix? If left out, the code can be referred to by linking to the repo; that's what I would support most.} % $\hh{XXX link to the benchmark code in the repo seems like the best solution -  we should structure the runtime results somewhat and summarize there as well.} DONE - SCT.
