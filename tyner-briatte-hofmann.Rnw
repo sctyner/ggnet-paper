@@ -376,7 +376,7 @@ data(blood, package = "geomnet")
 %
 <<blood_ggnet2,  echo=TRUE, fig.width=6, fig.height=6, warning=FALSE>>=
 # plot with ggnet2
-ggnet2(network(blood$edges[, 1:2], directed=FALSE), mode = "circle", size = 15,
+ggnet2(network(blood$edges[, 1:2], directed=TRUE), mode = "circle", size = 15,
        label = TRUE, arrow.size = 10, arrow.gap = 0.05, vjust = 0.5,
        node.color = "darkred", label.color = "grey80")
 @
@@ -441,7 +441,7 @@ names(em.cet) = email$nodes$label
 
 edges <- subset(email$edges, nrecipients < 54)
 em.net <- edges[, c("From", "to") ]
-em.net <- network(em.net, directed = FALSE)
+em.net <- network(em.net, directed = TRUE)
 em.net %v% "curr_empl_type" <-
   em.cet[ network.vertex.names(em.net) ]
 
@@ -560,7 +560,7 @@ To visualize how this network  changes over time, we facet the network by day: e
 em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
 em.day <- lapply(unique(em.day$day),
                  function(x) subset(em.day, day == x)[, 1:2 ])
-em.day <- lapply(em.day, network, directed = FALSE)
+em.day <- lapply(em.day, network, directed = TRUE)
 for (i in 1:length(em.day)) {
   em.day[[ i ]] %v% "curr_empl_type" <-
     em.cet[ network.vertex.names(em.day[[ i ]]) ]
@@ -792,7 +792,7 @@ mm.dir %v% "gender" <- as.character(
 # create directed network
 data(mm_directed, package = "geomnet")
 mm.dir <- network(mm.directed$edges, 
-                  directed = FALSE)
+                  directed = TRUE)
 # gender vertex attribute
 rownames(mm.directed$vertices) <- 
   mm.directed$vertices$label
@@ -876,7 +876,7 @@ rownames(football$vertices) <-
   football$vertices$label
 
 fb.net <- network(football$edges[, 1:2],
-                  directed = FALSE)
+                  directed = TRUE)
 set.edge.attribute(
   fb.net, "same.conf",
   football$edges$same.conf)
