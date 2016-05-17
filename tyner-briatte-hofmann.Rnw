@@ -135,7 +135,13 @@ library(sna)
 % authors."
 % \sct{I've come around to the idea of mentioning something about this in passing. i.e. we could mention that our purpose was not to engage with the theory of graph drawing but rather to engage with the current visualization methods to make them easier to access by users}
 
-
+\hh{XXX Still todo: 
+\begin{itemize}
+\item mention weights in networks. Thresholding of weights is then a subsetting routine - could maybe go into the conclusion? 
+\item in the intro: emphasize the goal of the paper: visualizations of networks within the ggplot2 framework and nothing but visualizations.
+\item cite ndtv package - this has some fancy animations of truly dynamic networks 
+\end{itemize}
+XXX}
 
 % starting point: network analysis is ubiquituous in science
 \par There are many kinds of networks, and networks are extensively studied across many disciplines \citep{watts2004ars}. For instance, social network analysis is a longstanding and prominent subfield of sociology, and the study of biological networks, such as protein-protein interaction networks or metabolic networks, is a notable subfield of biology \citep{prell2011social, junker2008analysis}. Though these two disciplines and the many others that study networks are themselves extremely different, they can all benefit from good network visualization methods.
@@ -188,7 +194,7 @@ Networks can vary widely in scope and complexity: the smallest network is simply
 
 %An even more common network example is a social network. 
 % Rewrite the hated sentence!
-\sct{As a reference example, we turn to a specific instance of a social network.} A social network is a network that everyone is a part of in one way or another, \sct{whether through friends, family, or other human interactions}. We do not necessarily refer here to social media like Facebook or LinkedIn, but rather to the connections we form with other people. To demonstrate the functionality of our tools for plotting networks, we have chosen an example of a social network from the popular television show \emph{Mad Men}. This network, which was compiled by \citet{madmen}, is made up of 52 vertices and 87 edges. Each vertex represents a character on the show, and there is an edge between every two characters who have had a romantic relationship.
+\sct{As a reference example, we turn to a specific instance of a social network.} A social network is a network that everyone is a part of in one way or another, \sct{whether through friends, family, or other human interactions}. We do not necessarily refer here to social media like Facebook or LinkedIn, but rather to the connections we form with other people. To demonstrate the functionality of our tools for plotting networks, we have chosen an example of a social network from the popular television show \emph{Mad Men}. This network, which was compiled by \citet{madmen} \hh{and made available in \CRANpkg{gcookbook} \citep{gcookbook}}, is made up of 52 vertices and 87 edges. Each vertex represents a character on the show, and there is an edge between every two characters who have had a romantic relationship.
 
 \begin{figure}[hbtp]
 \centering
@@ -1284,7 +1290,7 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 Another benefit that emerges from using \pkg{ggplot2} for network visualization is the speed at which it can plot fairly large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionalities offered in the \pkg{network} package. They also show the \pkg{ggplot2} approaches to be largely on par with the speed provided by the \pkg{igraph} package. We first investigate average plotting time
 of the protein network%
 %\footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes-protein/run.r} for the code to recreate results for visualizing the protein interaction network.}
-shown in Figure~\ref{fig.cap:yeast}, and then consider average plotting times of increasingly larger random networks. Note that in all tests, default package settings were used.%
+shown in Figure~\ref{fig.cap:yeast}, and then consider average plotting times of increasingly larger random networks. Note that in all tests, default package settings were used. %
 \hh{The code to create benchmark results for both of these situations is provided in the online supplement.} 
 %\footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes/run.r} for code to recreate benchmark results for visualizing random networks.}
 %
