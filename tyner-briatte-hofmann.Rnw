@@ -139,7 +139,7 @@ library(sna)
 \begin{itemize}
 \item mention weights in networks. Thresholding of weights is then a subsetting routine - could maybe go into the conclusion? 
 \item in the intro: emphasize the goal of the paper: visualizations of networks within the ggplot2 framework and nothing but visualizations.
-\item cite ndtv package - this has some fancy animations of truly dynamic networks 
+\item cite \CRANpkg{ndtv} package by \cite{ndtv} - this has some fancy animations of truly dynamic networks 
 \end{itemize}
 XXX}
 
