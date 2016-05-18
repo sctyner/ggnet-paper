@@ -138,7 +138,7 @@ library(sna)
 \hh{XXX Still todo: 
 \begin{itemize}
 \item mention weights in networks. Thresholding of weights is then a subsetting routine - could maybe go into the conclusion? 
-\item in the intro: emphasize the goal of the paper: visualizations of networks within the ggplot2 framework and nothing but visualizations.
+%\item in the intro: emphasize the goal of the paper: visualizations of networks within the ggplot2 framework and nothing but visualizations. DONE
 \item cite \CRANpkg{ndtv} package by \cite{ndtv} - this has some fancy animations of  dynamic temporal networks -- should probably go into the email example
 \end{itemize}
 XXX}
@@ -512,8 +512,12 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02),
 
 The email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a directed network of emails between company employees with 55 vertices and 9,063 edges. Each vertex represents an employee of the company, and each edge represents an email sent from one employee to another. The arrow of the directed edge points to the recipient(s) of the email. The network contains two business weeks of emails across the entire company. In order to better visualize the structure of the communication network between employees, emails that were sent out to all employees are removed.
 
+\hh{Emails taken by themselves form an event network, i.e.\ edges do not have any temporal duration. Here, however, we can think of emails as observable expressions of the underlying, unobservable, relationship between employees. We can think of this network as a dynamic temporal network, i.e.\ this network has the potential to change over time. The \CRANpkg{ndtv} package by \cite{ndtv} allows the analysis of such networks and provides impressive animations of the underlying dynamics. 
+Here, we are using a static approach by first binning emails by day and using small multiples to allow a comparison.}
+
 % let's have all of the interpretation in a single place to simplify the flow
-This network is plotted in Figure~\ref{fig.cap:email}. \sct{In each example, we have colored the vertices by the variable \code{CurrentEmploymentType}, which contains the department in the company of which each employee is a par.} There are six distinct clusters in this network which almost perfectly correspond to the six different types of employees in this company: administration, engineering, executive, facilities, information technology, and security.
+
+These visualizations are shown in Figure~\ref{fig.cap:email}. \sct{For each day, we have colored the vertices by the variable \code{CurrentEmploymentType}, which contains the department in the company of which each employee is a part of.} There are six distinct clusters in this network which almost perfectly correspond to the six different types of employees in this company: administration, engineering, executive, facilities, information technology, and security.
 
 %% HH: this is not necessarily true anymore, when taking the number of emails exchanged into account. SCT: I agree.
 %It is interesting to observe that, in all of the layouts, the `Security' employee group plays a central role in the email network of the company. This observation holds regardless of the actual network layout used (remember that \code{ggnet2} and \code{ggnetwork} default to the Fruchterman-Reingold algorithm, while \code{geomnet} defaults to the Kamada-Kawai algorithm; both layouts are force-directed, but proceed differently to assign coordinates to the nodes).
@@ -1043,10 +1047,12 @@ data(tnet)
 elist <- data.frame(Davis.Southern.women.2mode)
 names(elist) <- c("Lady", "Event")
 @
+\noindent
 \hh{The edge list for the Southern women's data consists of women attending events:}
 <<data_davis_list, dependson='davis_data_1', echo=TRUE>>=
 head(elist)
 @
+\noindent
 \hh{In order to distinguish between nodes from different types, we have to add an additional identifier element, so that we can distinguish between woman $L1$ and the first event, $E1$.}
 <<davis_data_2, dependson='davis_data_1', echo=TRUE>>=
 elist$Lady <- paste("L", elist$Lady, sep="")
