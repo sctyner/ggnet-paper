@@ -135,14 +135,6 @@ library(sna)
 % authors."
 % \sct{I've come around to the idea of mentioning something about this in passing. i.e. we could mention that our purpose was not to engage with the theory of graph drawing but rather to engage with the current visualization methods to make them easier to access by users}
 
-\hh{XXX Still todo: 
-\begin{itemize}
-\item mention weights in networks. Thresholding of weights is then a subsetting routine - could maybe go into the conclusion? 
-%\item in the intro: emphasize the goal of the paper: visualizations of networks within the ggplot2 framework and nothing but visualizations. DONE
-%\item cite \CRANpkg{ndtv} package by \cite{ndtv} - this has some fancy animations of  dynamic temporal networks -- should probably go into the email example XXX
-\end{itemize}
-XXX}
-
 % starting point: network analysis is ubiquituous in science
 \par There are many kinds of networks, and networks are extensively studied across many disciplines \citep{watts2004ars}. For instance, social network analysis is a longstanding and prominent subfield of sociology, and the study of biological networks, such as protein-protein interaction networks or metabolic networks, is a notable subfield of biology \citep{prell2011social, junker2008analysis}. Though these two disciplines and the many others that study networks are themselves extremely different, they can all benefit from good network visualization methods.
 
@@ -522,16 +514,16 @@ These visualizations are shown in Figure~\ref{fig.cap:email}. \sct{For each day,
 %It is interesting to observe that, in all of the layouts, the `Security' employee group plays a central role in the email network of the company. This observation holds regardless of the actual network layout used (remember that \code{ggnet2} and \code{ggnetwork} default to the Fruchterman-Reingold algorithm, while \code{geomnet} defaults to the Kamada-Kawai algorithm; both layouts are force-directed, but proceed differently to assign coordinates to the nodes).
 We can clearly see the varying densities of communications within departments and the more sparse communication between employees in different departments. We also see that one of the executives only communicates with employees in Facilities, while one of the IT employees frequently communicates with security employees.
 
-A comparison of the results of \pkg{ggnet}, \pkg{geomnet} and \pkg{ggnetwork} reveals some of the %(subtle)
-differences that exist between the implementations:
+A comparison of the results of \pkg{ggnet}, \pkg{geomnet} and \pkg{ggnetwork} reveals some of the more subtle %(subtle)
+differences between the implementations:
 
 \begin{itemize}
 
   %% this paragraph has been fixed to reflect your (sct + hh) remarks -- fb
 
   \item %
-  In the \code{ggnet2} implementation, the opacity of the edges between employees in the same cluster is higher than it is for the edges between employees in different clusters. This is due to the fact that the email network does not feature edge weights: instead, every email between two employees is represented by a different edge, resulting in edge overplotting. As the \code{edge.alpha} argument has been set to a value smaller than one, multiple emails between two employees create more opaque edges between them. \sct{Multiple emails are also taken into account in the \CRANpkg{geomnet} package. When there is more than one edge connecting two vertices, the \code{stat\_net} function adds a weight variable to the edgelist, which  is passed automatically to the layout algorithms and taken into account accordingly.} 
-\sct{What happens to weights in \CRANpkg{ggnetwork} or ggnet2, XXX Francois, take over? XXX } 
+  In the \code{ggnet2} implementation, the opacity of the edges between employees in the same cluster is higher than it is for the edges between employees in different clusters. This is due to the fact that the email network does not make use of edge weights: instead, every email between two employees is represented by an edge, resulting in edge overplotting. The \code{edge.alpha} argument has been set to a value smaller than one, therefore multiple emails between two employees create more opaque edges between them. \sct{Multiple emails are also taken into account in the \CRANpkg{geomnet} package. When there is more than one edge connecting two vertices, the \code{stat\_net} function adds a weight variable to the edgelist, which  is passed automatically to the layout algorithms and taken into account accordingly. } \hh{In addition to taking weights into account in the layout, we can also make use of them in the visualization. \CRANpkg{geomnet} allows to access all of the internal variables created in the visualization process, such as coordinates \code{..x.., ..y..} and edge weights \code{..weight..}. Note the use of the \CRANpkg{ggplot2} notation \code{..} for internal variables.} 
+%\sct{What happens to weights in \CRANpkg{ggnetwork}, XXX Francois, take over? XXX } 
   % XXX SCT - this next sentence is not totally accurate because geomnet creates weights in sna that are taken in the layout function automatically. I replaced it with above XXX 
 %This effect is not visible in the layouts created by \pkg{geomnet} and \code{ggnetwork} because both implementations draw a single segment for each directed edge, regardless of how many of these edges exist in the network data.
 
@@ -1479,7 +1471,19 @@ Users who are already familiar with \pkg{ggplot2} and some of the other `Hadley-
 On a personal level we discovered that the collaboration on this paper has helped us to improve upon our initial versions of each of these packages. For instance, the edge coloring in the \code{ggnet2} function was designed so that edges between two vertices in the same group were colored with that group's vertex color. This  inspired an implementation of it in \code{geomnet} through the traditional \code{ggplot2} group operator. During the process of writing the paper the authors collaborated on a solution for the problem of nodes being plotted on top of arrow tips. This solution now presents itself in form of the \code{arrow.gap} parameter, which allows to re-track the tip of an arrow on a directed edge.
 The implementation of a \pkg{ggplot2} \code{geom} for networks within \pkg{geomnet} inspired the creation of the aliased \code{geom}s of the \pkg{ggnetwork} package.
 
+\hh{
+\begin{center}
+{\large\bf Supplementary material}
+\end{center}
 
+\begin{description}
+
+\item[Software:] \CRANpkg{ggnetwork} 0.5.1 and \CRANpkg{geomnet} 0.0.1 were used to create the visualizations. \code{ggnet2} is part of \CRANpkg{GGally} 1.0.1.
+
+\item[Reproducibility:] All the code and anonymized data used in this analysis is available in the electronic supplement.
+
+\end{description}
+}
 
 
 \bibliography{tyner-briatte-hofmann}
