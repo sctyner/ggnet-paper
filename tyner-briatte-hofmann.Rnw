@@ -139,7 +139,7 @@ library(sna)
 \begin{itemize}
 \item mention weights in networks. Thresholding of weights is then a subsetting routine - could maybe go into the conclusion? 
 %\item in the intro: emphasize the goal of the paper: visualizations of networks within the ggplot2 framework and nothing but visualizations. DONE
-\item cite \CRANpkg{ndtv} package by \cite{ndtv} - this has some fancy animations of  dynamic temporal networks -- should probably go into the email example
+%\item cite \CRANpkg{ndtv} package by \cite{ndtv} - this has some fancy animations of  dynamic temporal networks -- should probably go into the email example XXX
 \end{itemize}
 XXX}
 
@@ -266,7 +266,6 @@ information on network edges and nodes as attributes that are then accessible to
   This functionality allows the \code{ggnet2} function to work in a similar fashion to \pkg{ggplot2} mappings of aesthetics within the \code{aes} operator.
 
 The \code{ggnet2} function also provides a few network-specific options, such as sizing the nodes as a function of their unweighted degree, or using the primary and secondary modes of a bipartite network as an aesthetic mapping for the nodes.%
-\footnote{Bipartite (or 'two-mode') networks are networks with two different kinds of nodes and where all ties are formed between these two kinds. Affiliation networks, which represent the ties between individuals and the groups to which they belong, are examples of such networks \citep[see][p.~53-54 and p.~123-127]{newman}.}%
   %
 All in all, the \code{ggnet2} function combines two different kinds of processes: it translates a network object into a data frame suitable for plotting with \pkg{ggplot2}, and it applies network-related aesthetic operations to that data frame, such as coloring the edges in function of the color of the nodes that they connect. %\sct{In the next section, we discuss \pkg{geomnet}, which is similarly constructed.}
 
@@ -531,7 +530,8 @@ differences that exist between the implementations:
   %% this paragraph has been fixed to reflect your (sct + hh) remarks -- fb
 
   \item %
-  In the \code{ggnet2} implementation, the opacity of the edges between employees in the same cluster is higher than it is for the edges between employees in different clusters. This is due to the fact that the email network does not feature edge weights: instead, every email between two employees is represented by a different edge, resulting in edge overplotting. As the \code{edge.alpha} argument has been set to a value smaller than one, multiple emails between two employees create more opaque edges between them. \sct{Multiple emails are also taken into account in the \CRANpkg{geomnet} package. When there is more than one edge connecting two vertices, the \code{stat\_net} function adds a weight variable to the edgelist, which automatically get passed to the layout algorithms and are taken into account accordingly. In \CRANpkg{ggnetwork}, XXX Francois, take over? XXX} 
+  In the \code{ggnet2} implementation, the opacity of the edges between employees in the same cluster is higher than it is for the edges between employees in different clusters. This is due to the fact that the email network does not feature edge weights: instead, every email between two employees is represented by a different edge, resulting in edge overplotting. As the \code{edge.alpha} argument has been set to a value smaller than one, multiple emails between two employees create more opaque edges between them. \sct{Multiple emails are also taken into account in the \CRANpkg{geomnet} package. When there is more than one edge connecting two vertices, the \code{stat\_net} function adds a weight variable to the edgelist, which  is passed automatically to the layout algorithms and taken into account accordingly.} 
+\sct{What happens to weights in \CRANpkg{ggnetwork} or ggnet2, XXX Francois, take over? XXX } 
   % XXX SCT - this next sentence is not totally accurate because geomnet creates weights in sna that are taken in the layout function automatically. I replaced it with above XXX 
 %This effect is not visible in the layouts created by \pkg{geomnet} and \code{ggnetwork} because both implementations draw a single segment for each directed edge, regardless of how many of these edges exist in the network data.
 
@@ -1033,8 +1033,9 @@ ggplot(
 %' %\afterpage{\clearpage}
 
 \subsection{Southern Women} % ==============================
-\hh{In a two-mode or bipartite network two classes of nodes exist and edges only connect nodes from different classes. 
-One of the classic examples for a two-mode network is the network of 18 Southern women attending 14 social events as collected by \citet{davis} and published e.g.\ as part of the \CRANpkg{tnet} package \citep{tnet}, i.e.\ a woman is linked by an edge to an event if she attended it. 
+Bipartite (or `two-mode') networks are networks with two different kinds of nodes and where all ties are formed between these two kinds. Affiliation networks, which represent the ties between individuals and the groups to which they belong, are examples of such networks \citep[see][p.~53-54 and p.~123-127]{newman}.
+
+\hh{One of the classic examples for a two-mode network is the network of 18 Southern women attending 14 social events as collected by \citet{davis} and published e.g.\ as part of the \CRANpkg{tnet} package \citep{tnet}, i.e.\ a woman is linked by an edge to an event if she attended it. 
 One of the questions for these type of networks is gain insight in the interplay between the two different sets of nodes. 
 
 The data for the example of the Southern women is reported as edge list in form of `lady $X$ attending event $Y$'.
