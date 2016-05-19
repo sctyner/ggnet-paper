@@ -1083,8 +1083,11 @@ davis <- rbind(davis, data.frame(from=davis$to, to=davis$from))
 davis$type <- factor(c(rep("Lady", nrow(elist)), rep("Event", nrow(elist))))
 @
 
-\begin{figure}
+\begin{figure}[bh]
+\begin{subfigure}[t]{\textwidth}
+\caption{\pkg{geomnet}}
 <<davis_geom_net, dependson='davis_data_2', size="footnotesize", opts.label="codefig", echo=TRUE>>=
+# Southern women network in geomnet
 davis$lcolour <- 
   c("white", "black")[as.numeric(davis$type)]
 
@@ -1092,7 +1095,7 @@ ggplot(data = davis) +
   geom_net(
     aes(from_id = from, to_id = to, 
         colour = type, shape = type), 
-    size = 15, label = TRUE, ealpha = 0.5,
+    size = 15, label = TRUE, ealpha = 0.25,
     vjust = 0.5, hjust = 0.5,
     labelcolour = davis$lcolour) +
   theme_net() + 
@@ -1100,7 +1103,49 @@ ggplot(data = davis) +
   scale_shape("Type of node") +
   theme(legend.position = "bottom")
 @
+\end{subfigure}
 \caption{\label{fig:davis}Graph of the Southern women data. Women are represented as orange triangles, events as green circles. }
+\end{figure}
+\begin{figure}
+\ContinuedFloat
+\begin{subfigure}[t]{\textwidth}
+\caption{\pkg{ggnet2}}
+<<davis_ggnet2, dependson='davis_data_2', size="footnotesize", opts.label="codefig", echo=TRUE, warning=FALSE>>=
+# Southern women network in ggnet2
+# create affiliation matrix
+bip = xtabs(~Event+Lady, data=elist)
+
+# weighted bipartite network
+bip = network(bip,
+              matrix.type = "bipartite",
+              ignore.eval = FALSE,
+              names.eval = "weights")
+
+# detect and color the mode
+ggnet2(bip, color = "mode", palette = "Set2", 
+       shape = "mode", 
+       size = 15, label = TRUE) +
+  theme(legend.position="bottom")
+@
+\end{subfigure}
+\begin{subfigure}[t]{\textwidth}
+\caption{\pkg{ggnetwork}}
+<<davis_ggnetwork, dependson='davis_data_2', size="footnotesize", opts.label="codefig", echo=TRUE, warning=FALSE>>=
+# Southern women network in ggnetwork
+set.vertex.attribute(bip, "mode", 
+  c(rep("event", 14), rep("woman", 18)))
+
+ggplot(data = ggnetwork(bip),
+       aes(x = x, y = y, xend = xend, yend = yend)) + 
+  geom_edges(colour = "grey80") +
+  geom_nodes(aes(colour = mode, shape = mode), size = 15) +
+  geom_nodetext(aes(label = vertex.names)) + 
+  scale_colour_brewer(palette = "Set2") +
+  theme_blank() + 
+  theme(legend.position = "bottom") 
+@
+\end{subfigure}
+\caption{\label{fig:davis}(continued) Graph of the Southern women data. Women are represented as orange triangles, events as green circles. }
 \end{figure}
 %
 \noindent
@@ -1253,6 +1298,12 @@ ggplot(data = protein$edges, aes(from_id = from, to_id = to)) +
   theme_net()
 @
 
+\begin{figure}[bhp]
+\centering
+\includegraphics[width=.8\textwidth]{figure/yeast_geom_net-1.pdf}
+%\end{subfigure}
+\caption{\label{fig.cap:yeast} Protein-protein interaction network in \emph{S. cerevisiae}. The layout is random and follows a Gaussian donut distribution.}
+\end{figure}
 <<yeast_ggnetwork, echo=TRUE, eval = FALSE,  cache=FALSE>>=
 # plot with ggnetwork
 ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
@@ -1262,11 +1313,7 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
   theme_blank()
 
 @
-\begin{figure}[hbtp]
-\includegraphics[width=\textwidth]{figure/yeast_geom_net-1.pdf}
-%\end{subfigure}
-\caption{\label{fig.cap:yeast} Protein-protein interaction network in \emph{S. cerevisiae}. The layout is random and follows a Gaussian donut distribution.}
-\end{figure}
+
 %\afterpage{\clearpage}
 
 %\newpage
@@ -1286,7 +1333,7 @@ shown in Figure~\ref{fig.cap:yeast}, and then consider average plotting times of
 We plotted the protein interaction network of Figure~\ref{fig.cap:yeast} 100 times using the \pkg{network} and \pkg{igraph} packages, and compared their run times to 100 runs each of the three visualization approaches introduced in this paper. The results are shown in Figure~\ref{fig:timings}. We can see that on average, the \pkg{ggplot2} framework provides a two to three-fold increase in speed over the network package, and that \pkg{geomnet} and \pkg{ggnetwork} are faster than package \pkg{igraph}. The three \pkg{ggplot2} approaches also have considerably less variability in time than the \pkg{network} package.
 Despite the large number of vertices, the protein interaction network has a relatively small number of edges (4480 out of over 2.2 Million theoretically possible connections resulting in an edge probability of just over 0.0020). Next, we examine networks with a higher edge probability.
 
-\begin{figure}
+\begin{figure}[b]
 \centering
 <<compare, echo = FALSE, eval = TRUE, fig.height = 4, fig.width = 8, out.width = '\\textwidth'>>=
 g = read.csv("runtimes-protein/runtimes-protein-100.csv", stringsAsFactors = FALSE) %>%
@@ -1457,7 +1504,6 @@ Users who are already familiar with \pkg{ggplot2} and some of the other `Hadley-
 On a personal level we discovered that the collaboration on this paper has helped us to improve upon our initial versions of each of these packages. For instance, the edge coloring in the \code{ggnet2} function was designed so that edges between two vertices in the same group were colored with that group's vertex color. This  inspired an implementation of it in \code{geomnet} through the traditional \code{ggplot2} group operator. During the process of writing the paper the authors collaborated on a solution for the problem of nodes being plotted on top of arrow tips. This solution now presents itself in form of the \code{arrow.gap} parameter, which allows to re-track the tip of an arrow on a directed edge.
 The implementation of a \pkg{ggplot2} \code{geom} for networks within \pkg{geomnet} inspired the creation of the aliased \code{geom}s of the \pkg{ggnetwork} package.
 
-\newpage
 \hh{
 \begin{center}
 {\large\bf Supplementary material}
