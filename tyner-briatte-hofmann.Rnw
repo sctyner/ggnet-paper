@@ -126,11 +126,18 @@ library(sna)
 
 % problem: many network packages exist, but are not easy to use
 Many R packages already exist to manipulate network objects, such as \CRANpkg{igraph} by \citet{igraph}, \CRANpkg{sna} by \citet{sna}, and \CRANpkg{network} by \citet{network} (see also \citet{network.jss}). \sct{Though t}hese packages \sct{have network visualization capabilities, visualization is not their primary purpose. This leads to visualization techniques in that require } %however, rely on idiosyncratic visualization syntaxes, which means that the user must acquire 
-detailed knowledge of each one of these packages \sct{and their syntaxes} in order to build meaningful network visualizations with them. \sct{XXX I'm not sure what you're trying to say in this next sentence, Francois. Could you explain a bit in a comment? XXX} These packages further require to repeat all graphic parameters (such as colors, coordinates and sizes) in every network visualization, with no possibility to use precomputed layers of these parameters, or to map these parameters to network attributes. \sct{To contrast, the packages we have written have one primary purpose: to provide a means of creating beautiful network visualizations within a framework that is accessible to and used by many.}
-
+detailed knowledge of each one of these packages \sct{and their syntaxes} in order to build meaningful network visualizations with them. 
+%\sct{XXX I'm not sure what you're trying to say in this next sentence, Francois. Could you explain a bit in a comment? XXX} \hh{XXXX ok, I can see where this is going - but it's a bit of shooting into one's knee going the long way. XXX how can we simplify this?
+%How about: XXX  }
+\hh{All of these packages are developed with a focus of analyzing network data and not for rendering the final product. This means that in order to visualize the network, the user has to make a lot of choices on graphic parameters,}  %These packages further require to repeat all graphic parameters
+such as colors, coordinates and sizes, %in every network visualization, 
+with no possibility to use precomputed defaults for these parameters, or to map these parameters to network attributes. 
+\sct{To contrast, the packages we have written have one primary purpose: to provide a means of creating beautiful network visualizations within the popular \CRANpkg{ggplot2} package \citep{ggplot2}.}
+%
 % solution: ggplot2 as an implementation framework
 %\sct{This is redundant} In this article, 
-Our objective is to bring network plotting capabilities to the popular \CRANpkg{ggplot2} package \citep{ggplot2}. \sct{Thus, our focus here is not on adding to the important theory of graph drawing, (cf. \citet{graphdrawing}) but rather the implementation of current graph drawing capabilities in the elegant \CRANpkg{ggplot2} famework.} \sct{The \CRANpkg{ggplot2} package} was designed as an implementation of the `grammar of graphics' proposed by \citet{wilkinson:1999}, and it has become extremely popular among R users.%
+%Our objective is to bring network plotting capabilities to the popular \CRANpkg{ggplot2} package \citep{ggplot2}. 
+\sct{Thus, our focus here is not on adding to the important theory of graph drawing, \citep[cf.\ ][]{graphdrawing} but rather the implementation of current graph drawing capabilities in the \CRANpkg{ggplot2} famework.} \sct{The \CRANpkg{ggplot2} package} was designed as an implementation of the `grammar of graphics' proposed by \citet{wilkinson:1999}, and it has become extremely popular among R users.%
   %
   \footnote{In order to give an indication of how  large the user base of \pkg{ggplot2} is, we looked at its usage statistics from January 1, 2015 to December 31, 2015 (see \url{http://cran-logs.rstudio.com/}). Over this period, the \pkg{ggplot2} package was downloaded over 1.75 million times from CRAN, which amounts to over 6,200 downloads per day. Over 700 R packages list \pkg{ggplot2} as a dependency or as a suggestion.} %
 %\sct{XXX I do not think that the line about Python is relevant, as we are submitting this to the R journal. I have commented it out for now. XXX}
@@ -140,8 +147,8 @@ Our objective is to bring network plotting capabilities to the popular \CRANpkg{
   % see also: port of ggplot2 to plotly? \url{https://plot.ly/ggplot2/} %% -- hh
   %
 %  This is the audience we are aiming at by making network visualizations a part of \pkg{ggplot2}.
-Because the syntax implemented in the \pkg{ggplot2} package is extendable to many different kinds of visualizations, many packages have built additional functionalities on top of the existing package. Examples include the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRANpkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the package \CRANpkg{GGally} by \citet{ggally}, and the \BIOpkg{ggbio} and \BIOpkg{ggtree} Bioconductor packages by \citet{ggbio} and \citet{ggtree}, which both provide visualizations for biological data.
-These packages have expanded the utility of \pkg{ggplot2}, likely resulting in a great increase of its user base. We hope to add to this user base even more by %extending 
+Because the syntax implemented in the \pkg{ggplot2} package is extendable to  different kinds of visualizations, many packages have built additional functionalities on top of the  \pkg{ggplot2} framework. Examples include the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRANpkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the package \CRANpkg{GGally} by \citet{ggally}, which encompasses various complementary visualization techniques to \pkg{ggplot2}, and the \BIOpkg{ggbio} and \BIOpkg{ggtree} Bioconductor packages by \citet{ggbio} and \citet{ggtree}, which both provide visualizations for biological data.
+These packages have expanded the utility of \pkg{ggplot2}, likely resulting in an  increase of its user base. We hope to add to this user base even more by %extending 
 \sct{applying} the benefits of the grammar of graphics to network visualization.
 % Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization.
 Our efforts rely upon the most recent changes to \pkg{ggplot2}, which allow users to more easily extend the package through additional geometries or \samp{geoms}.%
@@ -178,7 +185,7 @@ Networks can vary widely in scope and complexity: the smallest network is simply
 \centering
 <<madmen_geom_net, fig.width=7, fig.height=7.5>>=
 # make data accessible 
-data(madmen, package = geomnet)
+data(madmen, package = "geomnet")
 
 # code for geom_net
 # data step: merge edges and nodes
@@ -691,7 +698,7 @@ ggplot(ggnetwork(te.net),
   theme_blank()
 @
 \end{subfigure}
-\caption{\label{fig.cap:theme:c} Inheritance structure of \pkg{ggplot2} theme elements. This is a recreation of the graph found at \protect\url{http://docs.ggplot2.org/current/theme.html}.}
+\caption{\label{fig.cap:theme:c}(continued) Inheritance structure of \pkg{ggplot2} theme elements. This is a recreation of the graph found at \protect\url{http://docs.ggplot2.org/current/theme.html}.}
 \end{figure}
 
 %\afterpage{\clearpage}
@@ -866,7 +873,7 @@ ggplot(
   theme(legend.position = "bottom")
 @
 \end{subfigure}
-\caption{\label{fig.cap:madmen2} A directed network of relationships in Mad Men.}
+\caption{\label{fig.cap:madmen2}(continued) A directed network of relationships in Mad Men.}
 \end{figure}
 %\afterpage{\clearpage}
 The \pkg{gcookbook} package \citep{madmen} gives another, directed form of the Mad Men network.  It also encapsulates the romantic relationships between characters, but it additionally includes all advances made by one character but rejected by the other.  For example, Peggy Olson made advances toward her boss Don Draper, but Don refused her. This is represented  a directed edge going from Peggy to Don, but not from Don to Peggy.  If the advance is reciprocated, such as between Sal Romano and the Bellhop, there are two directed edges between the two vertices.
@@ -957,7 +964,7 @@ ggplot(
   theme_blank()
 @
 \end{subfigure}
-\caption{\label{fig.cap:football} The network of regular season Division I college football games in the season of fall 2000. The vertices and their labels are colored by conference.}
+\caption{\label{fig.cap:football}(continued) The network of regular season Division I college football games in the season of fall 2000. The vertices and their labels are colored by conference.}
 \end{figure}
 %\afterpage{\clearpage}
 \noindent
@@ -1449,6 +1456,7 @@ Users who are already familiar with \pkg{ggplot2} and some of the other `Hadley-
 On a personal level we discovered that the collaboration on this paper has helped us to improve upon our initial versions of each of these packages. For instance, the edge coloring in the \code{ggnet2} function was designed so that edges between two vertices in the same group were colored with that group's vertex color. This  inspired an implementation of it in \code{geomnet} through the traditional \code{ggplot2} group operator. During the process of writing the paper the authors collaborated on a solution for the problem of nodes being plotted on top of arrow tips. This solution now presents itself in form of the \code{arrow.gap} parameter, which allows to re-track the tip of an arrow on a directed edge.
 The implementation of a \pkg{ggplot2} \code{geom} for networks within \pkg{geomnet} inspired the creation of the aliased \code{geom}s of the \pkg{ggnetwork} package.
 
+\newpage
 \hh{
 \begin{center}
 {\large\bf Supplementary material}
