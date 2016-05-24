@@ -388,8 +388,8 @@ ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
   geom_net(colour = "darkred", layout = "circle", label = TRUE, size = 15,
            directed = TRUE, vjust = 0.5, labelcolour = "grey80",
            arrowsize = 1.5, linewidth = 0.5, arrowgap = 0.05,
-           selfies = TRUE, ecolour = "grey40") +
-  theme_net()
+           selfies = TRUE, ecolour = "grey40") + 
+  theme_net() 
 @
 
 <<blood_ggnetwork, echo=TRUE, fig.width=6, fig.height=6>>=
@@ -672,9 +672,9 @@ ggplot(data = TEnet,
        aes(from_id = parent, to_id = child)) +
   geom_net(
     aes(fontsize = degree), directed = TRUE,
-    label = TRUE, vjust = -.5, size = 3,
+    label = TRUE, size = 3,
     ecolour = "grey70", arrowsize = 0.5,
-    linewidth = 0.5) +
+    linewidth = 0.5, repel = TRUE) +
   theme_net() +
   xlim(c(-0.05, 1.05))
 @
@@ -725,7 +725,7 @@ MMnet <- merge(madmen$edges, madmen$vertices,
 # create plot
 ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
   geom_net(aes(colour = Gender), size = 4, label = TRUE,
-           vjust = -0.6, ecolour = "grey60") +
+           repel = TRUE, ecolour = "grey60") +
   scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
   xlim(c(-0.05, 1.05)) +
   theme_net() +
@@ -840,7 +840,7 @@ ggplot(data = MM2net,
   geom_net(
     aes(colour = Gender),  directed = TRUE,
     label = TRUE, ecolour = "grey50",
-    linewidth = 0.5, size = 2.5, vjust = -.5,
+    linewidth = 0.5, size = 2.5, repel = TRUE,
     layout = "fruchtermanreingold") +
   scale_colour_manual(
     values = c("#ff69b4", "#0099ff")) +
@@ -1173,7 +1173,7 @@ tripnet$Metro[idx] <- TRUE
 # plot the bike sharing network shown in Figure 7b
 ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
   geom_net(aes(linewidth = n / 15, colour = Metro),
-           label = TRUE, vjust = -0.5) +
+           label = TRUE, repel = TRUE) +
   theme_net() +
   xlim(c(-0.1, 1.1)) +
   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
@@ -1513,7 +1513,7 @@ The implementation of a \pkg{ggplot2} \code{geom} for networks within \pkg{geomn
 
 \item[Software:] \CRANpkg{ggnetwork} 0.5.1 and \CRANpkg{geomnet} 0.0.1 were used to create the visualizations. \code{ggnet2} is part of \CRANpkg{GGally} 1.0.1.
 
-\item[Reproducibility:] All the code and data used in the examples is available in the electronic supplement.
+\item[Reproducibility:] All the code and data used in the examples is available in the electronic supplement, which is hosted and kept maintained at \url{https://github.com/sctyner/ggnet-paper/tree/master/revision/supplementary\%20code}.
 
 \end{description}
 
