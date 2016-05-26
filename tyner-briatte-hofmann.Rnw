@@ -1144,7 +1144,7 @@ ggplot(data = ggnetwork(bip),
   theme(legend.position = "bottom") 
 @
 \end{subfigure}
-\caption{\label{fig:davis} Graph of the Southern women data. Women are represented as orange triangles, events as green circles. }
+\caption{\label{fig:davis}(continued) Graph of the Southern women data. Women are represented as orange triangles, events as green circles. }
 \end{figure}
 %
 \noindent
