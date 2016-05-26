@@ -348,6 +348,7 @@ For each of these examples, we are going to present the code necessary to produc
 
 For the following examples we will be loading all three packages under comparison. In practice, only one of these packages would be needed to visualize a network in the \CRANpkg{ggplot2} framework:
 <<examples-setup, echo = TRUE>>=
+library(ggplot2)
 library(GGally)
 library(geomnet)
 library(ggnetwork)
@@ -1512,7 +1513,7 @@ The implementation of a \pkg{ggplot2} \code{geom} for networks within \pkg{geomn
 
 \item[Software:] \CRANpkg{ggnetwork} 0.5.1 and \CRANpkg{geomnet} 0.0.1 were used to create the visualizations. \code{ggnet2} is part of \CRANpkg{GGally} 1.0.1.
 
-\item[Reproducibility:] All the code and data used in the examples is available in the electronic supplement, which is hosted and kept maintained at \url{https://github.com/sctyner/ggnet-paper/tree/master/revision/supplementary\%20code}.
+\item[Reproducibility:] Code and data used in the examples are available as part of the vignette in the \pkg{geomnet} package. %in the electronic supplement, which is hosted and kept maintained at \url{https://github.com/sctyner/ggnet-paper/tree/master/revision/supplementary\%20code}.
 
 \end{description}
 
