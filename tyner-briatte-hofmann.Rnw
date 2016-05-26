@@ -719,8 +719,7 @@ data(madmen, package = 'geomnet')
 
 # code for geom_net
 # data step: merge edges and nodes
-MMnet <- merge(madmen$edges, madmen$vertices,
-               by.x = "Name1", by.y = "label", all = TRUE)
+MMnet <- merge(madmen$edges, madmen$vertices, by.x = "Name1", by.y = "label", all = TRUE)
 
 # create plot
 ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
@@ -758,8 +757,7 @@ ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
 ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
   geom_edges(color = "grey50") +
   geom_nodes(aes(colour = gender), size = 4) +
-  geom_nodetext(aes(colour = gender, label = vertex.names),
-                size = 4, vjust = -0.6) +
+  geom_nodetext(aes(colour = gender, label = vertex.names), size = 4, vjust = -0.6) +
   scale_colour_manual(values = mm.col) +
   xlim(c(-0.05, 1.05)) +
   theme_blank() +
@@ -849,6 +847,7 @@ ggplot(data = MM2net,
 @
 \end{subfigure}
 %
+\caption{\label{fig.cap:madmen2} A directed network of relationships in Mad Men.}
 \end{figure}
 
 \begin{figure}
@@ -910,6 +909,7 @@ ggnet2(fb.net, mode = "fruchtermanreingold",
 @
 \end{subfigure}
 %
+\caption{\label{fig.cap:football}The network of regular season Division I college football games in the season of fall 2000. The vertices and their labels are colored by conference.}
 \end{figure}
 \begin{figure}
 \ContinuedFloat
