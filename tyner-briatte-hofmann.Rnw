@@ -724,8 +724,8 @@ MMnet <- merge(madmen$edges, madmen$vertices,
 
 # create plot
 ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
-  geom_net(aes(colour = Gender), size = 4, label = TRUE,
-           repel = TRUE, ecolour = "grey60") +
+  geom_net(aes(colour = Gender), 
+           size = 4, label = TRUE, repel = TRUE, ecolour = "grey60") +
   scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
   xlim(c(-0.05, 1.05)) +
   theme_net() +
@@ -750,8 +750,7 @@ mm.col <- c("female" = "#ff69b4", "male" = "#0099ff")
 <<madmen_ggnet2, echo=TRUE, out.width='\\textwidth', fig.width=9, fig.height=9>>=
 # create plot for ggnet2
 ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
-       label = TRUE, label.color = mm.col[ mm.net %v% "gender" ],
-       size = 4, vjust = -0.6)
+       label = TRUE, label.color = mm.col[ mm.net %v% "gender" ], size = 4, vjust = -0.6)
 @
 
 <<madmen_ggnetwork, echo=TRUE,  out.width='\\textwidth', fig.width=9, fig.height=9>>=
