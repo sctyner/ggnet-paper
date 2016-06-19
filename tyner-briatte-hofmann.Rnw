@@ -720,12 +720,13 @@ data(madmen, package = 'geomnet')
 
 # code for geom_net
 # data step: merge edges and nodes
-MMnet <- merge(madmen$edges, madmen$vertices, by.x = "Name1", by.y = "label", all = TRUE)
+MMnet <- merge(madmen$edges, madmen$vertices,
+               by.x = "Name1", by.y = "label", all = TRUE)
 
 # create plot
 ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
-  geom_net(aes(colour = Gender), 
-           size = 4, label = TRUE, repel = TRUE, ecolour = "grey60") +
+  geom_net(aes(colour = Gender), size = 4, label = TRUE,
+           repel = TRUE, ecolour = "grey60") +
   scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
   xlim(c(-0.05, 1.05)) +
   theme_net() +
@@ -750,7 +751,8 @@ mm.col <- c("female" = "#ff69b4", "male" = "#0099ff")
 <<madmen_ggnet2, echo=TRUE, out.width='\\textwidth', fig.width=9, fig.height=9>>=
 # create plot for ggnet2
 ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
-       label = TRUE, label.color = mm.col[ mm.net %v% "gender" ], size = 4, vjust = -0.6)
+       label = TRUE, label.color = mm.col[ mm.net %v% "gender" ],
+       size = 4, vjust = -0.6)
 @
 
 <<madmen_ggnetwork, echo=TRUE,  out.width='\\textwidth', fig.width=9, fig.height=9>>=
@@ -758,7 +760,8 @@ ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
 ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
   geom_edges(color = "grey50") +
   geom_nodes(aes(colour = gender), size = 4) +
-  geom_nodetext(aes(colour = gender, label = vertex.names), size = 4, vjust = -0.6) +
+  geom_nodetext(aes(colour = gender, label = vertex.names),
+                size = 4, vjust = -0.6) +
   scale_colour_manual(values = mm.col) +
   xlim(c(-0.05, 1.05)) +
   theme_blank() +
@@ -848,7 +851,6 @@ ggplot(data = MM2net,
 @
 \end{subfigure}
 %
-\caption{\label{fig.cap:madmen2} A directed network of relationships in Mad Men.}
 \end{figure}
 
 \begin{figure}
@@ -910,7 +912,6 @@ ggnet2(fb.net, mode = "fruchtermanreingold",
 @
 \end{subfigure}
 %
-\caption{\label{fig.cap:football}The network of regular season Division I college football games in the season of fall 2000. The vertices and their labels are colored by conference.}
 \end{figure}
 \begin{figure}
 \ContinuedFloat
@@ -1145,7 +1146,7 @@ ggplot(data = ggnetwork(bip),
   theme(legend.position = "bottom") 
 @
 \end{subfigure}
-\caption{\label{fig:davis}(continued) Graph of the Southern women data. Women are represented as orange triangles, events as green circles. }
+\caption{\label{fig:davis} Graph of the Southern women data. Women are represented as orange triangles, events as green circles. }
 \end{figure}
 %
 \noindent
@@ -1513,7 +1514,7 @@ The implementation of a \pkg{ggplot2} \code{geom} for networks within \pkg{geomn
 
 \item[Software:] \CRANpkg{ggnetwork} 0.5.1 and \CRANpkg{geomnet} 0.0.1 were used to create the visualizations. \code{ggnet2} is part of \CRANpkg{GGally} 1.0.1.
 
-\item[Reproducibility:] Code and data used in the examples are available as part of the vignette in the \pkg{geomnet} package. %in the electronic supplement, which is hosted and kept maintained at \url{https://github.com/sctyner/ggnet-paper/tree/master/revision/supplementary\%20code}.
+\item[Reproducibility:] All the code and data used in the examples is available in the electronic supplement, which is hosted and kept maintained at \url{https://github.com/sctyner/ggnet-paper/tree/master/revision/supplementary\%20code}.
 
 \end{description}
 
