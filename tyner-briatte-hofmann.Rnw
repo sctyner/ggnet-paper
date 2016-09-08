@@ -134,12 +134,14 @@ detailed knowledge of each one of them and their syntax in order to build meanin
 %This means that in order to visualize the network, the user has to make a lot of choices on graphic parameters,  %These packages further require to repeat all graphic parameters
 %such as colors, coordinates and sizes, %in every network visualization, 
 %with no possibility to use pre-computed defaults for these parameters, or to map these parameters to network attributes. 
-To contrast, the packages we have written have one primary purpose: to create beautiful network visualizations by providing a wrapper to the popular \CRANpkg{ggplot2} package \citep{ggplot2}.
+The packages we have written have one primary purpose: to create beautiful network visualizations by providing a wrapper to the popular \CRANpkg{ggplot2} package \citep{ggplot2}.
 %
 % solution: ggplot2 as an implementation framework
 %\sct{This is redundant} In this article, 
 %Our objective is to bring network plotting capabilities to the popular \CRANpkg{ggplot2} package \citep{ggplot2}. 
-Thus, our focus here is not on adding to the analysis of network data or to the many types of graph drawing, \citep[cf.\ ][]{graphdrawing} but rather it is on implementing existing graph drawing capabilities in the \CRANpkg{ggplot2} framework. The \CRANpkg{ggplot2} package was designed as an implementation of the `grammar of graphics' proposed by \citet{wilkinson:1999}, and it has become extremely popular among R users.%
+And so, our focus here is not on adding to the analysis of network data or to the field of graph drawing, \citep[cf.\ ][]{graphdrawing} but rather it is on implementing existing graph drawing capabilities in the \CRANpkg{ggplot2} framework, using the more traditional data frame structure. 
+
+\par The \CRANpkg{ggplot2} package was designed as an implementation of the `grammar of graphics' proposed by \citet{wilkinson:1999}, and it has become extremely popular among R users.%
   %
   \footnote{In order to give an indication of how  large the user base of \pkg{ggplot2} is, we looked at its usage statistics from January 1, 2015 to December 31, 2015 (see \url{http://cran-logs.rstudio.com/}). Over this period, the \pkg{ggplot2} package was downloaded over 1.75 million times from CRAN, which amounts to over 6,200 downloads per day. Over 700 R packages list \pkg{ggplot2} as a dependency or as a suggestion.} %
 %\sct{XXX I do not think that the line about Python is relevant, as we are submitting this to the R journal. I have commented it out for now. XXX}
@@ -150,14 +152,14 @@ Thus, our focus here is not on adding to the analysis of network data or to the 
   %
 %  This is the audience we are aiming at by making network visualizations a part of \pkg{ggplot2}.
 Because the syntax implemented in the \pkg{ggplot2} package is extendable to  different kinds of visualizations, many packages have built additional functionality on top of the  \pkg{ggplot2} framework. Examples include the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRANpkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the package \CRANpkg{GGally} by \citet{ggally}, which encompasses various complementary visualization techniques to \pkg{ggplot2}, and the \BIOpkg{ggbio} and \BIOpkg{ggtree} Bioconductor packages by \citet{ggbio} and \citet{ggtree}, which both provide visualizations for biological data.
-These packages have expanded the utility of \pkg{ggplot2}, likely resulting in an  increase of its user base. We hope to add to this user base even more by %extending 
-applying the benefits of the grammar of graphics to network visualization.
+These packages have expanded the utility of \pkg{ggplot2}, likely resulting in an  increase of its user base. We hope to appeal to this user base and potentially add to it by %extending 
+applying the benefits of the grammar of graphics implemented in \pkg{ggplot2} to network visualization.
 % Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization.
 Our efforts rely upon the most recent changes to \pkg{ggplot2}, which allow users to more easily extend the package through additional geometries or \samp{geoms}.%
 \footnote{Version 2.1.0, released 1 March 2016. See \url{https://cran.r-project.org/web/packages/ggplot2/news.html} for the full list of changes in \pkg{ggplot2} 2.1.0, as well as the new package vignette, ``Extending ggplot2'', which explains how the internal \code{ggproto} system of object-oriented programming can be used to create new geoms.} %
   %
 
-In the remainder of this paper, we present three different approaches to network visualization with \pkg{ggplot2}. Section~\nameref{sec:background} introduces the basic terminology of networks and illustrates their ubiquity in natural and social life. Section~\nameref{sec:implementations} then discusses the logic behind each of the three approaches that we offer. Section~\nameref{sec:examples} extends that discussion through several examples ranging from simple to complex networks, for which we provide the code corresponding to each approach alongside its graphical result. We follow with some considerations of runtime behavior in plotting networks in Section~\nameref{sec:speed} before closing with a discussion.
+In the remainder of this paper, we present three different approaches to network visualization through \pkg{ggplot2} wrappers. The section~\nameref{sec:background} introduces the basic terminology of networks and illustrates their ubiquity in natural and social life. The next section~\nameref{sec:implementations} then discusses the logic behind each of the three approaches that we offer. The section~\nameref{sec:examples} extends that discussion through several examples ranging from simple to complex networks, for which we provide the code corresponding to each approach alongside its graphical result. We follow with some considerations of runtime behavior in plotting networks in the section~\nameref{sec:speed} before closing with a discussion.
 
 %\section{A quick primer to network structures}
 % XXX SCT-I did not love that other section title...can we agree on another?
@@ -165,19 +167,17 @@ In the remainder of this paper, we present three different approaches to network
 \label{sec:background}
 % XXX SCT-Making the language more precise, per reviewer 1. 
 In its essence, a network is simply a set of %points
-actors connected in pairs by a set of %lines
-relationships \citep{newman}. %Here, we refer to the lines as edges (or ties) and to the points as nodes (or vertices).
-Here, we refer to the actors and relationships by their graph representation equivalents, vertices (or nodes) and edges, respectively. We note that our examples of visualization are all of one-mode networks, where all nodes are of the same kind and are able to connect to each other, however the graphical tools presented can be used to visualize %more general 
-many other types of networks. %\sct{XXX I'm not 100\% sure that's true but it seems right.XXX
+vertices connected in pairs by a set of %lines
+edges \citep{newman}. %Here, we refer to the lines as edges (or ties) and to the points as nodes (or vertices).
+Throughout this paper, we also use the terms ``nodes" and ``actors" to refer to vertices, as well as the terms ``ties" and ``relationships" to refer to edges. %We also note that our examples of visualization are all of one-mode networks, where all nodes are of the same kind and are able to connect to each other, however the graphical tools presented can be used to visualize %more general 
+%many other types of networks. %\sct{XXX I'm not 100\% sure that's true but it seems right.XXX
 % HH: more general is definitely true}
-
 The two sets of graphical objects that make up a network visualization, points and segments between them, have been used to %encode 
-examine a huge variety and quantity of information across many different fields of study. For instance, networks of scientific collaboration, a food web of marine animals, and American college football games are all covered in a paper on community detection in networks by \citet{football}. \citet{networkfailures} %examine 
+examine a huge variety and quantity of information across many different fields of study. For instance, networks of scientific collaboration, a food web of marine animals, and American college football games are all covered in a paper on community detection in networks by \citet{football}. Additionally, \citet{networkfailures} %examine 
 study node failure in interdependent networks like power grids.  Social networks such as links between actors found on \url{http://www.imdb.com/} and neural networks, like the completely mapped neural network of the \textit{C. elegans} worm are also extensively studied \citep{smallworld}.
 
-Networks can vary widely in scope and complexity: the smallest network is simply %an edge 
-one tie between two %vertices,
-actors, while one of the most commonly used and most complex networks, the world wide web, has billions of vertices (Web pages) and billions of edges (hyperlinks) connecting them. Additionally, the edges in a network can be directed or undirected: directed edges represent information travelling from one vertex to another, and switching the direction would change the structure of the network. The World Wide Web is an example of a directed network because hyperlinks connect one Web page to another, but not necessarily the other way around. Undirected edges are simply connections between vertices. Co-authorship networks are examples of undirected networks, where nodes are authors and they are connected by an edge if they have written an academic publication together.
+These examples show that networks can vary widely in scope and complexity: the smallest connected network is simply %an edge 
+one edge between two vertices, while one of the most commonly used and most complex networks, the world wide web, has billions of vertices (Web pages) and billions of edges (hyperlinks) connecting them. Additionally, the edges in a network can be directed or undirected: directed edges represent an ordering of vertices, like a relationship extending from one vertex to another, where switching the direction would change the structure of the network. The World Wide Web is an example of a directed network because hyperlinks connect one Web page to another, but not necessarily the other way around. Undirected edges are simply connections between vertices where order does not matter. Co-authorship networks are examples of undirected networks, where nodes are authors and they are connected by an edge if they have written an academic publication together.
 
 %An even more common network example is a social network. 
 % Rewrite the hated sentence!
@@ -194,6 +194,7 @@ data(madmen, package = "geomnet")
 MMnet <- merge(madmen$edges, madmen$vertices,
                by.x = "Name1", by.y = "label", all = TRUE)
 # create plot
+set.seed(10052016)
 ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
   geom_net(aes(colour = Gender), size = 1, label = TRUE,
            vjust = -0.6, ecolour = "grey60", directed = TRUE, 
