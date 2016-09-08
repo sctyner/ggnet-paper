@@ -1191,7 +1191,7 @@ idx <- grep("Metro", tripnet$Start.station)
 tripnet$Metro[idx] <- TRUE
 
 # plot the bike sharing network shown in Figure 7b
-set.seed(1302016)
+set.seed(1232016)
 ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
   geom_net(aes(linewidth = n / 15, colour = Metro),
            label = TRUE, repel = TRUE) +
@@ -1218,7 +1218,7 @@ bikes.col <- c("grey40", "darkorange")
   
 <<bikes_ggnet2, echo = TRUE, fig.keep='all'>>=
 # Fruchterman-Reingold placement
-set.seed(1302016)
+set.seed(1232016)
 ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
        edge.size = "n", color = bikes.col[ bikes.net %v% "station" ],
        label.color = bikes.col[ bikes.net %v% "station" ],
@@ -1227,7 +1227,7 @@ ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
   
 <<bikes_ggnetwork, echo = TRUE, fig.keep='all'>>=
 # Fruchterman-Reingold placement
-set.seed(1302016)
+set.seed(1232016)
 ggplot(data = ggnetwork(bikes.net),
          aes(x, y, xend = xend, yend = yend)) +
   geom_edges(aes(size = n), color = "grey40") +
