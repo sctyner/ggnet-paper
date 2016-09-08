@@ -339,12 +339,13 @@ ggplot(ggnetwork(te.net),
 ## 
 ## # code for geom_net
 ## # data step: merge edges and nodes
-## MMnet <- merge(madmen$edges, madmen$vertices, by.x = "Name1", by.y = "label", all = TRUE)
+## MMnet <- merge(madmen$edges, madmen$vertices,
+##                by.x = "Name1", by.y = "label", all = TRUE)
 ## 
 ## # create plot
 ## ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
-##   geom_net(aes(colour = Gender),
-##            size = 4, label = TRUE, repel = TRUE, ecolour = "grey60") +
+##   geom_net(aes(colour = Gender), size = 4, label = TRUE,
+##            repel = TRUE, ecolour = "grey60") +
 ##   scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
 ##   xlim(c(-0.05, 1.05)) +
 ##   theme_net() +
@@ -365,14 +366,16 @@ mm.col <- c("female" = "#ff69b4", "male" = "#0099ff")
 ## ----madmen_ggnet2, echo=TRUE, out.width='\\textwidth', fig.width=9, fig.height=9----
 # create plot for ggnet2
 ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
-       label = TRUE, label.color = mm.col[ mm.net %v% "gender" ], size = 4, vjust = -0.6)
+       label = TRUE, label.color = mm.col[ mm.net %v% "gender" ],
+       size = 4, vjust = -0.6)
 
 ## ----madmen_ggnetwork, echo=TRUE,  out.width='\\textwidth', fig.width=9, fig.height=9----
 # create plot for ggnetwork
 ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
   geom_edges(color = "grey50") +
   geom_nodes(aes(colour = gender), size = 4) +
-  geom_nodetext(aes(colour = gender, label = vertex.names), size = 4, vjust = -0.6) +
+  geom_nodetext(aes(colour = gender, label = vertex.names),
+                size = 4, vjust = -0.6) +
   scale_colour_manual(values = mm.col) +
   xlim(c(-0.05, 1.05)) +
   theme_blank() +

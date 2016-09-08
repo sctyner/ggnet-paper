@@ -4,7 +4,8 @@
 
 \maketitle
 \abstract{
-This paper explores three different approaches to visualize networks by building on the grammar of graphics framework implemented in the \pkg{ggplot2} package. The goal of each approach is to provide the user with the ability to apply the flexibility of \pkg{ggplot2} to the visualization of network data, including through the mapping of network attributes to specific plot aesthetics. We will show that these additions contribute significantly to the study of networks by making visualization of networks intuitive, both for users who are familiar with \pkg{ggplot2} and for those who are not.
+This paper explores three different approaches to visualize networks by building on the grammar of graphics framework implemented in the \pkg{ggplot2} package. The goal of each approach is to provide the user with the ability to apply the flexibility of \pkg{ggplot2} to the visualization of network data, including through the mapping of network attributes to specific plot aesthetics. We will show that these additions contribute %significantly 
+to the study of networks by making visualization of networks intuitive, both for users who are familiar with \pkg{ggplot2} and for those who are not.
 }
 
 <<setup_knitr, echo=FALSE>>=
@@ -12,7 +13,7 @@ library(knitr)
 opts_chunk$set(
   tidy = FALSE, echo = FALSE, cache = FALSE, eval = TRUE,
   message = FALSE, warning = FALSE, highlight = FALSE, 
-  background = '#FFFFFF',
+  background = '#FFFFFF', dev = 'png', 
   fig.height = 8, fig.width = 8, fig.align = 'center', fig.show = 'hide'
 )
 
@@ -122,22 +123,23 @@ library(sna)
 @
 
 % starting point: network analysis is ubiquituous in science
-\par There are many kinds of networks, and networks are extensively studied across many disciplines \citep{watts2004ars}. For instance, social network analysis is a longstanding and prominent sub-field of sociology, and the study of biological networks, such as protein-protein interaction networks or metabolic networks, is a notable sub-field of biology \citep{prell2011social, junker2008analysis}. Though these two disciplines and the many others that study networks are themselves extremely different, they can all benefit from good network visualization methods.
+\par There are many kinds of networks, and networks are extensively studied across many disciplines \citep{watts2004ars}. For instance, social network analysis is a longstanding and prominent sub-field of sociology, and the study of biological networks, such as protein-protein interaction networks or metabolic networks, is a notable sub-field of biology \citep{prell2011social, junker2008analysis}. In addition, the ubiquity of social media platforms, like Facebook, Twitter, and LinkedIn, has brought the concepts of networks out of academia and into %the forefront of the general public's mind 
+the mainstream. Though these disciplines and the many others that study networks are themselves very different and specialized, they can all benefit from good network visualization tools. %methods. 
 
 % problem: many network packages exist, but are not easy to use
-Many R packages already exist to manipulate network objects, such as \CRANpkg{igraph} by \citet{igraph}, \CRANpkg{sna} by \citet{sna}, and \CRANpkg{network} by \citet{network} (see also \citet{network.jss}). Though these packages have network visualization capabilities, visualization is not their primary purpose. This leads to visualization techniques in that require  %however, rely on idiosyncratic visualization syntaxes, which means that the user must acquire 
-detailed knowledge of each one of these packages and their syntax in order to build meaningful network visualizations with them. 
+Many R packages already exist to manipulate network objects, such as \CRANpkg{statnet} by \citet{statnet}, \CRANpkg{igraph} by \citet{igraph}, \CRANpkg{sna} by \citet{sna}, and \CRANpkg{network} by \citet{network} (see also \citet{network.jss}). Each one of these packages were developed with a focus of analyzing network data and not necessarily for rendering visualizations of networks. Though these packages do have network visualization capabilities, visualization was not intended as their primary purpose. This is by no means a critique or an inherently negative aspect of these packages: they are all hugely important tools for network analysis that we have relied heavily on in our own work.  We have found, however, that visualizing network data in these packages requires a lot of extra work if one is accustomed to working with more ``traditional" data structures such as vectors, data frames, or arrays. The visualization tools in these packages require  %however, rely on idiosyncratic visualization syntaxes, which means that the user must acquire 
+detailed knowledge of each one of them and their syntax in order to build meaningful network visualizations with them. This is obviously not a problem if the user is very familiar with network structures and has already spent time working with network data. If, however, the user is new to network data or is more comfortable working with the traditional data structures, they could find the learning curve for these packages burdensome.
 %\sct{XXX I'm not sure what you're trying to say in this next sentence, Francois. Could you explain a bit in a comment? XXX} \hh{XXXX ok, I can see where this is going - but it's a bit of shooting into one's knee going the long way. XXX how can we simplify this?
 %How about: XXX  }
-All of these packages are developed with a focus of analyzing network data and not for rendering the final product. This means that in order to visualize the network, the user has to make a lot of choices on graphic parameters,  %These packages further require to repeat all graphic parameters
-such as colors, coordinates and sizes, %in every network visualization, 
-with no possibility to use pre-computed defaults for these parameters, or to map these parameters to network attributes. 
-To contrast, the packages we have written have one primary purpose: to provide a means of creating beautiful network visualizations within the popular \CRANpkg{ggplot2} package \citep{ggplot2}.
+%This means that in order to visualize the network, the user has to make a lot of choices on graphic parameters,  %These packages further require to repeat all graphic parameters
+%such as colors, coordinates and sizes, %in every network visualization, 
+%with no possibility to use pre-computed defaults for these parameters, or to map these parameters to network attributes. 
+To contrast, the packages we have written have one primary purpose: to create beautiful network visualizations by providing a wrapper to the popular \CRANpkg{ggplot2} package \citep{ggplot2}.
 %
 % solution: ggplot2 as an implementation framework
 %\sct{This is redundant} In this article, 
 %Our objective is to bring network plotting capabilities to the popular \CRANpkg{ggplot2} package \citep{ggplot2}. 
-Thus, our focus here is not on adding to the important theory of graph drawing, \citep[cf.\ ][]{graphdrawing} but rather the implementation of current graph drawing capabilities in the \CRANpkg{ggplot2} framework. The \CRANpkg{ggplot2} package was designed as an implementation of the `grammar of graphics' proposed by \citet{wilkinson:1999}, and it has become extremely popular among R users.%
+Thus, our focus here is not on adding to the analysis of network data or to the many types of graph drawing, \citep[cf.\ ][]{graphdrawing} but rather it is on implementing existing graph drawing capabilities in the \CRANpkg{ggplot2} framework. The \CRANpkg{ggplot2} package was designed as an implementation of the `grammar of graphics' proposed by \citet{wilkinson:1999}, and it has become extremely popular among R users.%
   %
   \footnote{In order to give an indication of how  large the user base of \pkg{ggplot2} is, we looked at its usage statistics from January 1, 2015 to December 31, 2015 (see \url{http://cran-logs.rstudio.com/}). Over this period, the \pkg{ggplot2} package was downloaded over 1.75 million times from CRAN, which amounts to over 6,200 downloads per day. Over 700 R packages list \pkg{ggplot2} as a dependency or as a suggestion.} %
 %\sct{XXX I do not think that the line about Python is relevant, as we are submitting this to the R journal. I have commented it out for now. XXX}
