@@ -381,7 +381,7 @@ We begin with a very simple example that most should be familiar with: blood don
 data(blood, package = "geomnet")
 
 # plot with ggnet2 (Figure 2a)
-set.seed(10052016)
+set.seed(12252016)
 ggnet2(network(blood$edges[, 1:2], directed=TRUE), mode = "circle", size = 15,
        label = TRUE, arrow.size = 10, arrow.gap = 0.05, vjust = 0.5,
        node.color = "darkred", label.color = "grey80")
@@ -389,7 +389,7 @@ ggnet2(network(blood$edges[, 1:2], directed=TRUE), mode = "circle", size = 15,
 
 <<blood_geom_net, echo=TRUE, fig.width=6, fig.height=6>>=
 # plot with geomnet (Figure 2b)
-set.seed(10052016)
+set.seed(12252016)
 ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
   geom_net(colour = "darkred", layout = "circle", label = TRUE, size = 15,
            directed = TRUE, vjust = 0.5, labelcolour = "grey80",
@@ -400,7 +400,7 @@ ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
 
 <<blood_ggnetwork, echo=TRUE, fig.width=6, fig.height=6>>=
 # plot with ggnetwork (Figure 2c)
-set.seed(10052016)
+set.seed(12252016)
 ggplot(ggnetwork(network(blood$edges[, 1:2]),
                  layout = "circle", arrow.gap = 0.05),
        aes(x, y, xend = xend, yend = yend)) +
@@ -449,7 +449,7 @@ em.net <- edges[, c("From", "to") ]
 em.net <- network(em.net, directed = TRUE)
 em.net %v% "curr_empl_type" <-
   em.cet[ network.vertex.names(em.net) ]
-set.seed(10052016)
+set.seed(10312016)
 ggnet2(em.net, color = "curr_empl_type",
        size = 4, palette = "Set1",
        arrow.size = 5, arrow.gap = 0.02,
@@ -468,7 +468,7 @@ emailnet <- merge(
   subset(email$edges, nrecipients < 54),
   email$nodes,
   by.x = "From", by.y = "label", all = TRUE)
-set.seed(10052016)
+set.seed(10312016)
 ggplot(data = emailnet,
        aes(from_id = From, to_id = to)) +
   geom_net(
@@ -487,7 +487,7 @@ ggplot(data = emailnet,
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork}
 <<email_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
-set.seed(10052016)
+set.seed(10312016)
 ggplot(ggnetwork(em.net, arrow.gap = 0.02),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges(
@@ -581,7 +581,7 @@ for (i in 1:length(em.day)) {
 
 # plot ggnet2
 g <- list(length(em.day))
-set.seed(10052016)
+set.seed(7042016)
 for (i in 1:length(em.day)) {
   g[[ i ]] <- ggnet2(em.day[[ i ]], size = 2, color = "curr_empl_type",
                      palette = "Set1", arrow.size = 0, arrow.gap = 0.01,
@@ -605,7 +605,7 @@ emailnet <- merge(subset(email$edges, nrecipients < 54), employee,
                   all = TRUE)
 
 # creating the plot
-set.seed(10052016)
+set.seed(7042016)
 ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
   geom_net(aes(colour = CurrentEmploymentType,
                group = CurrentEmploymentType,
@@ -630,7 +630,7 @@ set.edge.attribute(em.net, "day", edges[, 3])
 em.net %v% "curr_empl_type" <- em.cet[ network.vertex.names(em.net) ]
 
 # create the plot
-set.seed(10052016)
+set.seed(7042016)
 ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges(
@@ -659,7 +659,7 @@ data(theme_elements, package = "geomnet")
 te.net <- network(theme_elements$edges)
 te.net %v% "size" <-
   sqrt(10 * (sna::degree(te.net) + 1))
-set.seed(10052016)
+set.seed(3272016)
 ggnet2(te.net, label = TRUE, color = "white",
        label.size = "size", layout.exp = 0.15)
 @
@@ -679,7 +679,7 @@ TEnet <- TEnet %>%
   mutate(degree = sqrt(10 * n() + 1))
 
 # create plot:
-set.seed(10052016)
+set.seed(3272016)
 ggplot(data = TEnet,
        aes(from_id = parent, to_id = child)) +
   geom_net(
@@ -700,7 +700,7 @@ ggplot(data = TEnet,
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
 <<theme_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
-set.seed(10052016)
+set.seed(3272016)
 ggplot(ggnetwork(te.net),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges() +
@@ -830,7 +830,7 @@ mm.dir %v% "gender" <-
   as.character(
     mm.directed$vertices[ network.vertex.names(mm.dir), "Gender" ]
     )
-set.seed(10052016)
+set.seed(1121991)
 ggnet2(
   mm.dir, mode = "fruchtermanreingold", size = 3,
   color = mm.col[ mm.dir %v% "gender" ],
@@ -850,7 +850,7 @@ MM2net <- merge(
   mm.directed$edges,
   mm.directed$vertices,
   by.x = "Name1", by.y = "label", all = TRUE)
-set.seed(10052016)
+set.seed(1121991)
 ggplot(data = MM2net,
        aes(from_id = Name1, to_id = Name2)) +
   geom_net(
@@ -873,7 +873,7 @@ ggplot(data = MM2net,
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork \label{mm2:ggnetwork}}
 <<madmen2_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, dependson="madmen2_ggnet2">>=
-set.seed(10052016)
+set.seed(1121991)
 ggplot(
   ggnetwork(mm.dir,
             layout = "fruchtermanreingold"),
@@ -920,7 +920,7 @@ fb.net %v% "conf" <-
   football$vertices[
     network.vertex.names(fb.net), "value"
     ]
-set.seed(10052016)
+set.seed(5232011)
 ggnet2(fb.net, mode = "fruchtermanreingold",
        color = "conf",  palette = "Paired",
        color.legend = "Conference",
@@ -944,7 +944,7 @@ ftnet$schools <- ifelse(
   ftnet$value == "Independents", ftnet$from, "")
 
 # create data plot
-set.seed(10052016)
+set.seed(5232011)
 ggplot(data = ftnet,
        aes(from_id = from, to_id = to)) +
   geom_net(
@@ -967,7 +967,7 @@ ggplot(data = ftnet,
 %%%%%%%%%%%%%
 % SCT # out of conf. games connected by dotted lines, not the other way around
 <<football_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
-set.seed(10052016)
+set.seed(5232011)
 ggplot(
   ggnetwork(
     fb.net, 
@@ -1109,7 +1109,7 @@ davis$type <- factor(c(rep("Lady", nrow(elist)), rep("Event", nrow(elist))))
 # Southern women network in geomnet
 davis$lcolour <- 
   c("white", "black")[as.numeric(davis$type)]
-set.seed(10052016)
+set.seed(8262013)
 ggplot(data = davis) + 
   geom_net(
     aes(from_id = from, to_id = to, 
@@ -1141,7 +1141,7 @@ bip = network(bip,
               names.eval = "weights")
 
 # detect and color the mode
-set.seed(10052016)
+set.seed(8262013)
 ggnet2(bip, color = "mode", palette = "Set2", 
        shape = "mode", 
        size = 15, label = TRUE) +
@@ -1154,7 +1154,7 @@ ggnet2(bip, color = "mode", palette = "Set2",
 # Southern women network in ggnetwork
 set.vertex.attribute(bip, "mode", 
   c(rep("event", 14), rep("woman", 18)))
-set.seed(10052016)
+set.seed(8262013)
 ggplot(data = ggnetwork(bip),
        aes(x = x, y = y, xend = xend, yend = yend)) + 
   geom_edges(colour = "grey80") +
@@ -1191,7 +1191,7 @@ idx <- grep("Metro", tripnet$Start.station)
 tripnet$Metro[idx] <- TRUE
 
 # plot the bike sharing network shown in Figure 7b
-set.seed(10052016)
+set.seed(1302016)
 ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
   geom_net(aes(linewidth = n / 15, colour = Metro),
            label = TRUE, repel = TRUE) +
@@ -1218,7 +1218,7 @@ bikes.col <- c("grey40", "darkorange")
   
 <<bikes_ggnet2, echo = TRUE, fig.keep='all'>>=
 # Fruchterman-Reingold placement
-set.seed(10052016)
+set.seed(1302016)
 ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
        edge.size = "n", color = bikes.col[ bikes.net %v% "station" ],
        label.color = bikes.col[ bikes.net %v% "station" ],
@@ -1227,7 +1227,7 @@ ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
   
 <<bikes_ggnetwork, echo = TRUE, fig.keep='all'>>=
 # Fruchterman-Reingold placement
-set.seed(10052016)
+set.seed(1302016)
 ggplot(data = ggnetwork(bikes.net),
          aes(x, y, xend = xend, yend = yend)) +
   geom_edges(aes(size = n), color = "grey40") +
@@ -1277,7 +1277,6 @@ metro_map <- get_map(location = c(left = -77.22257, bottom = 39.05721,
   %
 <<geographic_geomnet, echo=TRUE>>=
   # geomnet: overlay bike sharing network on geographic map
-set.seed(10052016)
   ggmap(metro_map) + 
   geom_net(data = tripnet, layout = NULL, label = TRUE,
            vjust = -0.5, ealpha = 0.5,
