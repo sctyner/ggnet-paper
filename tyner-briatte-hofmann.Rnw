@@ -242,9 +242,7 @@ The \code{mode} argument of \code{ggnet2} controls how the nodes of the network 
 
 Other arguments passed to the \code{ggnet2} function offer extensive control over the aesthetics of the plot that it returns, including %through
 the addition of edge and/or node labels and their respective aesthetics.
-Arguments such as \code{node.shape} or \code{edge.lty}, which  control the shape of the nodes and the line type of the edges, respectively, can take a global value, such as \samp{15} %for \code{node.shape}
-or \samp{dashed}% for \code{edge.lty},
-a vector of global values, or the name of an edge or vertex attribute, in which case the values of that attribute are used as the mapping aesthetic.
+Arguments such as \code{node.shape} or \code{edge.lty}, which  control the shape of the nodes and the line type of the edges, respectively, can take a single global value, a vector of global values, or the name of an edge or vertex attribute to be used as an aesthetic mapping. 
 
 This last functionality builds on one of the strengths of the \pkg{network} class, which can store %meta-
 information on network edges and nodes as attributes that are then accessible to the user through the \code{\%e\%} and \code{\%v\%} operators respectively.%
