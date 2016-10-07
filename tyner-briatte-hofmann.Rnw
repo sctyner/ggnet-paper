@@ -169,7 +169,7 @@ In the remainder of this paper, we present three different approaches to network
 In its essence, a network is simply a set of %points
 vertices connected in pairs by a set of %lines
 edges \citep{newman}. %Here, we refer to the lines as edges (or ties) and to the points as nodes (or vertices).
-Throughout this paper, we also use the terms ``nodes" and ``actors" to refer to vertices, as well as the terms ``ties" and ``relationships" to refer to edges. %We also note that our examples of visualization are all of one-mode networks, where all nodes are of the same kind and are able to connect to each other, however the graphical tools presented can be used to visualize %more general 
+Throughout this paper, we also use the term ``node" to refer to vertices, as well as the terms ``ties" or ``relationships" to refer to edges, depending on context. %We also note that our examples of visualization are all of one-mode networks, where all nodes are of the same kind and are able to connect to each other, however the graphical tools presented can be used to visualize %more general 
 %many other types of networks. %\sct{XXX I'm not 100\% sure that's true but it seems right.XXX
 % HH: more general is definitely true}
 The two sets of graphical objects that make up a network visualization, points and segments between them, have been used to %encode 
