@@ -1336,7 +1336,7 @@ Another benefit that emerges from using \pkg{ggplot2} for network visualization 
 of the protein network%
 %\footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes-protein/run.r} for the code to recreate results for visualizing the protein interaction network.}
 shown in Figure~\ref{fig.cap:yeast}, and then consider average plotting times of increasingly larger random networks. Note that in all tests, default package settings were used. %
-The code to create benchmark results for both of these situations is provided in the online supplement.
+The code to create benchmark results for both of these situations is provided in the online supplement, to which a link is provided in the Supplementary Material section at the end of this paper. 
 %\footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes/run.r} for code to recreate benchmark results for visualizing random networks.}
 %
 
