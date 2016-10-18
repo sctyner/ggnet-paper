@@ -191,15 +191,16 @@ As a reference example, we turn to a specific instance of a social network. A so
 data(madmen, package = "geomnet")
 
 # code for geom_net
-# data step: merge edges and nodes
+# data step: merge edges and nodes by the "from" column
 MMnet <- merge(madmen$edges, madmen$vertices,
                by.x = "Name1", by.y = "label", all = TRUE)
 # create plot
 set.seed(10052016)
 ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
-  geom_net(aes(colour = Gender), size = 1, label = TRUE,
-           vjust = -0.6, ecolour = "grey60", directed = TRUE, 
-           arrowgap = 0.02, arrowsize = 0, ealpha = 0.5) +
+  geom_net(aes(colour = Gender), layout = "kamadakawai", 
+           size = 1, label = TRUE, vjust = -0.6, ecolour = "grey60",
+           directed = TRUE, fontsize = 3, 
+           arrowgap = 0.01, arrowsize = .5, ealpha = 0.5) +
   scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
   xlim(c(-0.05, 1.05)) +
   theme_net() +
@@ -407,8 +408,9 @@ data(blood, package = "geomnet")
 
 # plot with ggnet2 (Figure 2a)
 set.seed(12252016)
-ggnet2(network(blood$edges[, 1:2], directed=TRUE), mode = "circle", size = 15,
-       label = TRUE, arrow.size = 10, arrow.gap = 0.05, vjust = 0.5,
+ggnet2(network(blood$edges[, 1:2], directed=TRUE), 
+       mode = "circle", size = 15, label = TRUE, 
+       arrow.size = 10, arrow.gap = 0.05, vjust = 0.5,
        node.color = "darkred", label.color = "grey80")
 @
 
@@ -463,22 +465,27 @@ In this example every vertex has a self-reference, as blood between two people o
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
 <<email_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
+# make data accessible
 data(email, package = 'geomnet')
 
+# create node attribute data
 em.cet <- as.character(
   email$nodes$CurrentEmploymentType)
 names(em.cet) = email$nodes$label
 
+# remove the emails sent to all employees
 edges <- subset(email$edges, nrecipients < 54)
+# create network
 em.net <- edges[, c("From", "to") ]
 em.net <- network(em.net, directed = TRUE)
+# create employee type node attribute
 em.net %v% "curr_empl_type" <-
   em.cet[ network.vertex.names(em.net) ]
 set.seed(10312016)
 ggnet2(em.net, color = "curr_empl_type",
        size = 4, palette = "Set1",
        arrow.size = 5, arrow.gap = 0.02,
-       edge.alpha = 0.25,
+       edge.alpha = 0.25, mode = "fruchtermanreingold",
        edge.color = c("color", "grey50"),
        color.legend = "Employment Type") +
   theme(legend.position = "bottom")
@@ -489,14 +496,16 @@ ggnet2(em.net, color = "curr_empl_type",
 \begin{subfigure}[t]{\textwidth}
 \caption{geomnet}
 <<email_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
+# data step for the geomnet plot
 emailnet <- merge(
   subset(email$edges, nrecipients < 54),
   email$nodes,
   by.x = "From", by.y = "label", all = TRUE)
+
 set.seed(10312016)
 ggplot(data = emailnet,
        aes(from_id = From, to_id = to)) +
-  geom_net(
+  geom_net(layout = "fruchtermanreingold",
     aes(colour = CurrentEmploymentType,
         group = CurrentEmploymentType,
         linewidth = 3 * (...samegroup.. / 8 + .125)),
@@ -512,8 +521,9 @@ ggplot(data = emailnet,
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork}
 <<email_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'>>=
+# use em.net created in ggnet2step
 set.seed(10312016)
-ggplot(ggnetwork(em.net, arrow.gap = 0.02),
+ggplot(ggnetwork(em.net, arrow.gap = 0.02,layout = "fruchtermanreingold"),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges(
     aes(color = curr_empl_type),
@@ -595,9 +605,12 @@ To give some insight into how the relations between employees change over time, 
 
 # data preparation
 em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
+# create one element in a list per day
 em.day <- lapply(unique(em.day$day),
                  function(x) subset(em.day, day == x)[, 1:2 ])
+# create list of networks
 em.day <- lapply(em.day, network, directed = TRUE)
+# create node (employee type) and network (day) attributes for each element in list
 for (i in 1:length(em.day)) {
   em.day[[ i ]] %v% "curr_empl_type" <-
     em.cet[ network.vertex.names(em.day[[ i ]]) ]
@@ -607,10 +620,12 @@ for (i in 1:length(em.day)) {
 # plot ggnet2
 g <- list(length(em.day))
 set.seed(7042016)
+# plot each element in list
 for (i in 1:length(em.day)) {
   g[[ i ]] <- ggnet2(em.day[[ i ]], size = 2, color = "curr_empl_type",
                      palette = "Set1", arrow.size = 0, arrow.gap = 0.01,
-                     edge.alpha = 0.1, legend.position = "none") +
+                     edge.alpha = 0.1, legend.position = "none", 
+                     mode = "kamadakawai") +
     ggtitle(paste("Day", em.day[[ i ]] %n% "day")) +
     theme(panel.border = element_rect(color = "grey50", fill = NA),
           aspect.ratio = 1)
@@ -632,10 +647,11 @@ emailnet <- merge(subset(email$edges, nrecipients < 54), employee,
 # creating the plot
 set.seed(7042016)
 ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
-  geom_net(aes(colour = CurrentEmploymentType,
-               group = CurrentEmploymentType,
-               linewidth = 2 * (...samegroup.. / 8 + .125)),
-           fiteach = TRUE, ealpha = 0.5, size = 1.5) +
+  geom_net(layout = "kamadakawai",
+    aes(colour = CurrentEmploymentType,
+        group = CurrentEmploymentType,
+        linewidth = 2 * (...samegroup.. / 8 + .125)),
+        fiteach = TRUE, ealpha = 0.5, size = 1.5) +
   scale_colour_brewer("Employment Type", palette = "Set1") +
   theme_net() +
   facet_wrap(~day, nrow = 2, labeller = "label_both") +
@@ -651,12 +667,15 @@ ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
 edges <- subset(email$edges, nrecipients < 54)
 edges <- edges[, c("From", "to", "day") ]
 em.net <- network(edges[, 1:2])
+# assign edge attributes (day)
 set.edge.attribute(em.net, "day", edges[, 3])
+# assign node attributes (employee type)
 em.net %v% "curr_empl_type" <- em.cet[ network.vertex.names(em.net) ]
 
 # create the plot
 set.seed(7042016)
-ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day"),
+ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day", 
+                 layout = "kamadakawai"),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges(
     aes(color = curr_empl_type),
@@ -679,14 +698,17 @@ This example comes from the \code{theme()} help page in the \pkg{ggplot2} docume
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
 <<theme_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+# make data accessible
 data(theme_elements, package = "geomnet")
 
+# create network object
 te.net <- network(theme_elements$edges)
+# assign node attribut (size based on node degree)
 te.net %v% "size" <-
   sqrt(10 * (sna::degree(te.net) + 1))
 set.seed(3272016)
-ggnet2(te.net, label = TRUE, color = "white",
-       label.size = "size", layout.exp = 0.15)
+ggnet2(te.net, label = TRUE, color = "white", label.size = "size",
+       mode = "fruchtermanreingold", layout.exp = 0.15)
 @
 \end{subfigure}
 %
@@ -707,7 +729,7 @@ TEnet <- TEnet %>%
 set.seed(3272016)
 ggplot(data = TEnet,
        aes(from_id = parent, to_id = child)) +
-  geom_net(
+  geom_net(layout = "fruchtermanreingold",
     aes(fontsize = degree), directed = TRUE,
     label = TRUE, size = 1, labelcolour = 'black',
     ecolour = "grey70", arrowsize = 0.5,
@@ -726,7 +748,8 @@ ggplot(data = TEnet,
 \caption{ggnet2}
 <<theme_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
 set.seed(3272016)
-ggplot(ggnetwork(te.net),
+# use network created in ggnet2 data step
+ggplot(ggnetwork(te.net, layout = "fruchtermanreingold"),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges() +
   geom_nodes(size = 12, color = "white") +
@@ -745,13 +768,13 @@ ggplot(ggnetwork(te.net),
 Code and plots of the inheritance structure are shown in Figure \ref{fig.cap:theme}. Note the various ways the packages adjust the side of the labels to correspond to the outdegree of the nodes, including the use of the \code{scale\_size\_continuous} function in Figure \ref{fig.cap:theme}(c). In each of these plots, it is easy to quickly determine  parent-child relationships, and to assess which theme elements are unrelated to all others. Nodes with the most children are the \code{rect}, \code{text}, and \code{line} elements, so we made their labels larger in order to emphasize their importance. In each case, the label size is a function of the out degree of the vertices.
 %Using this plot made creation of the \code{theme\_net} object used throughout these examples very simple. We just made set each of the major parent elements, \code{text}, \code{rect}, and \code{line} to \code{element\_blank()} and then set the aspect ratio equal to one.
 
-\subsection{Romantic relationships in \emph{Mad Men}} % ========================
+%\subsection{Romantic relationships in \emph{Mad Men}} % ========================
 
-  The following code creates the network example given in Figure~\ref{fig.cap:madmen} in the introduction. We changed the vertex size and edge color for all vertices and edges, included vertex labels, and colored the vertices according to the character's gender.
+%  The following code creates the network example given in Figure~\ref{fig.cap:madmen} in the introduction. We changed the vertex size and edge color for all vertices and edges, included vertex labels, and colored the vertices according to the character's gender.
 
-The code for creating Figure ~\ref{fig.cap:madmen} using all three approaches is shown below. We have provided this code for completeness, but do not provide the result of each in order to save space. 
+%The code for creating Figure ~\ref{fig.cap:madmen} using all three approaches is shown below. We have provided this code for completeness, but do not provide the result of each in order to save space. 
 %and the corresponding networks are shown in figure~\ref{fig:madmen-2}.
-<<codefromfirstmmnet, echo=TRUE, eval=TRUE>>=
+<<codefromfirstmmnet, echo=FALSE, eval=FALSE>>=
 # make the data available
 data(madmen, package = 'geomnet')
 
@@ -761,7 +784,7 @@ MMnet <- merge(madmen$edges, madmen$vertices,
 # data step for both ggnet2 and ggnetwork
 # create undirected network
 mm.net <- network(madmen$edges[, 1:2], directed = FALSE)
-# gender vertex attribute
+# create node attribute (gender)
 rownames(madmen$vertices) <- madmen$vertices$label
 mm.net %v% "gender" <- as.character(
   madmen$vertices[ network.vertex.names(mm.net), "Gender"]
@@ -770,16 +793,17 @@ mm.net %v% "gender" <- as.character(
 mm.col <- c("female" = "#ff69b4", "male" = "#0099ff")
 @
 
-<<madmen_ggnet2, echo=TRUE, out.width='\\textwidth', fig.width=9, fig.height=9>>=
+<<madmen_ggnet2, echo=FALSE, out.width='\\textwidth', fig.width=9, fig.height=9, eval=FALSE>>=
 # create plot for ggnet2
 set.seed(10052016)
 ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
        label = TRUE, label.color = mm.col[ mm.net %v% "gender" ],
-       size = 4, vjust = -0.6)
+       size = 4, vjust = -0.6, layout = "kamadakawai")
 # create plot for geomnet
 set.seed(10052016)
 ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
-  geom_net(aes(colour = Gender), size = 4, label = TRUE,
+  geom_net(layout = "kamadakawai", aes(colour = Gender), 
+           size = 4, label = TRUE,
            repel = TRUE, ecolour = "grey60") +
   scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
   xlim(c(-0.05, 1.05)) +
@@ -787,7 +811,8 @@ ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
   theme(legend.position = "bottom")
 # create plot for ggnetwork
 set.seed(10052016)
-ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
+ggplot(data = ggnetwork(mm.net, layout = "kamadakawai"), 
+       aes(x, y, xend = xend, yend = yend)) +
   geom_edges(color = "grey50") +
   geom_nodes(aes(colour = gender), size = 4) +
   geom_nodetext(aes(colour = gender, label = vertex.names),
@@ -830,10 +855,10 @@ ggplot(data = ggnetwork(mm.net), aes(x, y, xend = xend, yend = yend)) +
 %\caption{\label{mm2:datastep} Data preparation for the directed network of the  Mad Men example in Figures~\ref{mm2:ggnet2} and~\ref{mm2:ggnetwork}.}
 
 %\end{figure}
-\begin{figure}[hbtp]
-\begin{subfigure}[t]{\textwidth}
-\caption{ggnet2\label{mm2:ggnet2}}
-<<madmen2_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+%\begin{figure}[hbtp]
+%\begin{subfigure}[t]{\textwidth}
+%\caption{ggnet2\label{mm2:ggnet2}}
+<<madmen2_ggnet2, size="footnotesize", opts.label="codefig", echo=FALSE, eval=FALSE>>=
 # data step for ggnet2 and ggnetwork
 # create directed network
 data(mm_directed, package = "geomnet")
@@ -857,11 +882,11 @@ ggnet2(
   arrow.gap = 0.02
 )
 @
-\end{subfigure}
+%\end{subfigure}
 %
-\begin{subfigure}[t]{\textwidth}
-\caption{geomnet}
-<<madmen2_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+%\begin{subfigure}[t]{\textwidth}
+%\caption{geomnet}
+<<madmen2_geom_net, size="footnotesize", opts.label="codefig", echo=FALSE,eval=FALSE>>=
 MM2net <- merge(
   mm.directed$edges,
   mm.directed$vertices,
@@ -880,15 +905,15 @@ ggplot(data = MM2net,
    theme_net() +
   theme(legend.position = "bottom")
 @
-\end{subfigure}
+%\end{subfigure}
 %
-\end{figure}
+%\end{figure}
 
-\begin{figure}
-\ContinuedFloat
-\begin{subfigure}[t]{\textwidth}
-\caption{ggnetwork \label{mm2:ggnetwork}}
-<<madmen2_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, dependson="madmen2_ggnet2">>=
+%\begin{figure}
+%\ContinuedFloat
+%\begin{subfigure}[t]{\textwidth}
+%\caption{ggnetwork \label{mm2:ggnetwork}}
+<<madmen2_ggnetwork, size="footnotesize", opts.label="codefig", echo=FALSE, dependson="madmen2_ggnet2", eval=FALSE>>=
 set.seed(1121991)
 ggplot(
   ggnetwork(mm.dir,
@@ -906,12 +931,12 @@ ggplot(
   theme_blank() +
   theme(legend.position = "bottom")
 @
-\end{subfigure}
-\caption{\label{fig.cap:madmen2}(continued) A directed network of relationships in Mad Men.}
-\end{figure}
+%\end{subfigure}
+%\caption{\label{fig.cap:madmen2}(continued) A directed network of relationships in Mad Men.}
+%\end{figure}
 %\afterpage{\clearpage}
-The \pkg{gcookbook} package \citep{madmen} gives another, directed form of the Mad Men network.  It also encapsulates the romantic relationships between characters, but it additionally includes all advances made by one character but rejected by the other.  For example, Peggy Olson made advances toward her boss Don Draper, but Don refused her. This is represented  a directed edge going from Peggy to Don, but not from Don to Peggy.  If the advance is reciprocated, such as between Sal Romano and the Bellhop, there are two directed edges between the two vertices.
-This network is shown in figure \ref{fig.cap:madmen2}.  It is much more densely connected than the previous Mad Men example.  This network allows us to see more of the drama in the show. For instance, we can see that Roger made advances towards Betty, his business partner's wife, which is much more scandalous than what appears in the first network.
+%The \pkg{gcookbook} package \citep{madmen} gives another, directed form of the Mad Men network.  It also encapsulates the romantic relationships between characters, but it additionally includes all advances made by one character but rejected by the other.  For example, Peggy Olson made advances toward her boss Don Draper, but Don refused her. This is represented  a directed edge going from Peggy to Don, but not from Don to Peggy.  If the advance is reciprocated, such as between Sal Romano and the Bellhop, there are two directed edges between the two vertices.
+%This network is shown in figure \ref{fig.cap:madmen2}.  It is much more densely connected than the previous Mad Men example.  This network allows us to see more of the drama in the show. For instance, we can see that Roger made advances towards Betty, his business partner's wife, which is much more scandalous than what appears in the first network.
 
 \subsection{College football} % ================================================
 
@@ -923,19 +948,22 @@ The network of football games is given in figure \ref{fig.cap:football}. Here,  
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}\vspace{-.5cm}
 <<football_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+#make data accessible
 data(football, package = 'geomnet')
 rownames(football$vertices) <-
   football$vertices$label
-
+# create network 
 fb.net <- network(football$edges[, 1:2],
                   directed = TRUE)
-set.edge.attribute(
-  fb.net, "same.conf",
-  football$edges$same.conf)
+# create node attribute (what conference is team in?)
 fb.net %v% "conf" <-
   football$vertices[
     network.vertex.names(fb.net), "value"
     ]
+# create edge attribute (between teams in same conference?)
+set.edge.attribute(
+  fb.net, "same.conf",
+  football$edges$same.conf)
 set.seed(5232011)
 ggnet2(fb.net, mode = "fruchtermanreingold",
        color = "conf",  palette = "Paired",
@@ -955,7 +983,7 @@ ftnet <- merge(
   football$edges, football$vertices,
   by.x = "from", by.y = "label", all = TRUE)
 
-# label independent schools
+# create new label variable for viewing independent schools
 ftnet$schools <- ifelse(
   ftnet$value == "Independents", ftnet$from, "")
 
@@ -963,13 +991,12 @@ ftnet$schools <- ifelse(
 set.seed(5232011)
 ggplot(data = ftnet,
        aes(from_id = from, to_id = to)) +
-  geom_net(
+  geom_net(layout = 'fruchtermanreingold',
     aes(colour = value, group = value,
         linetype = factor(same.conf != 1),
         label = schools),
     linewidth = 0.5,
-    size = 5, vjust = -0.75, alpha = 0.3,
-    layout = 'fruchtermanreingold') +
+    size = 5, vjust = -0.75, alpha = 0.3) +
   theme_net() +
   theme(legend.position = "bottom") +
   scale_colour_brewer("Conference", palette = "Paired")  +
@@ -983,6 +1010,7 @@ ggplot(data = ftnet,
 %%%%%%%%%%%%%
 % SCT # out of conf. games connected by dotted lines, not the other way around
 <<football_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE>>=
+# use network from ggnet2 step
 set.seed(5232011)
 ggplot(
   ggnetwork(
@@ -1135,7 +1163,7 @@ bip = network(bip,
 # detect and color the mode
 set.seed(8262013)
 ggnet2(bip, color = "mode", palette = "Set2", 
-       shape = "mode", 
+       shape = "mode", mode = "kamadakawai",
        size = 15, label = TRUE) +
   theme(legend.position="bottom")
 @
@@ -1148,11 +1176,13 @@ ggnet2(bip, color = "mode", palette = "Set2",
 \caption{\pkg{geomnet}}
 <<davis_geom_net, dependson='davis_data_2', size="footnotesize", opts.label="codefig", echo=TRUE>>=
 # Southern women network in geomnet
+# change labelcolour
 davis$lcolour <- 
   c("white", "black")[as.numeric(davis$type)]
+
 set.seed(8262013)
 ggplot(data = davis) + 
-  geom_net(
+  geom_net(layout = "kamadakawai",
     aes(from_id = from, to_id = to, 
         colour = type, shape = type), 
     size = 15, label = TRUE, ealpha = 0.25,
@@ -1167,15 +1197,16 @@ ggplot(data = davis) +
 \begin{subfigure}[t]{\textwidth}
 \caption{\pkg{ggnetwork}}
 <<davis_ggnetwork, dependson='davis_data_2', size="footnotesize", opts.label="codefig", echo=TRUE, warning=FALSE>>=
-# Southern women network in ggnetwork
+# Southern women network in ggnetwork. Use data from ggnet2 step
+# assign vertex attributes (Node type and label)
 set.vertex.attribute(bip, "mode", 
   c(rep("event", 14), rep("woman", 18)))
 set.seed(8262013)
-ggplot(data = ggnetwork(bip),
+ggplot(data = ggnetwork(bip, layout = "kamadakawai"),
        aes(x = x, y = y, xend = xend, yend = yend)) + 
   geom_edges(colour = "grey80") +
   geom_nodes(aes(colour = mode, shape = mode), size = 15) +
-  geom_nodetext(aes(label = vertex.names)) + 
+  geom_nodetext(aes(label = vertex.names)) +
   scale_colour_brewer(palette = "Set2") +
   theme_blank() + 
   theme(legend.position = "bottom") 
@@ -1196,12 +1227,12 @@ Figure~\ref{fig:bikes} shows four renderings of this data. The first is a geogra
 The code for these renderings is shown below:
   
 <<bikes_geom_net, echo=TRUE, warning=FALSE, fig.keep='all'>>=
-  # code for geomnet
-  # data preparation
-  data(bikes, package = 'geomnet')
+# make data accessible
+data(bikes, package = 'geomnet')
+# data step for geomnet
 tripnet <- merge(bikes$trips, bikes$stations, by.x = "Start.station",
                  by.y = "name", all = TRUE)
-
+# create variable to identify Metro Stations
 tripnet$Metro = FALSE
 idx <- grep("Metro", tripnet$Start.station)
 tripnet$Metro[idx] <- TRUE
@@ -1221,10 +1252,13 @@ ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
 <<bikes_prepare, echo = TRUE>>=
 # data preparation for ggnet2 and ggnetwork
 bikes.net <- network(bikes$trips[, 1:2 ], directed = FALSE)
+# create edge attribute (number of trips)
 network::set.edge.attribute(bikes.net, "n", bikes$trips[, 3 ] / 15)
+# create vertex attribute for Metro Station
 bikes.net %v% "station" <-  grepl("Metro", network.vertex.names(bikes.net))
 bikes.net %v% "station" <-  1 + as.integer(bikes.net %v% "station")
 rownames(bikes$stations) <- bikes$stations$name
+# create node attributes (coordinates)
 bikes.net %v% "lon" <-
   bikes$stations[ network.vertex.names(bikes.net), "long" ]
 bikes.net %v% "lat" <-
@@ -1233,18 +1267,18 @@ bikes.col <- c("grey40", "darkorange")
 @
   
 <<bikes_ggnet2, echo = TRUE, fig.keep='all'>>=
-# Fruchterman-Reingold placement
+# Non-geographic placement
 set.seed(1232016)
-ggnet2(bikes.net, size = 4, label = TRUE, vjust = -0.5,
-       edge.size = "n", color = bikes.col[ bikes.net %v% "station" ],
-       label.color = bikes.col[ bikes.net %v% "station" ],
-       layout.exp = 1.1)
+ggnet2(bikes.net, mode = "fruchtermanreingold", size = 4, label = TRUE,
+       vjust = -0.5, edge.size = "n", layout.exp = 1.1,
+       color = bikes.col[ bikes.net %v% "station" ],
+       label.color = bikes.col[ bikes.net %v% "station" ])
 @
   
 <<bikes_ggnetwork, echo = TRUE, fig.keep='all'>>=
-# Fruchterman-Reingold placement
+# Non-geographic placement. Use data from ggnet2 step.
 set.seed(1232016)
-ggplot(data = ggnetwork(bikes.net),
+ggplot(data = ggnetwork(bikes.net, layout = "fruchtermanreingold"),
          aes(x, y, xend = xend, yend = yend)) +
   geom_edges(aes(size = n), color = "grey40") +
   geom_nodes(aes(color = factor(station)), size = 4) +
@@ -1292,7 +1326,7 @@ metro_map <- get_map(location = c(left = -77.22257, bottom = 39.05721,
 @
   %
 <<geographic_geomnet, echo=TRUE>>=
-  # geomnet: overlay bike sharing network on geographic map
+# geomnet: overlay bike sharing network on geographic map
   ggmap(metro_map) + 
   geom_net(data = tripnet, layout = NULL, label = TRUE,
            vjust = -0.5, ealpha = 0.5,
@@ -1303,13 +1337,14 @@ metro_map <- get_map(location = c(left = -77.22257, bottom = 39.05721,
                colour = Metro)) +
   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
   theme_net() %+replace% theme(aspect.ratio=NULL) +
+  coord_map() + 
   theme(legend.position = "bottom")
 @
   
 We can also make use of the option \samp{layout = NULL} whenever we do not want to use an in-built layout algorithm but make use of a user-defined custom layout. In this case, the coordinates of the layout have to be created outside of the visualization and $x$ and $y$ coordinates have to be made available instead.
 
   
-\subsection{Protein interactions in yeast} % ===================================
+%\subsection{Protein interactions in yeast} % ===================================
 
 % % \fb{Suggestion: convert this example to a discussion point about speed.}
 % % \hh{Talking about speed in the discussion is a good idea, but by the time that we go into the discussion there shouldn't be any more examples. }
@@ -1317,7 +1352,7 @@ We can also make use of the option \samp{layout = NULL} whenever we do not want 
 % \hh{XXX I'd be more in favor of going the opposite way and to drop the discussion of the protein example from the speed considerations. We don't have a handle on the different results, and by them time we do, the protein network is going to be a distraction. I've seen the INSERT point, and I think we could have a sentence there that refers back, if you want, but moving the whole example there is going to make that section even more complicated. XXX}
 % \sct{XXX Originally, I added the protein network example for three reasons: first, to demonstrate the layout changes that are possible by passing the layout.par argument to geom\_net; second because it's a pretty well known example of a biological network, which we discuss in the intro; and third, it's a large network, much larger than all of our other ones, and more realistic with respect to what networks many researchers are interested. i.e. more people study networks like this than study networks like the blood, mad men, bikeshare, etc. networks. I think removing it would be detrimental to the paper. I like the idea of keeping it in the examples, adding emphasis to the reasons I put it there in the first place, and referencing it later on. XXX}
 %
-In our examples thus far, we have focused on rather small social or relationship networks and one larger communication network. Now we present an example of a biological network, which comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 2,113 proteins that make up the vertices of this network, with a total of 4480 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}, resulting in a relatively large  network. Despite its size, each one of the approaches in the \pkg{ggplot2} framework can be drawn in a few hundred milliseconds. A more in-depth discussion on plotting speed follows in the next section. The proteins and the interactions between them are plotted in the networks shown in Figure~\ref{fig.cap:yeast}. %These interactions and their associated proteins are plotted  in Figure~\ref{fig.cap:yeast}.
+
 In this visualization, we demonstrate the layout capabilities of our functions by changing the layout to \code{random} and setting the distribution to \code{"uniang"}, which is a  ``Gaussian donut" layout \citep{sna}.  Indeed, we see a near circular area in the middle of the graph because the layout parameter has forced all of the vertices to the exterior, leaving a ``donut hole" in the middle. Because all of the approaches result in nearly identical figures, only one network is shown. The code for all three approaches is given below:
 
 <<yeast_ggnet2, echo=TRUE, eval = FALSE, cache=FALSE>>=
@@ -1361,6 +1396,7 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 %\newpage
 \section{Some considerations of speed}\label{sec:speed}
 % \hh{XXX So, the testing waters are much more muddy than anticipated. What we can do, though, is to describe the testing scenario(s), and then report our findings with an attempt to summarize. XXX I've added a facetted plot to show the variability in the results that we've seen between the different machines. I made a few changes to the plot, as you can see - using a smooth allows us to see a trend, while the points show variability and give some indication of the distribution (I don't like min and max for that because they are the least robust measures). I also want to see where the actual measurements are taken - that's the reason for showing the points. XXX}
+In our examples thus far, we have focused on rather small social or relationship networks and one larger communication network. Now we present an example of a biological network, which comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 2,113 proteins that make up the vertices of this network, with a total of 4480 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}, resulting in a relatively large  network. Despite its size, each one of the approaches in the \pkg{ggplot2} framework can be drawn in a few hundred milliseconds. A more in-depth discussion on plotting speed follows in the next section. The proteins and the interactions between them are plotted in the networks shown in Figure~\ref{fig.cap:yeast}. These interactions and their associated proteins are plotted in Figure~\ref{fig.cap:yeast}. Due to the lengthy 
 
 Another benefit that emerges from using \pkg{ggplot2} for network visualization is the speed at which it can plot fairly large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionality offered in the \pkg{network} package. They also show the \pkg{ggplot2} approaches to be largely on par with the speed provided by the \pkg{igraph} package. We first investigate average plotting time
 of the protein network%
