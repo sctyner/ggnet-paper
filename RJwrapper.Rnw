@@ -4,6 +4,7 @@
 \usepackage{RJournal}
 \usepackage{amsmath,amssymb,array}
 \usepackage{booktabs}
+\usepackage{tabu}
 
 %% load any required packages here
 

@@ -4,8 +4,9 @@
 
 \maketitle
 \abstract{
-This paper explores three different approaches to visualize networks by building on the grammar of graphics framework implemented in the \pkg{ggplot2} package. The goal of each approach is to provide the user with the ability to apply the flexibility of \pkg{ggplot2} to the visualization of network data, including through the mapping of network attributes to specific plot aesthetics. We will show that these additions contribute %significantly 
-to the study of networks by making visualization of networks intuitive, both for users who are familiar with \pkg{ggplot2} and for those who are not.
+This paper explores three different approaches to visualize networks by building on the grammar of graphics framework implemented in the \pkg{ggplot2} package. The goal of each approach is to provide the user with the ability to apply the flexibility of \pkg{ggplot2} to the visualization of network data, including through the mapping of network attributes to specific plot aesthetics. By incorporating networks in the \pkg{ggplot2} framework, these approaches (1) allow users to enhance networks with additional information on edges and nodes, (2) give access to the strengths of \pkg{ggplot2}, such as layers and facets, and (3) convert network data objects to the more familiar data frames.
+%We will show that these additions contribute %significantly 
+%to the study of networks by making visualization of networks intuitive, both for users who are familiar with \pkg{ggplot2} and for those who are not.
 }
 
 <<setup_knitr, echo=FALSE>>=
@@ -225,7 +226,7 @@ Coloring the vertices or edges in a graph is a quick way to visualize grouping a
 \label{sec:implementations}
 %
 % ==============================================================================
-We present two basic approaches to using the \pkg{ggplot2} framework for network visualization. First, we implement network visualizations by providing a wrapper function, \code{ggnet2} for the user to visualize a network using \pkg{ggplot2} elements. Second, we implement network visualizations using layering in \pkg{ggplot2}.  For the second approach, we have two ways of creating a network visualization. The first, \pkg{geomnet}, wraps all network structures, including vertices, edges, and vertex labels into a single \code{geom}. The second, \pkg{ggnetwork}, implements each structural component in an independent \code{geom} and layers them to create the visualization. In each package, our goal is to provide users with a way to map network properties to aesthetic properties of graphs that is familiar to them and straightforward to implement. Each package has a slightly different approach to accomplish this goal, and we will discuss all of these approaches in this section.
+We present two basic approaches to using the \pkg{ggplot2} framework for network visualization. First, we implement network visualizations by providing a wrapper function, \code{ggnet2} for the user to visualize a network using \pkg{ggplot2} elements. Second, we implement network visualizations using layering in \pkg{ggplot2}.  For the second approach, we have two ways of creating a network visualization. The first, \pkg{geomnet}, wraps all network structures, including vertices, edges, and vertex labels into a single \code{geom}. The second, \pkg{ggnetwork}, implements each structural component in an independent \code{geom} and layers them to create the visualization. In each package, our goal is to provide users with a way to map network properties to aesthetic properties of graphs that is familiar to them and straightforward to implement. Each package has a slightly different approach to accomplish this goal, and we will discuss all of these approaches in this section. We conclude the section with a side-by-side comparison of the features available in all three implementations in Table~\ref{tab:comparison}.
 
 \subsection{ggnet2} % ==========================================================
 
@@ -333,6 +334,35 @@ The \code{ggnetwork} function also accepts the arguments \code{arrow.gap} and \c
 the network structure as a function of a specific edge attribute, like a temporal attribute.
 %Both the \code{arrow.gap} and the \code{by} arguments are further illustrated in the remainder of this paper.
 % SCT: I took out the above sentence because all arguments are further demonstrated in the examples section, so it seemed silly to just talk about the two here for ggnetwork.
+
+\begin{table}
+\begin{tabu} to \linewidth { X[l]| X[c] | X[c] | X[c] }
+\toprule
+& \code{ggnet2} & \code{geom\_net} & \code{geom\_nodes}, \code{geom\_edges}, etc\\
+Functionality & (\pkg{GGally}) & (\pkg{geomnet}) &  (\pkg{ggnetwork}) \\
+\midrule
+Data &  object of class \code{network} or object easily converted to that class (i.e. incidence or adjacency matrices, edge list) or object of class \code{igraph} & merged data frame of node data and edge data OR one edge data frame and one node data frame to be merged internally & same as \code{ggnet2}\\
+\midrule
+Naming conventions & \code{node.\underline{\phantom{AA}}},  \code{edge.\underline{\phantom{AA}}}, \code{label.\underline{\phantom{AA}}}, \code{edge.label.\underline{\phantom{AA}}} for \code{alpha}, \code{color}, etc. & arguments identical to \pkg{ggplot2} with exception of \code{ecolor}, \code{ealpha} & same as \pkg{ggplot2}\\
+\midrule
+Layout package \& default & \pkg{sna}, Fruchterman-Reingold & \pkg{sna}, Kamada-Kawai & \pkg{sna}, Fruchterman-Reingold\\
+\midrule
+Aesthetic mappings to variables & all \code{alpha}, \code{color}, \code{shape}, \code{size} for nodes, edges, labels & \code{colour}, \code{size}, \code{linetype}, \code{linewidth}, \code{label} & same as \pkg{ggplot2} \\
+\midrule
+Arrows & \code{directed = TRUE}, \code{arrow.size}, \code{gap} & \code{arrowsize}, \code{gap}, \code{arrow = arrow()} like \pkg{ggplot2} & specify arrows in \code{geom\_edge} like in code{geom\_segment}, \code{arrow.gap} \\
+\midrule
+Theme or palette changes & done in the function with arguments like \code{\underline{\phantom{AA}}.legend}, \code{\underline{\phantom{AA}}.palette}, etc. and adding \pkg{ggplot2} elements  & adding \pkg{ggplot2} elements & adding \pkg{ggplot2} elements \\
+\midrule
+Creating small multiples  & created separately, use \code{grid.arrange} from \pkg{gridExtra} & use \code{facet\_*()} from \pkg{ggplot2} & use \code{by} argument in \code{ggnetwork()} and \code{facet\_*()} from \pkg{ggplot2}\\
+\midrule
+Edge labelling? & Yes  & No & Yes\\
+\midrule
+Draw self-loops? &  No & Yes & No \\
+\bottomrule
+\end{tabu}
+\caption{\label{tab:comparison} Comparing the three different package side-by-side. }
+\end{table}
+
 
 % ==============================================================================
 %
