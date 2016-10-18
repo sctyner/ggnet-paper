@@ -1353,9 +1353,9 @@ We can also make use of the option \samp{layout = NULL} whenever we do not want 
 % \sct{XXX Originally, I added the protein network example for three reasons: first, to demonstrate the layout changes that are possible by passing the layout.par argument to geom\_net; second because it's a pretty well known example of a biological network, which we discuss in the intro; and third, it's a large network, much larger than all of our other ones, and more realistic with respect to what networks many researchers are interested. i.e. more people study networks like this than study networks like the blood, mad men, bikeshare, etc. networks. I think removing it would be detrimental to the paper. I like the idea of keeping it in the examples, adding emphasis to the reasons I put it there in the first place, and referencing it later on. XXX}
 %
 
-In this visualization, we demonstrate the layout capabilities of our functions by changing the layout to \code{random} and setting the distribution to \code{"uniang"}, which is a  ``Gaussian donut" layout \citep{sna}.  Indeed, we see a near circular area in the middle of the graph because the layout parameter has forced all of the vertices to the exterior, leaving a ``donut hole" in the middle. Because all of the approaches result in nearly identical figures, only one network is shown. The code for all three approaches is given below:
+% In this visualization, we demonstrate the layout capabilities of our functions by changing the layout to \code{random} and setting the distribution to \code{"uniang"}, which is a  ``Gaussian donut" layout \citep{sna}.  Indeed, we see a near circular area in the middle of the graph because the layout parameter has forced all of the vertices to the exterior, leaving a ``donut hole" in the middle. Because all of the approaches result in nearly identical figures, only one network is shown. The code for all three approaches is given below:
 
-<<yeast_ggnet2, echo=TRUE, eval = FALSE, cache=FALSE>>=
+<<yeast_ggnet2, echo=FALSE, eval = FALSE, cache=FALSE>>=
 # plot with ggnet2
 data(protein, package = 'geomnet')
 set.seed(10052016)
@@ -1364,7 +1364,7 @@ ggnet2(network(protein$edges[,1:2]), size = 2, color = "magenta",
       edge.alpha = 0.05)
 @
 
-<<yeast_geom_net, echo=TRUE, cache=FALSE>>=
+<<yeast_geom_net, echo=FALSE, cache=FALSE, eval=FALSE>>=
 # plot with geom_net
 set.seed(10052016)
 ggplot(data = protein$edges, aes(from_id = from, to_id = to)) +
@@ -1374,13 +1374,13 @@ ggplot(data = protein$edges, aes(from_id = from, to_id = to)) +
   theme_net()
 @
 
-\begin{figure}[bhp]
-\centering
-\includegraphics[width=.8\textwidth]{figure/yeast_geom_net-1.pdf}
-%\end{subfigure}
-\caption{\label{fig.cap:yeast} Protein-protein interaction network in \emph{S. cerevisiae}. The layout is random and follows a Gaussian donut distribution.}
-\end{figure}
-<<yeast_ggnetwork, echo=TRUE, eval = FALSE,  cache=FALSE>>=
+% \begin{figure}[bhp]
+% \centering
+% \includegraphics[width=.8\textwidth]{figure/yeast_geom_net-1.pdf}
+% %\end{subfigure}
+% \caption{\label{fig.cap:yeast} Protein-protein interaction network in \emph{S. cerevisiae}. The layout is random and follows a Gaussian donut distribution.}
+% \end{figure}
+<<yeast_ggnetwork, echo=FALSE, eval = FALSE,  cache=FALSE>>=
 # plot with ggnetwork
 set.seed(10052016)
 ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
@@ -1396,7 +1396,8 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 %\newpage
 \section{Some considerations of speed}\label{sec:speed}
 % \hh{XXX So, the testing waters are much more muddy than anticipated. What we can do, though, is to describe the testing scenario(s), and then report our findings with an attempt to summarize. XXX I've added a facetted plot to show the variability in the results that we've seen between the different machines. I made a few changes to the plot, as you can see - using a smooth allows us to see a trend, while the points show variability and give some indication of the distribution (I don't like min and max for that because they are the least robust measures). I also want to see where the actual measurements are taken - that's the reason for showing the points. XXX}
-In our examples thus far, we have focused on rather small social or relationship networks and one larger communication network. Now we present an example of a biological network, which comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 2,113 proteins that make up the vertices of this network, with a total of 4480 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}, resulting in a relatively large  network. Despite its size, each one of the approaches in the \pkg{ggplot2} framework can be drawn in a few hundred milliseconds. A more in-depth discussion on plotting speed follows in the next section. The proteins and the interactions between them are plotted in the networks shown in Figure~\ref{fig.cap:yeast}. These interactions and their associated proteins are plotted in Figure~\ref{fig.cap:yeast}. Due to the lengthy 
+In our examples thus far, we have focused on rather small social or relationship networks and one larger communication network. Now we present an example of a biological network, which comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 2,113 proteins that make up the vertices of this network, with a total of 4480 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}, resulting in a relatively large  network. When these interactions and their associated proteins are plotted according to a force-directed layout, the time takes a very long time.  Figure~\ref{fig.cap:yeast}. Due to the lengthy Despite its size, each one of the approaches in the \pkg{ggplot2} framework can be drawn in a few hundred milliseconds. %A more in-depth discussion on plotting speed follows in the next section. 
+%The proteins and the interactions between them are plotted in the networks shown in Figure~\ref{fig.cap:yeast}. 
 
 Another benefit that emerges from using \pkg{ggplot2} for network visualization is the speed at which it can plot fairly large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionality offered in the \pkg{network} package. They also show the \pkg{ggplot2} approaches to be largely on par with the speed provided by the \pkg{igraph} package. We first investigate average plotting time
 of the protein network%
