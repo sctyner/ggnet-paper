@@ -199,8 +199,7 @@ set.seed(10052016)
 ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
   geom_net(aes(colour = Gender), layout = "kamadakawai", 
            size = 1, label = TRUE, vjust = -0.6, ecolour = "grey60",
-           directed = TRUE, fontsize = 3, 
-           arrowgap = 0.01, arrowsize = .5, ealpha = 0.5) +
+           directed =FALSE, fontsize = 3, ealpha = 0.5) +
   scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
   xlim(c(-0.05, 1.05)) +
   theme_net() +
@@ -227,7 +226,55 @@ Coloring the vertices or edges in a graph is a quick way to visualize grouping a
 \label{sec:implementations}
 %
 % ==============================================================================
-We present two basic approaches to using the \pkg{ggplot2} framework for network visualization. First, we implement network visualizations by providing a wrapper function, \code{ggnet2} for the user to visualize a network using \pkg{ggplot2} elements. Second, we implement network visualizations using layering in \pkg{ggplot2}.  For the second approach, we have two ways of creating a network visualization. The first, \pkg{geomnet}, wraps all network structures, including vertices, edges, and vertex labels into a single \code{geom}. The second, \pkg{ggnetwork}, implements each structural component in an independent \code{geom} and layers them to create the visualization. In each package, our goal is to provide users with a way to map network properties to aesthetic properties of graphs that is familiar to them and straightforward to implement. Each package has a slightly different approach to accomplish this goal, and we will discuss all of these approaches in this section. We conclude the section with a side-by-side comparison of the features available in all three implementations in Table~\ref{tab:comparison}.
+We present two basic approaches to using the \pkg{ggplot2} framework for network visualization. First, we implement network visualizations by providing a wrapper function, \code{ggnet2} for the user to visualize a network using \pkg{ggplot2} elements. Second, we implement network visualizations using layering in \pkg{ggplot2}.  For the second approach, we have two ways of creating a network visualization. The first, \pkg{geomnet}, wraps all network structures, including vertices, edges, and vertex labels into a single \code{geom}. The second, \pkg{ggnetwork}, implements each structural component in an independent \code{geom} and layers them to create the visualization. In each package, our goal is to provide users with a way to map network properties to aesthetic properties of graphs that is familiar to them and straightforward to implement. Each package has a slightly different approach to accomplish this goal, and we will discuss all of these approaches in this section. For each implementation, we also provide the code necessary to create Figure~\ref{fig.cap:madmen}, and describe the arguments used. We conclude the section with a side-by-side comparison of the features available in all three implementations in Table~\ref{tab:comparison}.
+
+<<codefromfirstmmnet, echo=FALSE, eval=FALSE>>=
+# make the data available
+data(madmen, package = 'geomnet')
+# data step for both ggnet2 and ggnetwork
+# create undirected network
+mm.net <- network(madmen$edges[, 1:2], directed = FALSE)
+# create node attribute (gender)
+rownames(madmen$vertices) <- madmen$vertices$label
+mm.net %v% "gender" <- as.character(
+  madmen$vertices[ network.vertex.names(mm.net), "Gender"]
+)
+# gender color palette
+mm.col <- c("female" = "#ff69b4", "male" = "#0099ff")
+# create plot for ggnet2
+set.seed(10052016)
+ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
+       label = TRUE, label.color = mm.col[ mm.net %v% "gender" ],
+       size = 4, vjust = -0.6, layout = "kamadakawai")
+@
+
+<<madmen_ggnet2, echo=FALSE, out.width='\\textwidth', fig.width=9, fig.height=9, eval=FALSE>>=
+# data step for geom_net: merge edges and nodes
+MMnet <- merge(madmen$edges, madmen$vertices,
+               by.x = "Name1", by.y = "label", all = TRUE)
+# create plot for geomnet
+set.seed(10052016)
+ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
+  geom_net(layout = "kamadakawai", aes(colour = Gender), 
+           size = 4, label = TRUE,
+           repel = TRUE, ecolour = "grey60") +
+  scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
+  xlim(c(-0.05, 1.05)) +
+  theme_net() +
+  theme(legend.position = "bottom")
+# create plot for ggnetwork
+set.seed(10052016)
+ggplot(data = ggnetwork(mm.net, layout = "kamadakawai"), 
+       aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(color = "grey50") +
+  geom_nodes(aes(colour = gender), size = 4) +
+  geom_nodetext(aes(colour = gender, label = vertex.names),
+                size = 4, vjust = -0.6) +
+  scale_colour_manual(values = mm.col) +
+  xlim(c(-0.05, 1.05)) +
+  theme_blank() +
+  theme(legend.position = "bottom")
+@
 
 \subsection{ggnet2} % ==========================================================
 
@@ -774,55 +821,6 @@ Code and plots of the inheritance structure are shown in Figure \ref{fig.cap:the
 
 %The code for creating Figure ~\ref{fig.cap:madmen} using all three approaches is shown below. We have provided this code for completeness, but do not provide the result of each in order to save space. 
 %and the corresponding networks are shown in figure~\ref{fig:madmen-2}.
-<<codefromfirstmmnet, echo=FALSE, eval=FALSE>>=
-# make the data available
-data(madmen, package = 'geomnet')
-
-# data step for geom_net: merge edges and nodes
-MMnet <- merge(madmen$edges, madmen$vertices,
-               by.x = "Name1", by.y = "label", all = TRUE)
-# data step for both ggnet2 and ggnetwork
-# create undirected network
-mm.net <- network(madmen$edges[, 1:2], directed = FALSE)
-# create node attribute (gender)
-rownames(madmen$vertices) <- madmen$vertices$label
-mm.net %v% "gender" <- as.character(
-  madmen$vertices[ network.vertex.names(mm.net), "Gender"]
-)
-# gender color palette
-mm.col <- c("female" = "#ff69b4", "male" = "#0099ff")
-@
-
-<<madmen_ggnet2, echo=FALSE, out.width='\\textwidth', fig.width=9, fig.height=9, eval=FALSE>>=
-# create plot for ggnet2
-set.seed(10052016)
-ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
-       label = TRUE, label.color = mm.col[ mm.net %v% "gender" ],
-       size = 4, vjust = -0.6, layout = "kamadakawai")
-# create plot for geomnet
-set.seed(10052016)
-ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
-  geom_net(layout = "kamadakawai", aes(colour = Gender), 
-           size = 4, label = TRUE,
-           repel = TRUE, ecolour = "grey60") +
-  scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
-  xlim(c(-0.05, 1.05)) +
-  theme_net() +
-  theme(legend.position = "bottom")
-# create plot for ggnetwork
-set.seed(10052016)
-ggplot(data = ggnetwork(mm.net, layout = "kamadakawai"), 
-       aes(x, y, xend = xend, yend = yend)) +
-  geom_edges(color = "grey50") +
-  geom_nodes(aes(colour = gender), size = 4) +
-  geom_nodetext(aes(colour = gender, label = vertex.names),
-                size = 4, vjust = -0.6) +
-  scale_colour_manual(values = mm.col) +
-  xlim(c(-0.05, 1.05)) +
-  theme_blank() +
-  theme(legend.position = "bottom")
-@
-
 
 % \begin{figure}[hbtp]
 % \begin{subfigure}[t]{.495\textwidth}
