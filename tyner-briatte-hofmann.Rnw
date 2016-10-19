@@ -198,7 +198,7 @@ MMnet <- merge(madmen$edges, madmen$vertices,
 set.seed(10052016)
 ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
   geom_net(aes(colour = Gender), layout = "kamadakawai", 
-           size = 1, label = TRUE, vjust = -0.6, ecolour = "grey60",
+           size = 2, label = TRUE, vjust = -0.6, ecolour = "grey60",
            directed =FALSE, fontsize = 3, ealpha = 0.5) +
   scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
   xlim(c(-0.05, 1.05)) +
@@ -228,7 +228,16 @@ Coloring the vertices or edges in a graph is a quick way to visualize grouping a
 % ==============================================================================
 We present two basic approaches to using the \pkg{ggplot2} framework for network visualization. First, we implement network visualizations by providing a wrapper function, \code{ggnet2} for the user to visualize a network using \pkg{ggplot2} elements. Second, we implement network visualizations using layering in \pkg{ggplot2}.  For the second approach, we have two ways of creating a network visualization. The first, \pkg{geomnet}, wraps all network structures, including vertices, edges, and vertex labels into a single \code{geom}. The second, \pkg{ggnetwork}, implements each structural component in an independent \code{geom} and layers them to create the visualization. In each package, our goal is to provide users with a way to map network properties to aesthetic properties of graphs that is familiar to them and straightforward to implement. Each package has a slightly different approach to accomplish this goal, and we will discuss all of these approaches in this section. For each implementation, we also provide the code necessary to create Figure~\ref{fig.cap:madmen}, and describe the arguments used. We conclude the section with a side-by-side comparison of the features available in all three implementations in Table~\ref{tab:comparison}.
 
-<<codefromfirstmmnet, echo=FALSE, eval=FALSE>>=
+\subsection{ggnet2} % ==========================================================
+
+The \code{ggnet2} function is an improved version of the \code{ggnet} function.%, which has been part of the \pkg{GGally} package since 2013 \citep{ggally}. %
+Both functions  are part of the \pkg{GGally} package \citep{ggally}.  A detailed description of the \code{ggnet2} function is available from within the package as a vignette.%
+%\footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnet/}.}%
+
+\begin{figure}[h]
+<<madmen_ggnet2, eval=FALSE, echo=TRUE, fig.cap="The code required to generate Figure~\\ref{fig.cap:madmen} using the \\code{ggnet2} function in the \\pkg{GGally} package.">>=
+library(GGally)
+library(network)
 # make the data available
 data(madmen, package = 'geomnet')
 # data step for both ggnet2 and ggnetwork
@@ -245,42 +254,10 @@ mm.col <- c("female" = "#ff69b4", "male" = "#0099ff")
 set.seed(10052016)
 ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
        label = TRUE, label.color = mm.col[ mm.net %v% "gender" ],
-       size = 4, vjust = -0.6, layout = "kamadakawai")
+       size = 2, vjust = -0.6, mode = "kamadakawai", label.size = 3)
 @
-
-<<madmen_ggnet2, echo=FALSE, out.width='\\textwidth', fig.width=9, fig.height=9, eval=FALSE>>=
-# data step for geom_net: merge edges and nodes
-MMnet <- merge(madmen$edges, madmen$vertices,
-               by.x = "Name1", by.y = "label", all = TRUE)
-# create plot for geomnet
-set.seed(10052016)
-ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
-  geom_net(layout = "kamadakawai", aes(colour = Gender), 
-           size = 4, label = TRUE,
-           repel = TRUE, ecolour = "grey60") +
-  scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
-  xlim(c(-0.05, 1.05)) +
-  theme_net() +
-  theme(legend.position = "bottom")
-# create plot for ggnetwork
-set.seed(10052016)
-ggplot(data = ggnetwork(mm.net, layout = "kamadakawai"), 
-       aes(x, y, xend = xend, yend = yend)) +
-  geom_edges(color = "grey50") +
-  geom_nodes(aes(colour = gender), size = 4) +
-  geom_nodetext(aes(colour = gender, label = vertex.names),
-                size = 4, vjust = -0.6) +
-  scale_colour_manual(values = mm.col) +
-  xlim(c(-0.05, 1.05)) +
-  theme_blank() +
-  theme(legend.position = "bottom")
-@
-
-\subsection{ggnet2} % ==========================================================
-
-The \code{ggnet2} function is an improved version of the \code{ggnet} function.%, which has been part of the \pkg{GGally} package since 2013 \citep{ggally}. %
-Both functions  are part of the \pkg{GGally} package \citep{ggally}.  A detailed description of the \code{ggnet2} function is available from within the package as a vignette.%
-%\footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnet/}.}%
+\caption{\label{fig.cap:madmenggnet2} The code required to generate Figure~\ref{fig.cap:madmen} using the \code{ggnet2} function in the \pkg{GGally} package.}
+\end{figure}
 
 The \code{ggnet2} function offers a large range of network visualization functionality in a single function call. Although its result is a \pkg{ggplot2} object that can be further styled with \pkg{ggplot2} scales and themes, the syntax of the \code{ggnet2} function is designed to be easily understood by the user. The aesthetics relating to the nodes are controlled by arguments such as \code{node.alpha} or \code{node.color}, while those relating to the edges are controlled by %similarly named
 arguments starting with \samp{edge}. As a consequence, while \code{ggnet2} applies the grammar of graphics to network objects, the function itself still works very much like the plotting functions of the \pkg{igraph} and \pkg{network} packages: a long series of arguments is used to control every possible aspect of how the network should be visualized.
@@ -306,6 +283,26 @@ The \code{ggnet2} function also provides a few network-specific options, such as
 All in all, the \code{ggnet2} function combines two different kinds of processes: it translates a network object into a data frame suitable for plotting with \pkg{ggplot2}, and it applies network-related aesthetic operations to that data frame, such as coloring the edges in function of the color of the nodes that they connect. %\sct{In the next section, we discuss \pkg{geomnet}, which is similarly constructed.}
 
 \subsection{geomnet} % =========================================================
+\begin{figure}[h]
+<<madmen_geom_net_code, echo=TRUE, eval=FALSE, fig.cap="The code required to generate Figure~\\ref{fig.cap:madmen} using the \\code{geom\\_net} function in the \\pkg{geomnet} package.">>=
+# also loads ggplot2
+library(geomnet)
+# data step for geom_net: merge edges and nodes
+MMnet <- merge(madmen$edges, madmen$vertices,
+               by.x = "Name1", by.y = "label", all = TRUE)
+# create plot for geomnet
+set.seed(10052016)
+ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
+  geom_net(layout = "kamadakawai", aes(colour = Gender), 
+           size = 4, label = TRUE,
+           repel = TRUE, ecolour = "grey60") +
+  scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
+  xlim(c(-0.05, 1.05)) +
+  theme_net() +
+  theme(legend.position = "bottom")
+@
+\caption{\label{fig.cap:madmengeomnet} The code required to generate Figure~\ref{fig.cap:madmen} using the \code{geom\_net} function in the \pkg{geomnet} package.}
+\end{figure}
 
 \subsubsection{Data Structure}
 
@@ -356,6 +353,25 @@ Note that the edge specific aesthetics that overwrite node aesthetics are curren
 %
 %\footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnetwork/}.}%
 %
+\begin{figure}[h]
+<<madmen_ggnetwork, echo=TRUE, eval=FALSE, fig.cap="The code required to generate Figure~\\ref{fig.cap:madmen} using the \\pkg{ggnetwork} package.">>=
+# create plot for ggnetwork. uses same data created for ggnet2 function
+library(ggnetwork)
+set.seed(10052016)
+ggplot(data = ggnetwork(mm.net, layout = "kamadakawai"), 
+       aes(x, y, xend = xend, yend = yend)) +
+  geom_edges(color = "grey50") +
+  geom_nodes(aes(colour = gender), size = 2) +
+  geom_nodetext(aes(colour = gender, label = vertex.names),
+                size = 3, vjust = -0.6) +
+  scale_colour_manual(values = mm.col) +
+  xlim(c(-0.05, 1.05)) +
+  theme_blank() +
+  theme(legend.position = "bottom")
+@
+\caption{\label{fig.cap:madmenggnetwork} The code required to generate Figure~\ref{fig.cap:madmen} using the \pkg{ggnetwork} package.}
+\end{figure}
+
 The approach taken by the \pkg{ggnetwork} package is to alias some of the native geoms of the \pkg{ggplot2} package. An aliased geom is simply a variant of an already existing one. The \pkg{ggplot2} package contains several examples of aliased geoms, such as \code{geom\_histogram}, which is a variant of \code{geom\_bar} see \citep[see][p.~67, Table~4.6]{ggplot2}.
 
 Following that logic, the \pkg{ggnetwork} package adds four aliased geometries to \pkg{ggplot2}:
