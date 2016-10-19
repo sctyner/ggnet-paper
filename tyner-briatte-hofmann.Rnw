@@ -339,7 +339,7 @@ while the latter, like \code{alpha} or \code{colour}, for instance, are used for
 The parameter \code{curvature} is set to zero by default, but if specified, leads to curved edges using the newly implemented \pkg{ggplot2} geom \code{geom\_curve} instead of the regular \code{geom\_segment}.
 Note that the edge specific aesthetics that overwrite node aesthetics are currently considered as `as.is' values: they do not get a legend and are not scaled within the ggplot2 framework. This is done to avoid any clashes between node and edge scales.
 
-{\bf self-referencing vertices:} some networks contain self references, i.e.\  an edge has the same vertex id in its from and to columns. If the parameter \code{selfies} is set to \code{TRUE}, a circle is drawn using the new \code{geom\_circle} next to the vertex to represent this self reference.
+{\bf self-referencing vertices:} some networks contain self references, i.e.\  an edge has the same vertex id in its from and to columns. If the parameter \code{selfloops} is set to \code{TRUE}, a circle is drawn using the new \code{geom\_circle} next to the vertex to represent this self reference.
 
 %
 \item {\bf arrow:} whenever the parameter \code{directed} is set from its default state to \code{TRUE}, arrows are drawn from the `from' to the `to' node, with tips pointing towards the `to' node.  By default, arrows have an absolute size of 10 points. The entire structure of the arrow can be changed by passing an \code{arrow} object from the \CRANpkg{grid} package to the \code{arrow} argument. If the user doesn't wish to change the whole arrow object, the parameters \code{arrowsize} and \code{arrowgap} are also available. The \code{arrowsize} argument is of a positive numeric value that is used as a multiple of the original arrow size, i.e.\ \code{arrowsize = 2} shows arrow tips at twice their original size.  The parameter \code{arrowgap} can be used to avoid overplotting of the arrow tips by the nodes, \code{arrowgap} specifies a proportion by which the edge should be shrunk with default of 0.05. A value of 0.5 will result in edges drawn only half way from the `from' node to the `to' node.
@@ -484,7 +484,7 @@ ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
   geom_net(colour = "darkred", layout = "circle", label = TRUE, size = 15,
            directed = TRUE, vjust = 0.5, labelcolour = "grey80",
            arrowsize = 1.5, linewidth = 0.5, arrowgap = 0.05,
-           selfies = TRUE, ecolour = "grey40") + 
+           selfloops = TRUE, ecolour = "grey40") + 
   theme_net() 
 @
 
@@ -501,7 +501,7 @@ ggplot(ggnetwork(network(blood$edges[, 1:2]),
   theme_blank()
 @
 \noindent
-In this example every vertex has a self-reference, as blood between two people of matching ABO and RhD type can always be exchanged.  The \pkg{geomnet} approach shows these self-references as circles looping back to the vertex, which is controlled by using the parameter setting \code{selfies = TRUE}.
+In this example every vertex has a self-reference, as blood between two people of matching ABO and RhD type can always be exchanged.  The \pkg{geomnet} approach shows these self-references as circles looping back to the vertex, which is controlled by using the parameter setting \code{selfloops = TRUE}.
 
 \begin{figure}[hbt]
 \begin{subfigure}[t]{.32\textwidth}

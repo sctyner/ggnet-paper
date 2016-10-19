@@ -205,7 +205,7 @@ ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
   geom_net(colour = "darkred", layout = "circle", label = TRUE, size = 15,
            directed = TRUE, vjust = 0.5, labelcolour = "grey80",
            arrowsize = 1.5, linewidth = 0.5, arrowgap = 0.05,
-           selfies = TRUE, ecolour = "grey40") + 
+           selfloops = TRUE, ecolour = "grey40") + 
   theme_net() 
 
 ## ----blood_ggnetwork, echo=TRUE, fig.width=6, fig.height=6---------------
