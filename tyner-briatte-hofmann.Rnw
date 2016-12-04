@@ -261,18 +261,18 @@ ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
 The \code{ggnet2} function offers a large range of network visualization functionality in a single function call. Although its result is a \pkg{ggplot2} object that can be further styled with \pkg{ggplot2} scales and themes, the syntax of the \code{ggnet2} function is designed to be easily understood by the user. The aesthetics relating to the nodes are controlled by arguments such as \code{node.alpha} or \code{node.color}, while those relating to the edges are controlled by %similarly named
 arguments starting with \samp{edge}. Additionally, as seen in Figure~\ref{fig.cap:madmenggnet2}, the usual \pkg{ggplot2} arguments like \code{color} can be used without the prefix to map node attributes to aesthetic values. The arguments with the \code{node.} prefix are aliased versions for readability of the code. Thus, while \code{ggnet2} applies the grammar of graphics to network objects, the function itself still works very much like the plotting functions of the \pkg{igraph} and \pkg{network} packages: a long series of arguments is used to control every possible aspect of how the network should be visualized.
 
-The \code{ggnet2} function takes a single network object as input. This initial object might be an object of class \code{network} from the \pkg{network} package (with the exception of hypergraphs or multiplex graphs), or any data structure that can be coerced to an object of that class via functions in the \pkg{network} package, such as an incidence matrix, an adjacency matrix, or an edge list. Additionally, if the \CRANpkg{intergraph} package \citep{intergraph} is installed, the function  also accepts a network object of class \code{igraph}. Internally, the function converts the network object to two data frames: one for edges and another one for nodes. It then passes them to \pkg{ggplot2}. Each of the two data frames contain the information required by \pkg{ggplot2} to plot segments and points respectively, such as a shape for the points (nodes) and a line type for the segments (edges). The final result returned to the user is a plot with a minimum of two layers, or more if there are edge and/or node labels.%
+The \code{ggnet2} function takes a single network object as input. This initial object might be an object of class \code{"network"} from the \pkg{network} package (with the exception of hypergraphs or multiplex graphs), or any data structure that can be coerced to an object of that class via functions in the \pkg{network} package, such as an incidence matrix, an adjacency matrix, or an edge list. Additionally, if the \CRANpkg{intergraph} package \citep{intergraph} is installed, the function  also accepts a network object of class \code{igraph}. Internally, the function converts the network object to two data frames: one for edges and another one for nodes. It then passes them to \pkg{ggplot2}. Each of the two data frames contain the information required by \pkg{ggplot2} to plot segments and points respectively, such as a shape for the points (nodes) and a line type for the segments (edges). The final result returned to the user is a plot with a minimum of two layers, or more if there are edge and/or node labels.%
 
 The \code{mode} argument of \code{ggnet2} controls how the nodes of the network are to be positioned in the plot returned by the function. This argument can take any of the layout values supported by the \code{gplot.layout} function of the \pkg{sna} package, and defaults to \samp{fruchtermanreingold}, which places the nodes through the force-directed layout algorithm by \citet{fruchterman_reingold}. In the example presented in Figure~\ref{fig.cap:madmenggnet2}, the Kamada-Kawai layout is used by adding \samp{mode = "kamadakawai"} to the function call. Many other possible layouts and their parameters can also be passed to \code{ggnet2} through the \code{layout.par} argument. For a list of possible layouts and their arguments, see \code{?sna::gplot.layout}.
 
 Other arguments passed to the \code{ggnet2} function offer extensive control over the aesthetics of the plot that it returns, including %through
 the addition of edge and/or node labels and their respective aesthetics.
-Arguments such as \code{node.shape} or \code{edge.lty}, which  control the shape of the nodes and the line type of the edges, respectively, can take a single global value, a vector of global values, or the name of an edge or vertex attribute to be used as an aesthetic mapping. This feature is used to change the size of the nodes and the node labels in Figure~\ref{fig.cap{madmenggnet2}} by including \samp{size = 2} and \samp{label.size = 3} in the function call. 
+Arguments such as \code{node.shape} or \code{edge.lty}, which  control the shape of the nodes and the line type of the edges, respectively, can take a single global value, a vector of global values, or the name of an edge or vertex attribute to be used as an aesthetic mapping. This feature is used to change the size of the nodes and the node labels in Figure~\ref{fig.cap:madmenggnet2} by including \samp{size = 2} and \samp{label.size = 3} in the function call. 
 
-This last functionality builds on one of the strengths of the \pkg{network} class, which can store %meta-
+This last functionality builds on one of the strengths of the \code{"network"} class, which can store %meta-
 information on network edges and nodes as attributes that are then accessible to the user through the \code{\%e\%} and \code{\%v\%} operators respectively.%
 %
-\footnote{See \citet[p.~22-24]{network}. The equivalent operators in the \pkg{igraph} package are called \code{E} and \code{V}.} Usage examples of these operators can be seen in Figure~\ref{fig.cap{madmenggnet2}}. The attribute of gender is assigned to nodes, which in turn is accessed to color the nodes and node labels by gender.%
+\footnote{See \citet[p.~22-24]{network}. The equivalent operators in the \pkg{igraph} package are called \code{E} and \code{V}.} Usage examples of these operators can be seen in Figure~\ref{fig.cap:madmenggnet2}. The attribute of gender is assigned to nodes, which in turn is accessed to color the nodes and node labels by gender.%
   %
   If the \code{ggnet2} function is given the \code{node.alpha = "importance"} argument, it will interpret it as an attempt to map the vertex attribute called \samp{importance} to the transparency level of the nodes. This works exactly like the command \code{net \%v\% "importance"}, which returns the vertex attribute \samp{importance} of the \code{"network"} object \code{net}. % SCT : This sentence seems very redundant. %This same result can also be achieved by passing the more explicit argument \code{node.alpha = net \%v\% "importance"}.
   This functionality allows the \code{ggnet2} function to work in a similar fashion to \pkg{ggplot2} mappings of aesthetics within the \code{aes} operator.
@@ -306,21 +306,20 @@ ggplot(data = MMnet, aes(from_id = from_id, to_id = to_id)) +
 \subsubsection{Data Structure}
 
 The package \pkg{geomnet} implements network visualization in a single \pkg{ggplot2} layer. A stable version is available on CRAN, with a development version available at \url{https://github.com/sctyner/geomnet}. The package has two main functions:  \code{stat\_net}, which performs all of the calculations, and \code{geom\_net}, which renders the plot. It also contains the secondary functions \code{geom\_circle} and \code{theme\_net}, which assist, respectively, in drawing self-referencing edges and removing axes and other background elements from the plots.
-The approach in \pkg{geomnet} is similar to the implementation of other, native \pkg{ggplot2} geoms, such as \code{geom\_smooth}. When using \code{geom\_smooth}, the user does not need to know about any of the internals of the loess function, and similarly, when using \code{geomnet}, the user is not expected to know about the internals of the layout algorithm. On the other hand, if users are comfortable with network analysis, the entire body of layout methods provided by the \pkg{sna} package is available to them through the parameters \code{layout.alg} and \code{layout.par}.
+The approach in \pkg{geomnet} is similar to the implementation of other, native \pkg{ggplot2} geoms, such as \code{geom\_smooth}. When using \code{geom\_smooth}, the user does not need to know about any of the internals of the loess function, and similarly, when using \code{geomnet}, the user is not expected to know about the internals of the layout algorithm, just the name of the algorithm they'd like to use. On the other hand, if users are comfortable with network analysis, the entire body of layout methods provided by the \pkg{sna} package is available to them through the parameters \code{layout.alg} and \code{layout.par}.
 %
 
 In network analysis there are usually two sources of information: one data set consisting of a description of the nodes, represented as the vertices in the network and vertex attributes, and another data set detailing the relationship between these nodes, i.e.\ it consists of the edge list and any additional edge attributes. %We make two important assumptions about the way this information is encoded for use in \CRANpkg{geomnet}. First, we assume that the vertices are labelled using an `id' column. Second, we assume that the edges are described as connection between vertices via their respective `id' labels in a `from' and a `to' column. Thus, t
 The minimum amount of information needed is a vector of all vertex labels and a two column data frame %of to and from vertex ids corresponding to the edges.  
 that encodes the edge list of the network. In order for this geometry to work, these two data sets need to be combined into a single data frame. For this, %we are using the convention that all of the vertex information is merged into the edge data set using the `from' as the reference column in a full join operation.
-we implemented several new \code{fortify} methods for producing the correct data structure from different S3 objects that encode network information. Supported classes are \code{"network"} from the \pkg{sna} and \pkg{network} packages, \code{"igraph"} from the \pkg{igraph} package, \code{"adjmat"}, and \code{"edgedf"}. The last two are new classes introduced in \pkg{geomnet} that are identical to the \code{"matrix"} and \code{"data.frame"} classes, respectively. We created these new classes and the functions \code{as.adjmat} and \code{as.edgedf} so that network data in adjacency matrix and edgelist (data frame) formats can have their own fortify functions, separate from the very generic matrix and data frame classes. 
-%Generally, there will be some vertices that are sinks in the network because they only show up in the `to' column. We can easily accommodate for these by adding artificial edges in the data set that have missing information for the `to' column. The user may pass two data frames to the function, e.g. \samp{data = edge\_data} and \samp{vertices = vertex\_data}, or just one, e.g. \samp{data = merged\_data}. 
+we implemented several new \code{fortify} methods for producing the correct data structure from different S3 objects that encode network information. Supported classes are \code{"network"} from the \pkg{sna} and \pkg{network} packages, \code{"igraph"} from the \pkg{igraph} package, \code{"adjmat"}, and \code{"edgedf"}. The last two are new classes introduced in \pkg{geomnet} that are identical to the \code{"matrix"} and \code{"data.frame"} classes, respectively. We created these new classes and the functions \code{as.adjmat()} and \code{as.edgedf()} so that network data in adjacency matrix and edgelist (data frame) formats can have their own fortify functions, separate from the very generic matrix and data frame classes. These fortify functions combine the edge and the node information using a full join. A full join is used because generally, there will be some vertices that are sinks in the network because they only show up in the `to' column, and so we accommodate for these by adding artificial edges in the data set that have missing information for the `to' column. The user may also pass two data frames to the function, e.g. \samp{data = edge\_data} and \samp{vertices = vertex\_data}, but we recommend using the \code{fortify} methods whenever possible.
 
-%Fortunately, R provides functionality that allows for an easy way of producing the required result: \code{merge} (in base R), \code{join} \citep[in \CRANpkg{plyr} see][]{plyr} and \code{full\_join} \citep[in \CRANpkg{dplyr}, see][]{dplyr} can be used. In \code{merge} the argument \code{all} needs to be set to \code{TRUE}; in \code{join}, the parameters have to be set to \code{type = "full"} and \code{all = TRUE}. These operations are equivalent to a `full join' in SQL terminology. An example of the type of merge necessary is presented in Figure~\ref{fig.cap:madmengeomnet} with the creation of the \code{MMnet} data set. Two dataframes, \code{madmen\$edges} and \code{madmen\$vertices} are joined to create the required data. The first few rows of these data sets and their merged result are below. 
+A usage example of the \code{fortify.edgedf} method is presented in Figure~\ref{fig.cap:madmengeomnet} with the creation of the \code{MMnet} data set. Two dataframes, \code{madmen\$edges} and \code{madmen\$vertices} are joined to create the required data. The first few rows of these data sets and their merged result are below. 
 
 <<data_peek, echo=TRUE>>=
-head(madmen$edges, 3)
+head(as.edgedf(madmen$edges), 3)
 head(madmen$vertices, 3)
-head(MMnet, 3)
+head(fortify(as.edgedf(madmen$edges), madmen$vertices), 3)
 @
 
 The formal requirements of \code{stat\_net} are two columns, called \code{from\_id} and \code{to\_id}. During this routine, columns \code{x, y} and \code{xend, yend} are calculated and used as a required input for \code{geom\_net}.
@@ -339,7 +338,7 @@ the \code{layout.alg} parameter takes a character value corresponding to the pos
 %Corresponding to each layout, the parameter  \code{layout.par} consists of a list of the parameters for the chosen layout
 % XXX SCT: above sentence was TERRIBLE. re-write:
 In \CRANpkg{sna}, for each layout there is a corresponding set of possible layout parameters, \code{layout.par}, which can be passed as a list to \code{geom\_net}. If the user wishes to create small multiples using \CRANpkg{ggplot2} \code{facets}, they can use \code{fiteach}, a logical value specifying whether the same layout should be used for all panels (default) or each panel's data should be fit separately.
-\item {\bf vertices:} any of \pkg{ggplot2}'s aesthetics relating to points: \code{colour}, \code{size}, \code{shape}, \code{alpha}, and \code{stroke} are available and used for specifying the appearance of nodes in the network. For example \samp{aes(colour = Gender)} is used in Figure~\ref{fig.cap:madmengeomnet} to color the nodes and node labels according to the gender of each character. 
+\item {\bf vertices:} any of \pkg{ggplot2}'s aesthetics relating to points: \code{colour}, \code{size}, \code{shape}, \code{alpha}, \code{x}, and \code{y} are available and used for specifying the appearance of nodes in the network. For example \samp{aes(colour = Gender)} is used in Figure~\ref{fig.cap:madmengeomnet} to color the nodes and node labels according to the gender of each character. 
 %
 \item {\bf edges:} for edges we distinguish between two different sets of aesthetics: aesthetics that only relate to line attributes, such as  \code{linewidth} and \code{linetype}, and aesthetics that are also used by the point \code{geom}.  The former can be used in the same way as they are used in \code{geom\_segment}, %Additionally, node aesthetics
 while the latter, like \code{alpha} or \code{colour}, for instance, are used for vertices unless separately specified. Instead, use the parameters \code{ecolour} or \code{ealpha}, which are only applied to the edges. If the \code{group} variable is specified, a new variable, called \code{samegroup} is added during the layout process. This variable is \code{TRUE}, if an edge is between two vertices of the same group, and \code{FALSE} otherwise. If \code{samegroup} is \code{TRUE}, the corresponding edge will be colored using the same color as the vertices it connects. If the edge is between vertices of a different group, the default grey shade is used for the edge.
@@ -351,7 +350,7 @@ Note that the edge specific aesthetics that overwrite node aesthetics are curren
 
 %
 \item {\bf arrow:} whenever the parameter \code{directed} is set from its default state to \code{TRUE}, arrows are drawn from the `from' to the `to' node, with tips pointing towards the `to' node.  By default, arrows have an absolute size of 10 points. The entire structure of the arrow can be changed by passing an \code{arrow} object from the \CRANpkg{grid} package to the \code{arrow} argument. If the user doesn't wish to change the whole arrow object, the parameters \code{arrowsize} and \code{arrowgap} are also available. The \code{arrowsize} argument is of a positive numeric value that is used as a multiple of the original arrow size, i.e.\ \code{arrowsize = 2} shows arrow tips at twice their original size.  The parameter \code{arrowgap} can be used to avoid overplotting of the arrow tips by the nodes, \code{arrowgap} specifies a proportion by which the edge should be shrunk with default of 0.05. A value of 0.5 will result in edges drawn only half way from the `from' node to the `to' node.
-\item {\bf labels:}  the \code{labelon} argument is a logical parameter, which when set to \code{TRUE} will label the nodes with their IDs, as is in Figure~\ref{fig.cap:madmen}. The \code{aes} option \code{label} can also be used as a data variable, in which case the nodes are labeled with the value corresponding to their respective values of the provided variable. If \code{colour} is specified for the nodes, the same values are used for the labels, unless \code{labelcolour} is specified. If \code{fontsize} is specified, it changes the label size to that value in points. Other parameter values, such as \code{vjust} and \code{hjust} help in adjusting labels relative to the nodes. The parameters work in the same fashion as in native \pkg{ggplot2} \code{geom}s. Additionally, the label can be drawn by using \code{geom\_text} (the default) or using the new \code{geom\_label} in \CRANpkg{ggplot2} by adding \samp{labelgeom = "label"} to the arguments in \code{geom\_net}. With the help of the package \CRANpkg{ggrepel} by \citet{ggrepel} we have implemented the logical \code{repel} argument, which when true, uses \code{geom\_text\_repel} or \code{geom\_label\_repel} to plot the labels instead of \code{geom\_text} or \code{geom\_label}, respectively. Using \code{repel} can be extremely useful when the networks are dense or the labels are long, as in Figure~\ref{fig.cap:madmen}, helping to solve an established problem with many network visualizations. 
+\item {\bf labels:}  the \code{labelon} argument is a logical parameter, which when set to \code{TRUE} will label the nodes with their IDs, as is in Figure~\ref{fig.cap:madmen}. The \code{aes} option \code{label} can also be used to label nodes, in which case the nodes are labeled with the value corresponding to their respective values of the provided variable. If \code{colour} is specified for the nodes, the same values are used for the labels, unless \code{labelcolour} is specified. If \code{fontsize} is specified, it changes the label size to that value in points. Other parameter values, such as \code{vjust} and \code{hjust} help in adjusting labels relative to the nodes. The parameters work in the same fashion as in native \pkg{ggplot2} \code{geom}s. Additionally, the label can be drawn by using \code{geom\_text} (the default) or using the new \code{geom\_label} in \CRANpkg{ggplot2} by adding \samp{labelgeom = "label"} to the arguments in \code{geom\_net}. Finally, with the help of the package \CRANpkg{ggrepel} by \citet{ggrepel} we have implemented the logical \code{repel} argument, which when true, uses \code{geom\_text\_repel} or \code{geom\_label\_repel} to plot the labels instead of \code{geom\_text} or \code{geom\_label}, respectively. Using \code{repel} can be extremely useful when the networks are dense or the labels are long, as in Figure~\ref{fig.cap:madmen}, helping to solve a common problem with many network visualizations. 
 
 \end{itemize}
 
@@ -413,19 +412,19 @@ the network structure as a function of a specific edge attribute, like a tempora
 & \code{ggnet2} & \code{geom\_net} & \code{geom\_nodes}, \code{geom\_edges}, etc\\
 Functionality & (\pkg{GGally}) & (\pkg{geomnet}) &  (\pkg{ggnetwork}) \\
 \midrule
-Data &  object of class \code{network} or object easily converted to that class (i.e. incidence or adjacency matrices, edge list) or object of class \code{igraph} & merged data frame of node data and edge data OR one edge data frame and one node data frame to be merged internally & same as \code{ggnet2}\\
+Data &  object of class \code{"network"} or object easily converted to that class (i.e. incidence or adjacency matrices, edge list) or object of class \code{"igraph"} & a fortified \code{"network"}, \code{"igraph"}, \code{"edgedf"}, or \code{"adjmat"} object OR one edge data frame and one node data frame to be merged internally & same as \code{ggnet2}\\
 \midrule
 Naming conventions & \code{node.\underline{\phantom{AA}}},  \code{edge.\underline{\phantom{AA}}}, \code{label.\underline{\phantom{AA}}}, \code{edge.label.\underline{\phantom{AA}}} for \code{alpha}, \code{color}, etc. & arguments identical to \pkg{ggplot2} with exception of \code{ecolor}, \code{ealpha} & same as \pkg{ggplot2}\\
 \midrule
 Layout package \& default & \pkg{sna}, Fruchterman-Reingold & \pkg{sna}, Kamada-Kawai & \pkg{sna}, Fruchterman-Reingold\\
 \midrule
-Aesthetic mappings to variables & all \code{alpha}, \code{color}, \code{shape}, \code{size} for nodes, edges, labels & \code{colour}, \code{size}, \code{linetype}, \code{linewidth}, \code{label} & same as \pkg{ggplot2} \\
+Aesthetic mappings to variables & all \code{alpha}, \code{color}, \code{shape}, \code{size} for nodes, edges, labels & \code{colour}, \code{size}, \code{shape}, \code{x}, \code{y}, \code{linetype}, \code{linewidth}, \code{label}, \code{group}, \code{fontsize} & same as \pkg{ggplot2} \\
 \midrule
 Arrows & \code{directed = TRUE}, \code{arrow.size}, \code{gap} & \code{arrowsize}, \code{gap}, \code{arrow = arrow()} like \pkg{ggplot2} & specify arrows in \code{geom\_edge} like in code{geom\_segment}, \code{arrow.gap} \\
 \midrule
 Theme or palette changes & done in the function with arguments like \code{\underline{\phantom{AA}}.legend}, \code{\underline{\phantom{AA}}.palette}, etc. and adding \pkg{ggplot2} elements  & adding \pkg{ggplot2} elements & adding \pkg{ggplot2} elements \\
 \midrule
-Creating small multiples  & created separately, use \code{grid.arrange} from \pkg{gridExtra} & use \code{facet\_*()} from \pkg{ggplot2} & use \code{by} argument in \code{ggnetwork()} and \code{facet\_*()} from \pkg{ggplot2}\\
+Creating small multiples  & created separately, use \code{grid.arrange} from \pkg{gridExtra} & add g\code{group} argument to \code{fortify()} and use \code{facet\_*()} from \pkg{ggplot2} & use \code{by} argument in \code{ggnetwork()} and \code{facet\_*()} from \pkg{ggplot2}\\
 \midrule
 Edge labelling? & Yes  & No & Yes\\
 \midrule
@@ -636,7 +635,7 @@ differences between the implementations:
   %% this paragraph has been fixed to reflect your (sct + hh) remarks -- fb
 
   \item %
-  In the \code{ggnet2} implementation, the opacity of the edges between employees in the same cluster is higher than it is for the edges between employees in different clusters. This is due to the fact that the email network does not make use of edge weights: instead, every email between two employees is represented by an edge, resulting in edge overplotting. The \code{edge.alpha} argument has been set to a value smaller than one, therefore multiple emails between two employees create more opaque edges between them. Multiple emails are also taken into account in the \CRANpkg{geomnet} package. When there is more than one edge connecting two vertices, the \code{stat\_net} function adds a weight variable to the edge list, which  is passed automatically to the layout algorithms and taken into account accordingly. In addition to taking weights into account in the layout, we can also make use of them in the visualization. \CRANpkg{geomnet} allows to access all of the internal variables created in the visualization process, such as coordinates \code{..x.., ..y..} and edge weights \code{..weight..}. Note the use of the \CRANpkg{ggplot2} notation \code{..} for internal variables.
+  In the \code{ggnet2} implementation, the opacity of the edges between employees in the same cluster is higher than it is for the edges between employees in different clusters. This is due to the fact that the email network does not make use of edge weights: instead, every email between two employees is represented by an edge, resulting in edge overplotting. The \code{edge.alpha} argument has been set to a value smaller than one, therefore multiple emails between two employees create more opaque edges between them. Multiple emails are also taken into account in the \CRANpkg{geomnet} package. When there is more than one edge connecting two vertices, the \code{stat\_net} function adds a weight variable to the edge list, which  is passed automatically to the layout algorithms and taken into account during layout. In addition to taking weights into account in the layout, we can also make use of them in the visualization. \CRANpkg{geomnet} allows to access all of the internal variables created in the visualization process, such as coordinates \code{..x.., ..y..} and edge weights \code{..weight..}. Note the use of the \CRANpkg{ggplot2} notation \code{..} for internal variables.
 %\sct{What happens to weights in \CRANpkg{ggnetwork}, XXX Francois, take over? XXX } 
   % XXX SCT - this next sentence is not totally accurate because geomnet creates weights in sna that are taken in the layout function automatically. I replaced it with above XXX 
 %This effect is not visible in the layouts created by \pkg{geomnet} and \code{ggnetwork} because both implementations draw a single segment for each directed edge, regardless of how many of these edges exist in the network data.
@@ -707,21 +706,17 @@ gridExtra::grid.arrange(grobs = g, nrow = 2)
 # geomnet code for the  email network facetted by day as shown in fig.4b
 
 # data step: making sure that there is one entry for each person on each day
-employee <- data.frame(expand.grid(label = unique(email$nodes$label),
-                                   day = unique(email$edges$day)))
-employee <- merge(employee, email$nodes, by = "label")
-emailnet <- merge(subset(email$edges, nrecipients < 54), employee,
-                  by.x = c("From", "day"), by.y = c("label", "day"),
-                  all = TRUE)
+emailnet <- fortify(as.edgedf(subset(email$edges, nrecipients < 54)), email$nodes, group = "day")
 
 # creating the plot
 set.seed(7042016)
-ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
+ggplot(data = emailnet, aes(from_id = from, to_id = to_id)) +
   geom_net(layout.alg = "kamadakawai",
     aes(colour = CurrentEmploymentType,
         group = CurrentEmploymentType,
         linewidth = 2 * (...samegroup.. / 8 + .125)),
-        fiteach = TRUE, ealpha = 0.5, size = 1.5) +
+        arrowsize = .5,
+        directed = TRUE, fiteach = TRUE, ealpha = 0.5, size = 1.5, na.rm = FALSE) +
   scale_colour_brewer("Employment Type", palette = "Set1") +
   theme_net() +
   facet_wrap(~day, nrow = 2, labeller = "label_both") +
@@ -789,7 +784,9 @@ ggnet2(te.net, label = TRUE, color = "white", label.size = "size",
 # introduce a degree-out variable
 # data step: merge nodes and edges and
 # introduce a degree-out variable
-TEnet <- fortify(as.edgedf(theme_elements$edges[,c("parent", "child")]), theme_elements$vertices)
+TEnet <- fortify(
+  as.edgedf(theme_elements$edges[,c(2,1)]),
+            theme_elements$vertices)
 TEnet <- TEnet %>%
   group_by(from_id) %>%
   mutate(degree = sqrt(10 * n() + 1))
@@ -836,127 +833,6 @@ ggplot(ggnetwork(te.net, layout = "fruchtermanreingold"),
 
 Code and plots of the inheritance structure are shown in Figure \ref{fig.cap:theme}. Note the various ways the packages adjust the side of the labels to correspond to the outdegree of the nodes, including the use of the \code{scale\_size\_continuous} function in Figure \ref{fig.cap:theme}(c). In each of these plots, it is easy to quickly determine  parent-child relationships, and to assess which theme elements are unrelated to all others. Nodes with the most children are the \code{rect}, \code{text}, and \code{line} elements, so we made their labels larger in order to emphasize their importance. In each case, the label size is a function of the out degree of the vertices.
 %Using this plot made creation of the \code{theme\_net} object used throughout these examples very simple. We just made set each of the major parent elements, \code{text}, \code{rect}, and \code{line} to \code{element\_blank()} and then set the aspect ratio equal to one.
-
-%\subsection{Romantic relationships in \emph{Mad Men}} % ========================
-
-%  The following code creates the network example given in Figure~\ref{fig.cap:madmen} in the introduction. We changed the vertex size and edge color for all vertices and edges, included vertex labels, and colored the vertices according to the character's gender.
-
-%The code for creating Figure ~\ref{fig.cap:madmen} using all three approaches is shown below. We have provided this code for completeness, but do not provide the result of each in order to save space. 
-%and the corresponding networks are shown in figure~\ref{fig:madmen-2}.
-
-% \begin{figure}[hbtp]
-% \begin{subfigure}[t]{.495\textwidth}
-% \caption{ggnet2}
-% \includegraphics[width=\textwidth]{figure/madmen_ggnet2-1.pdf}
-% \end{subfigure}
-% \begin{subfigure}[t]{.495\textwidth}
-% \caption{ggnetwork}
-% \includegraphics[width=\textwidth]{figure/madmen_ggnetwork-1.pdf}
-% \end{subfigure}
-% 
-% \caption{\label{fig:madmen-2} Graph of the characters in the show Mad Men who are linked by a romantic relationship, ggnet2 and ggnetwork implementation.}
-% \end{figure}
-% %\afterpage{\clearpage}
-
-% XXX SCT: I'm getting rid of this figure and adding it to the rest of the code in fig 8
-%\begin{figure}
-% <<madmen2_prepare, echo = FALSE>>=
-% # data step for ggnet2 and ggnetwork
-% # create directed network
-% data(mm_directed)
-% mm.dir <- network(mm.directed$edges, directed = TRUE)
-% 
-% # gender vertex attribute
-% rownames(mm.directed$vertices) <- mm.directed$vertices$label
-% mm.dir %v% "gender" <- as.character(
-%   mm.directed$vertices[ network.vertex.names(mm.dir), "Gender" ]
-% )
-% @
-%\caption{\label{mm2:datastep} Data preparation for the directed network of the  Mad Men example in Figures~\ref{mm2:ggnet2} and~\ref{mm2:ggnetwork}.}
-
-%\end{figure}
-%\begin{figure}[hbtp]
-%\begin{subfigure}[t]{\textwidth}
-%\caption{ggnet2\label{mm2:ggnet2}}
-<<madmen2_ggnet2, size="footnotesize", opts.label="codefig", echo=FALSE, eval=FALSE>>=
-# data step for ggnet2 and ggnetwork
-# create directed network
-data(mm_directed, package = "geomnet")
-mm.dir <- network(mm.directed$edges, 
-                  directed = TRUE)
-# gender vertex attribute
-rownames(mm.directed$vertices) <- 
-  mm.directed$vertices$label
-mm.dir %v% "gender" <- 
-  as.character(
-    mm.directed$vertices[ network.vertex.names(mm.dir), "Gender" ]
-    )
-set.seed(1121991)
-ggnet2(
-  mm.dir, mode = "fruchtermanreingold", size = 3,
-  color = mm.col[ mm.dir %v% "gender" ],
-  label = TRUE,
-  label.color = mm.col[ mm.dir %v% "gender" ],
-  hjust = -0.1, legend.position = "bottom",
-  layout.exp = 0.15, arrow.size = 7.5,
-  arrow.gap = 0.02
-)
-@
-%\end{subfigure}
-%
-%\begin{subfigure}[t]{\textwidth}
-%\caption{geomnet}
-<<madmen2_geom_net, size="footnotesize", opts.label="codefig", echo=FALSE,eval=FALSE>>=
-MM2net <- merge(
-  mm.directed$edges,
-  mm.directed$vertices,
-  by.x = "Name1", by.y = "label", all = TRUE)
-set.seed(1121991)
-ggplot(data = MM2net,
-       aes(from_id = Name1, to_id = Name2)) +
-  geom_net(
-    aes(colour = Gender),  directed = TRUE,
-    labelon = TRUE, ecolour = "grey50",
-    linewidth = 0.5, size = 2.5, repel = TRUE,
-    layout.alg = "fruchtermanreingold") +
-  scale_colour_manual(
-    values = c("#ff69b4", "#0099ff")) +
-  xlim(c(-0.1, 1.1)) +
-   theme_net() +
-  theme(legend.position = "bottom")
-@
-%\end{subfigure}
-%
-%\end{figure}
-
-%\begin{figure}
-%\ContinuedFloat
-%\begin{subfigure}[t]{\textwidth}
-%\caption{ggnetwork \label{mm2:ggnetwork}}
-<<madmen2_ggnetwork, size="footnotesize", opts.label="codefig", echo=FALSE, dependson="madmen2_ggnet2", eval=FALSE>>=
-set.seed(1121991)
-ggplot(
-  ggnetwork(mm.dir,
-            layout = "fruchtermanreingold"),
-       aes(x, y, xend = xend, yend = yend)) +
-  geom_edges(
-    color = "grey50",
-    arrow = arrow(length = unit(10, "pt"),
-                  type = "closed")) +
-  geom_nodes(size = 3, aes(color = gender)) +
-  geom_nodetext(aes(label = vertex.names,
-                    color = gender),
-                hjust = -0.1) +
-  scale_color_manual(values = mm.col) +
-  theme_blank() +
-  theme(legend.position = "bottom")
-@
-%\end{subfigure}
-%\caption{\label{fig.cap:madmen2}(continued) A directed network of relationships in Mad Men.}
-%\end{figure}
-%\afterpage{\clearpage}
-%The \pkg{gcookbook} package \citep{madmen} gives another, directed form of the Mad Men network.  It also encapsulates the romantic relationships between characters, but it additionally includes all advances made by one character but rejected by the other.  For example, Peggy Olson made advances toward her boss Don Draper, but Don refused her. This is represented  a directed edge going from Peggy to Don, but not from Don to Peggy.  If the advance is reciprocated, such as between Sal Romano and the Bellhop, there are two directed edges between the two vertices.
-%This network is shown in figure \ref{fig.cap:madmen2}.  It is much more densely connected than the previous Mad Men example.  This network allows us to see more of the drama in the show. For instance, we can see that Roger made advances towards Betty, his business partner's wife, which is much more scandalous than what appears in the first network.
 
 \subsection{College football} % ================================================
 
@@ -1380,22 +1256,22 @@ ggnet2(network(protein$edges[,1:2]), size = 2, color = "magenta",
       edge.alpha = 0.05)
 @
 
-<<yeast_geom_net, echo=FALSE, cache=FALSE, eval=FALSE>>=
+<<yeast_geom_net, echo=FALSE, cache=FALSE, eval=TRUE>>=
 # plot with geom_net
-set.seed(10052016)
-ggplot(data = protein$edges, aes(from_id = from, to_id = to)) +
-  geom_net(alpha = 0.25, ealpha = 0.05, size = 2, colour = "magenta",
-           ecolour = "grey70", linewidth = 0.5,
-           layout.alg = "random", layout.par = list(dist = "uniang")) +
+yeast <- read.csv("data/protein-layout.csv", stringsAsFactors = FALSE)
+ggplot(data = yeast) + 
+  geom_net(layout.alg = NULL, 
+           aes(from_id = from, to_id = to,
+               x = x , y = y), size = 1, linewidth = .5, ealpha = .25, colour = 'black') + 
   theme_net()
 @
 
-% \begin{figure}[bhp]
-% \centering
-% \includegraphics[width=.8\textwidth]{figure/yeast_geom_net-1.pdf}
-% %\end{subfigure}
-% \caption{\label{fig.cap:yeast} Protein-protein interaction network in \emph{S. cerevisiae}. The layout is random and follows a Gaussian donut distribution.}
-% \end{figure}
+\begin{figure}[bhp]
+\centering
+\includegraphics[width=.8\textwidth]{figure/yeast_geom_net-1.pdf}
+%\end{subfigure}
+\caption{\label{fig.cap:yeast} Protein-protein interaction network in \emph{S. cerevisiae}. A Fructerman-Reingold algorithm allowed to run for 50,000 iterations produced the coordinates for the nodes.}
+\end{figure}
 <<yeast_ggnetwork, echo=FALSE, eval = FALSE,  cache=FALSE>>=
 # plot with ggnetwork
 set.seed(10052016)
@@ -1412,7 +1288,7 @@ ggplot(ggnetwork(protein$edges[, 1:2], layout = "random", dist = "uniang"),
 %\newpage
 \section{Some considerations of speed}\label{sec:speed}
 % \hh{XXX So, the testing waters are much more muddy than anticipated. What we can do, though, is to describe the testing scenario(s), and then report our findings with an attempt to summarize. XXX I've added a facetted plot to show the variability in the results that we've seen between the different machines. I made a few changes to the plot, as you can see - using a smooth allows us to see a trend, while the points show variability and give some indication of the distribution (I don't like min and max for that because they are the least robust measures). I also want to see where the actual measurements are taken - that's the reason for showing the points. XXX}
-In our examples thus far, we have focused on rather small social or relationship networks and one larger communication network. Now we present an example of a biological network, which comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 2,113 proteins that make up the vertices of this network, with a total of 4480 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}, resulting in a relatively large  network. When these interactions and their associated proteins are plotted according to a force-directed layout, the time takes a very long time.  Figure~\ref{fig.cap:yeast}. Due to the lengthy Despite its size, each one of the approaches in the \pkg{ggplot2} framework can be drawn in a few hundred milliseconds. %A more in-depth discussion on plotting speed follows in the next section. 
+In our examples thus far, we have focused on rather small social or relationship networks and one larger communication network. Now we present an example of a biological network, which comes from \citet{protein}. It is the complete protein-protein interaction network in the yeast species \emph{S. cerevisiae}. There are 2,113 proteins that make up the vertices of this network, with a total of 4480 edges between them.  These edges represent ``direct physical interactions" between any two proteins \citep[][p. 42]{protein}, resulting in a relatively large  network. When these interactions and their associated proteins are plotted using the Fructerman-Reingold layout algorithm, the runtime is extremely long, about 9.5 minutes for 50,000 iterations through the algorithm. The resulting layout is shown in Figure~\ref{fig.cap:yeast}. When testing the three approaches with the larger network, we decided to use a random layout to save time. Despite its size, each one of the approaches in the \pkg{ggplot2} framework can be drawn in a few hundred milliseconds. %A more in-depth discussion on plotting speed follows in the next section. 
 %The proteins and the interactions between them are plotted in the networks shown in Figure~\ref{fig.cap:yeast}. 
 
 Another benefit that emerges from using \pkg{ggplot2} for network visualization is the speed at which it can plot fairly large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionality offered in the \pkg{network} package. They also show the \pkg{ggplot2} approaches to be largely on par with the speed provided by the \pkg{igraph} package. We first investigate average plotting time
