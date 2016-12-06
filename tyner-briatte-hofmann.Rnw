@@ -424,7 +424,7 @@ Arrows & \code{directed = TRUE}, \code{arrow.size}, \code{gap} & \code{arrowsize
 \midrule
 Theme or palette changes & done in the function with arguments like \code{\underline{\phantom{AA}}.legend}, \code{\underline{\phantom{AA}}.palette}, etc. and adding \pkg{ggplot2} elements  & adding \pkg{ggplot2} elements & adding \pkg{ggplot2} elements \\
 \midrule
-Creating small multiples  & created separately, use \code{grid.arrange} from \pkg{gridExtra} & add g\code{group} argument to \code{fortify()} and use \code{facet\_*()} from \pkg{ggplot2} & use \code{by} argument in \code{ggnetwork()} and \code{facet\_*()} from \pkg{ggplot2}\\
+Creating small multiples  & created separately, use \code{grid.arrange} from \pkg{gridExtra} & add \code{group} argument to \code{fortify()} and use \code{facet\_*()} from \pkg{ggplot2} & use \code{by} argument in \code{ggnetwork()} and \code{facet\_*()} from \pkg{ggplot2}\\
 \midrule
 Edge labelling? & Yes  & No & Yes\\
 \midrule
