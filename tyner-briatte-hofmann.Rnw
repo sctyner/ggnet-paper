@@ -229,8 +229,7 @@ We present two basic approaches to using the \pkg{ggplot2} framework for network
 
 \subsection{ggnet2} % ==========================================================
 
-The \code{ggnet2} function is an improved version of the \code{ggnet} function.%, which has been part of the \pkg{GGally} package since 2013 \citep{ggally}. %
-Both functions are part of the \pkg{GGally} package \citep{ggally}.  A detailed description of the \code{ggnet2} function is available from within the package as a vignette. Some example code to recreate Figure~\ref{fig.cap:madmen} using \code{ggnet2} is presented in Figure~\ref{fig.cap:madmenggnet2}. %
+The \code{ggnet2} function is a part of the \pkg{GGally} package, a suite of functions developed to extend the plotting capabilities of \pkg{ggplot2} \citep{ggally}.  A detailed description of the \code{ggnet2} function is available from within the package as a vignette. Some example code to recreate Figure~\ref{fig.cap:madmen} using \code{ggnet2} is presented in Figure~\ref{fig.cap:madmenggnet2}. %
 %\footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnet/}.}%
 
 \begin{figure}[h]
