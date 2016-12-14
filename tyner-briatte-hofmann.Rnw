@@ -647,7 +647,7 @@ differences between the implementations:
 
 \end{itemize}
 
-To give some insight into how the relations between employees change over time, we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows email networks associated with each day of the work week. The code for these visualizations is below. The different approaches create small multiples in different ways. The \code{ggnet2} approach requires that the network be separated, each plot created individually, then placed together using the \code{grid.arrange} function from the \CRANpkg{gridExtra} package \citep{gridextra}. The \pkg{geomnet} approach uses the \code{facet\_*} family of functions just as they are used in \pkg{ggplot2}, and the \pkg{ggnetwork} approach uses the \code{by} argument in the \code{ggnetwork} function in combination with the \code{facet\_*} functions.  
+To give some insight into how the relations between employees change over time, we facet the network by day: each panel in Figure~\ref{fig:email_facet} shows email networks associated with each day of the work week. The code for these visualizations is below. The different approaches create small multiples in different ways. The \code{ggnet2} approach requires that the network be separated, each plot created individually, then placed together using the \code{grid.arrange} function from the \CRANpkg{gridExtra} package \citep{gridextra}. The \pkg{geomnet} approach uses the \code{facet\_*} family of functions just as they are used in \pkg{ggplot2}, and the \pkg{ggnetwork} approach uses the \code{by} argument in the \code{ggnetwork} function in combination with the \code{facet\_*} functions. We present the full code for each of these approaches below. 
 
 \begin{figure}[hbt]
 \begin{subfigure}[t]{\textwidth}
@@ -665,20 +665,21 @@ To give some insight into how the relations between employees change over time, 
 \includegraphics[width=\textwidth]{figure/email_facet_ggnetwork-1.pdf}
 \end{subfigure}
 
-\caption{\label{fig:email_facet} The same email network as in figure~\ref{fig.cap:email} faceted by day of the week.}
+\caption{\label{fig:email_facet} The same email network as in Figure~\ref{fig.cap:email} faceted by day of the week.}
 \end{figure}
 \afterpage{\clearpage}
-<<email_facet_ggnet2, fig.height=4, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
-# ggnet2 code for the email network facetted by day as shown in fig.4a
 
-# data preparation
+First, the code for the \code{ggnet2} approach, which results in Figure~\ref{fig:email_facet}(a):
+<<email_facet_ggnet2, fig.height=4, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
+# data preparation. first, remove emails sent to all employees
 em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
-# create one element in a list per day
+# for small multiples by day, create one element in a list per day 
+# (10 days, 10 elements in the list em.day)
 em.day <- lapply(unique(em.day$day),
                  function(x) subset(em.day, day == x)[, 1:2 ])
-# create list of networks
+# make the list of edgelists a list of network objects for plotting with ggnet2
 em.day <- lapply(em.day, network, directed = TRUE)
-# create node (employee type) and network (day) attributes for each element in list
+# create vertex (employee type) and network (day) attributes for each element in list
 for (i in 1:length(em.day)) {
   em.day[[ i ]] %v% "curr_empl_type" <-
     em.cet[ network.vertex.names(em.day[[ i ]]) ]
@@ -686,31 +687,36 @@ for (i in 1:length(em.day)) {
 }
 
 # plot ggnet2
+# first, make an empty list containing slots for the 10 days (one plot per day)
 g <- list(length(em.day))
 set.seed(7042016)
-# plot each element in list
+# create a ggnet2 plot for each element in the list of networks
 for (i in 1:length(em.day)) {
-  g[[ i ]] <- ggnet2(em.day[[ i ]], size = 2, color = "curr_empl_type",
-                     palette = "Set1", arrow.size = 0, arrow.gap = 0.01,
-                     edge.alpha = 0.1, legend.position = "none", 
+  g[[ i ]] <- ggnet2(em.day[[ i ]], size = 2, 
+                     color = "curr_empl_type",
+                     palette = "Set1", arrow.size = 0,
+                     arrow.gap = 0.01, edge.alpha = 0.1,
+                     legend.position = "none", 
                      mode = "kamadakawai") +
     ggtitle(paste("Day", em.day[[ i ]] %n% "day")) +
     theme(panel.border = element_rect(color = "grey50", fill = NA),
           aspect.ratio = 1)
 }
+# arrange all of the network plots into one plot window
 gridExtra::grid.arrange(grobs = g, nrow = 2)
 @
-
+Second, the code for the \pkg{geomnet} approach, which results in Figure~\ref{fig:email_facet}(b):
 <<email_facet_geom_net, fig.height=4.5, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
-# geomnet code for the  email network facetted by day as shown in fig.4b
-
-# data step: making sure that there is one entry for each person on each day
+# data step: use the fortify.edgedf group argument to 
+# combine the edge and node data and allow all nodes to 
+# show up on all days. Also, remove emails sent to all  
+# employees
 emailnet <- fortify(as.edgedf(subset(email$edges, nrecipients < 54)), email$nodes, group = "day")
 
 # creating the plot
 set.seed(7042016)
 ggplot(data = emailnet, aes(from_id = from, to_id = to_id)) +
-  geom_net(layout.alg = "kamadakawai",
+  geom_net(layout.alg = "kamadakawai", singletons = FALSE,
     aes(colour = CurrentEmploymentType,
         group = CurrentEmploymentType,
         linewidth = 2 * (...samegroup.. / 8 + .125)),
@@ -724,16 +730,17 @@ ggplot(data = emailnet, aes(from_id = from, to_id = to_id)) +
         plot.margin = unit(c(0, 0, 0, 0), "mm"))
 @
 
+Finally, the code for the \pkg{ggnetwork} approach, which results in Figure~\ref{fig:email_facet}(c):
 <<email_facet_ggnetwork, fig.height=4.5, fig.width=8,echo=TRUE, out.width='\\textwidth'>>=
-# ggnetwork code for the  email network facetted by day as shown in fig.4c
-
 # create the network and aesthetics
+# first, remove emails sent to all employees
 edges <- subset(email$edges, nrecipients < 54)
 edges <- edges[, c("From", "to", "day") ]
+# Create network class object for plotting with ggnetwork
 em.net <- network(edges[, 1:2])
 # assign edge attributes (day)
 set.edge.attribute(em.net, "day", edges[, 3])
-# assign node attributes (employee type)
+# assign vertex attributes (employee type)
 em.net %v% "curr_empl_type" <- em.cet[ network.vertex.names(em.net) ]
 
 # create the plot
@@ -751,7 +758,7 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day",
   theme_facet(legend.position = "bottom")
 @
 
-Note that the main difference in the visualizations of Figure~\ref{fig:email_facet} stems from whether \emph{one} layout is used across all panels (as for the \code{ggnetwork} example) or whether individual layouts are fit to each of the subsets (as for the \code{ggnet2} and the \code{geomnet} examples). In \code{geomnet} this is controlled via the argument \code{fiteach}. By default  \code{fiteach = TRUE}, but \code{fiteach = FALSE} results in all panels sharing the same layout. Having the same layout in each panel makes seeing specific differences in ties between nodes easier, while having a different layout in each panel emphasizes the overall structural differences between the sub-networks. It would be interesting to be able to have a hybrid of these two approaches, but at the moment this is beyond the capability of any of the methods.
+Note the two key differences in the visualizations of Figure~\ref{fig:email_facet}: whether singletons (isolated nodes) are plotted (as in the \pkg{ggnetwork} method), and whether \emph{one} layout is used across all panels (as for the \code{ggnetwork} example) or whether individual layouts are fit to each of the subsets (as for the \code{ggnet2} and the \code{geomnet} examples). Plotting isolated nodes in \pkg{geomnet} is possible by setting \code{singletons = TRUE}, and it would be possible in \code{ggnet2} by including all nodes in the creation of the list of networks. Using the same layout for plotting small multiples in \code{geomnet} is controlled by the argument \code{fiteach}. By default, \code{fiteach = TRUE}, but \code{fiteach = FALSE} results in all panels sharing the same layout. Having the same layout in each panel makes seeing specific differences in ties between nodes easier, while having a different layout in each panel emphasizes the overall structural differences between the sub-networks. It would be interesting to be able to have a hybrid of these two approaches, but at the moment this is beyond the capability of any of the methods.
 Through the faceting it becomes obvious that there are several days where one or more of the departments does not communicate with any of the other departments. There are only two days, day 13 and day 15, without any isolated department communications. Faceting is one of the major benefits of implementing tools for network visualization in \pkg{ggplot2}. Faceting allows the user to quickly separate dense networks into smaller sub-networks for easy visual comparison and analyses, a feature that the other network visualization tools do not have.
 
 \subsection{\pkg{ggplot2} theme elements} % ====================================
