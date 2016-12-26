@@ -1304,7 +1304,7 @@ In our examples thus far, we have focused on rather small social or relationship
 Another benefit that emerges from using \pkg{ggplot2} for network visualization is the speed at which it can plot fairly large networks. In order to assess the speed gain procured by our three approaches, we ran two separate tests, both of which designate \pkg{ggplot2}-based approaches as faster than the plotting functionality offered in the \pkg{network} package. They also show the \pkg{ggplot2} approaches to be largely on par with the speed provided by the \pkg{igraph} package. We first investigate average random layout plotting time of the protein network 
 %\footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes-protein/run.r} for the code to recreate results for visualizing the protein interaction network.}
 shown in Figure~\ref{fig.cap:yeast}, and then consider average plotting times of increasingly larger random networks. Note that in all tests, default package settings were used. %
-The code to create benchmark results for both of these situations is provided in the online supplement, to which a link is provided in the Supplementary Material section at the end of this paper. 
+The code to create benchmark results for both of these situations is provided in the vignette of the package \CRANpkg{ggCompNet}. See the Supplementary Material section at the end of this paper for more information. 
 %\footnote{See \url{https://raw.githubusercontent.com/sctyner/ggnet-paper/master/runtimes/run.r} for code to recreate benchmark results for visualizing random networks.}
 %
 
@@ -1483,14 +1483,14 @@ On a personal level we discovered that the collaboration on this paper has helpe
 
 
 \begin{center}
-{\large\bf Supplementary material}
+{\large\bf Supplementary Material}
 \end{center}
 
 \begin{description}
 
 \item[Software:] \CRANpkg{ggnetwork} 0.5.1 and \CRANpkg{geomnet} 0.2.0 were used to create the visualizations. \code{ggnet2} is part of \CRANpkg{GGally} 1.3.0.
 
-\item[Reproducibility:] All the code used in the examples is available as a vignette in the \pkg{geomnet} package. There are two vignettes: one for the speed comparisons and one for the visualizations provided in the Examples section. The vignettes provide links to all of our data, most of which is included in the \pkg{geomnet} package.
+\item[Reproducibility:] All the code used in the examples is available as a vignette in the CRAN package \pkg{ggCompNet}. There are two vignettes: one for the speed comparisons and one for the visualizations provided in the Examples section. The package also provide our speed test data for creating Figure~\ref{fig.cap:runtimes-random}. We created this package to accompany this paper with the hope that interested users will compare these methods on their own systems and against their own code. Finally, all of the data we use in the examples, with the exception of the bipartite network example, is included as a part of the \pkg{geomnet} package. 
 
 \end{description}
 
