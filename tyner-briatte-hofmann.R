@@ -114,14 +114,13 @@ library(sna)
 data(madmen, package = "geomnet")
 
 # code for geom_net
-# data step: merge edges and nodes by the "from" column
-MMnet <- merge(madmen$edges, madmen$vertices,
-               by.x = "Name1", by.y = "label", all = TRUE)
+# data step: join the edge and node data with a fortify call
+MMnet <- fortify(as.edgedf(madmen$edges), madmen$vertices)
 # create plot
 set.seed(10052016)
-ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
-  geom_net(aes(colour = Gender), layout = "kamadakawai", 
-           size = 2, label = TRUE, vjust = -0.6, ecolour = "grey60",
+ggplot(data = MMnet, aes(from_id = from_id, to_id = to_id)) +
+  geom_net(aes(colour = Gender), layout.alg = "kamadakawai", 
+           size = 2, labelon = TRUE, vjust = -0.6, ecolour = "grey60",
            directed =FALSE, fontsize = 3, ealpha = 0.5) +
   scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
   xlim(c(-0.05, 1.05)) +
@@ -146,25 +145,30 @@ ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
 ## # create plot for ggnet2
 ## set.seed(10052016)
 ## ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
-##        label = TRUE, label.color = mm.col[ mm.net %v% "gender" ],
+##        labelon = TRUE, label.color = mm.col[ mm.net %v% "gender" ],
 ##        size = 2, vjust = -0.6, mode = "kamadakawai", label.size = 3)
 
 ## ----madmen_geom_net_code, echo=TRUE, eval=FALSE, fig.cap="The code required to generate Figure~\\ref{fig.cap:madmen} using the \\code{geom\\_net} function in the \\pkg{geomnet} package."----
 ## # also loads ggplot2
 ## library(geomnet)
-## # data step for geom_net: merge edges and nodes
-## MMnet <- merge(madmen$edges, madmen$vertices,
-##                by.x = "Name1", by.y = "label", all = TRUE)
-## # create plot for geomnet
+## 
+## # data step: join the edge and node data with a fortify call
+## MMnet <- fortify(as.edgedf(madmen$edges), madmen$vertices)
+## # create plot
 ## set.seed(10052016)
-## ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
-##   geom_net(layout = "kamadakawai", aes(colour = Gender),
-##            size = 4, label = TRUE,
-##            repel = TRUE, ecolour = "grey60") +
+## ggplot(data = MMnet, aes(from_id = from_id, to_id = to_id)) +
+##   geom_net(aes(colour = Gender), layout.alg = "kamadakawai",
+##            size = 2, labelon = TRUE, vjust = -0.6, ecolour = "grey60",
+##            directed =FALSE, fontsize = 3, ealpha = 0.5) +
 ##   scale_colour_manual(values = c("#FF69B4", "#0099ff")) +
 ##   xlim(c(-0.05, 1.05)) +
 ##   theme_net() +
 ##   theme(legend.position = "bottom")
+
+## ----data_peek, echo=TRUE------------------------------------------------
+head(as.edgedf(madmen$edges), 3)
+head(madmen$vertices, 3)
+head(fortify(as.edgedf(madmen$edges), madmen$vertices), 3)
 
 ## ----madmen_ggnetwork, echo=TRUE, eval=FALSE, fig.cap="The code required to generate Figure~\\ref{fig.cap:madmen} using the \\pkg{ggnetwork} package."----
 ## # create plot for ggnetwork. uses same data created for ggnet2 function
@@ -172,10 +176,10 @@ ggplot(data = MMnet, aes(from_id = Name1, to_id = Name2)) +
 ## set.seed(10052016)
 ## ggplot(data = ggnetwork(mm.net, layout = "kamadakawai"),
 ##        aes(x, y, xend = xend, yend = yend)) +
-##   geom_edges(color = "grey50") +
-##   geom_nodes(aes(colour = gender), size = 2) +
+##   geom_edges(color = "grey50") + # draw edge layer
+##   geom_nodes(aes(colour = gender), size = 2) + # draw node layer
 ##   geom_nodetext(aes(colour = gender, label = vertex.names),
-##                 size = 3, vjust = -0.6) +
+##                 size = 3, vjust = -0.6) + # draw node label layer
 ##   scale_colour_manual(values = mm.col) +
 ##   xlim(c(-0.05, 1.05)) +
 ##   theme_blank() +
@@ -202,7 +206,7 @@ ggnet2(network(blood$edges[, 1:2], directed=TRUE),
 # plot with geomnet (Figure 2b)
 set.seed(12252016)
 ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
-  geom_net(colour = "darkred", layout = "circle", label = TRUE, size = 15,
+  geom_net(colour = "darkred", layout.alg = "circle", labelon = TRUE, size = 15,
            directed = TRUE, vjust = 0.5, labelcolour = "grey80",
            arrowsize = 1.5, linewidth = 0.5, arrowgap = 0.05,
            selfloops = TRUE, ecolour = "grey40") + 
@@ -248,15 +252,14 @@ ggnet2(em.net, color = "curr_empl_type",
 
 ## ----email_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'----
 # data step for the geomnet plot
-emailnet <- merge(
-  subset(email$edges, nrecipients < 54),
-  email$nodes,
-  by.x = "From", by.y = "label", all = TRUE)
-
+email$edges <- email$edges[, c(1,5,2:4,6:9)]
+emailnet <- fortify(
+  as.edgedf(subset(email$edges, nrecipients < 54)),
+  email$nodes)
 set.seed(10312016)
 ggplot(data = emailnet,
-       aes(from_id = From, to_id = to)) +
-  geom_net(layout = "fruchtermanreingold",
+       aes(from_id = from_id, to_id = to_id)) +
+  geom_net(layout.alg = "fruchtermanreingold",
     aes(colour = CurrentEmploymentType,
         group = CurrentEmploymentType,
         linewidth = 3 * (...samegroup.. / 8 + .125)),
@@ -286,16 +289,15 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02,layout = "fruchtermanreingold"),
   theme(legend.position = "bottom")
 
 ## ----email_facet_ggnet2, fig.height=4, fig.width=8, echo=TRUE, out.width='\\textwidth'----
-# ggnet2 code for the email network facetted by day as shown in fig.4a
-
-# data preparation
+# data preparation. first, remove emails sent to all employees
 em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
-# create one element in a list per day
+# for small multiples by day, create one element in a list per day 
+# (10 days, 10 elements in the list em.day)
 em.day <- lapply(unique(em.day$day),
                  function(x) subset(em.day, day == x)[, 1:2 ])
-# create list of networks
+# make the list of edgelists a list of network objects for plotting with ggnet2
 em.day <- lapply(em.day, network, directed = TRUE)
-# create node (employee type) and network (day) attributes for each element in list
+# create vertex (employee type) and network (day) attributes for each element in list
 for (i in 1:length(em.day)) {
   em.day[[ i ]] %v% "curr_empl_type" <-
     em.cet[ network.vertex.names(em.day[[ i ]]) ]
@@ -303,39 +305,40 @@ for (i in 1:length(em.day)) {
 }
 
 # plot ggnet2
+# first, make an empty list containing slots for the 10 days (one plot per day)
 g <- list(length(em.day))
 set.seed(7042016)
-# plot each element in list
+# create a ggnet2 plot for each element in the list of networks
 for (i in 1:length(em.day)) {
-  g[[ i ]] <- ggnet2(em.day[[ i ]], size = 2, color = "curr_empl_type",
-                     palette = "Set1", arrow.size = 0, arrow.gap = 0.01,
-                     edge.alpha = 0.1, legend.position = "none", 
+  g[[ i ]] <- ggnet2(em.day[[ i ]], size = 2, 
+                     color = "curr_empl_type",
+                     palette = "Set1", arrow.size = 0,
+                     arrow.gap = 0.01, edge.alpha = 0.1,
+                     legend.position = "none", 
                      mode = "kamadakawai") +
     ggtitle(paste("Day", em.day[[ i ]] %n% "day")) +
     theme(panel.border = element_rect(color = "grey50", fill = NA),
           aspect.ratio = 1)
 }
+# arrange all of the network plots into one plot window
 gridExtra::grid.arrange(grobs = g, nrow = 2)
 
 ## ----email_facet_geom_net, fig.height=4.5, fig.width=8, echo=TRUE, out.width='\\textwidth'----
-# geomnet code for the  email network facetted by day as shown in fig.4b
-
-# data step: making sure that there is one entry for each person on each day
-employee <- data.frame(expand.grid(label = unique(email$nodes$label),
-                                   day = unique(email$edges$day)))
-employee <- merge(employee, email$nodes, by = "label")
-emailnet <- merge(subset(email$edges, nrecipients < 54), employee,
-                  by.x = c("From", "day"), by.y = c("label", "day"),
-                  all = TRUE)
+# data step: use the fortify.edgedf group argument to 
+# combine the edge and node data and allow all nodes to 
+# show up on all days. Also, remove emails sent to all  
+# employees
+emailnet <- fortify(as.edgedf(subset(email$edges, nrecipients < 54)), email$nodes, group = "day")
 
 # creating the plot
 set.seed(7042016)
-ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
-  geom_net(layout = "kamadakawai",
+ggplot(data = emailnet, aes(from_id = from, to_id = to_id)) +
+  geom_net(layout.alg = "kamadakawai", singletons = FALSE,
     aes(colour = CurrentEmploymentType,
         group = CurrentEmploymentType,
         linewidth = 2 * (...samegroup.. / 8 + .125)),
-        fiteach = TRUE, ealpha = 0.5, size = 1.5) +
+        arrowsize = .5,
+        directed = TRUE, fiteach = TRUE, ealpha = 0.5, size = 1.5, na.rm = FALSE) +
   scale_colour_brewer("Employment Type", palette = "Set1") +
   theme_net() +
   facet_wrap(~day, nrow = 2, labeller = "label_both") +
@@ -344,15 +347,15 @@ ggplot(data = emailnet, aes(from_id = From, to_id = to)) +
         plot.margin = unit(c(0, 0, 0, 0), "mm"))
 
 ## ----email_facet_ggnetwork, fig.height=4.5, fig.width=8,echo=TRUE, out.width='\\textwidth'----
-# ggnetwork code for the  email network facetted by day as shown in fig.4c
-
 # create the network and aesthetics
+# first, remove emails sent to all employees
 edges <- subset(email$edges, nrecipients < 54)
 edges <- edges[, c("From", "to", "day") ]
+# Create network class object for plotting with ggnetwork
 em.net <- network(edges[, 1:2])
 # assign edge attributes (day)
 set.edge.attribute(em.net, "day", edges[, 3])
-# assign node attributes (employee type)
+# assign vertex attributes (employee type)
 em.net %v% "curr_empl_type" <- em.cet[ network.vertex.names(em.net) ]
 
 # create the plot
@@ -385,21 +388,22 @@ ggnet2(te.net, label = TRUE, color = "white", label.size = "size",
 ## ----theme_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE, fig.width=7, fig.height = 7----
 # data step: merge nodes and edges and
 # introduce a degree-out variable
-TEnet <- merge(
-  theme_elements$edges,
-  theme_elements$vertices,
-  by.x = "parent", by.y = "name", all = TRUE)
+# data step: merge nodes and edges and
+# introduce a degree-out variable
+TEnet <- fortify(
+  as.edgedf(theme_elements$edges[,c(2,1)]),
+            theme_elements$vertices)
 TEnet <- TEnet %>%
-  group_by(parent) %>%
+  group_by(from_id) %>%
   mutate(degree = sqrt(10 * n() + 1))
 
 # create plot:
 set.seed(3272016)
 ggplot(data = TEnet,
-       aes(from_id = parent, to_id = child)) +
-  geom_net(layout = "fruchtermanreingold",
+       aes(from_id = from_id, to_id = to_id)) +
+  geom_net(layout.alg = "fruchtermanreingold",
     aes(fontsize = degree), directed = TRUE,
-    label = TRUE, size = 1, labelcolour = 'black',
+    labelon = TRUE, size = 1, labelcolour = 'black',
     ecolour = "grey70", arrowsize = 0.5,
     linewidth = 0.5, repel = TRUE) +
   theme_net() +
@@ -417,67 +421,6 @@ ggplot(ggnetwork(te.net, layout = "fruchtermanreingold"),
   scale_size_continuous(range = c(4, 8)) +
   guides(size = FALSE) +
   theme_blank()
-
-## ----madmen2_ggnet2, size="footnotesize", opts.label="codefig", echo=FALSE, eval=FALSE----
-## # data step for ggnet2 and ggnetwork
-## # create directed network
-## data(mm_directed, package = "geomnet")
-## mm.dir <- network(mm.directed$edges,
-##                   directed = TRUE)
-## # gender vertex attribute
-## rownames(mm.directed$vertices) <-
-##   mm.directed$vertices$label
-## mm.dir %v% "gender" <-
-##   as.character(
-##     mm.directed$vertices[ network.vertex.names(mm.dir), "Gender" ]
-##     )
-## set.seed(1121991)
-## ggnet2(
-##   mm.dir, mode = "fruchtermanreingold", size = 3,
-##   color = mm.col[ mm.dir %v% "gender" ],
-##   label = TRUE,
-##   label.color = mm.col[ mm.dir %v% "gender" ],
-##   hjust = -0.1, legend.position = "bottom",
-##   layout.exp = 0.15, arrow.size = 7.5,
-##   arrow.gap = 0.02
-## )
-
-## ----madmen2_geom_net, size="footnotesize", opts.label="codefig", echo=FALSE,eval=FALSE----
-## MM2net <- merge(
-##   mm.directed$edges,
-##   mm.directed$vertices,
-##   by.x = "Name1", by.y = "label", all = TRUE)
-## set.seed(1121991)
-## ggplot(data = MM2net,
-##        aes(from_id = Name1, to_id = Name2)) +
-##   geom_net(
-##     aes(colour = Gender),  directed = TRUE,
-##     label = TRUE, ecolour = "grey50",
-##     linewidth = 0.5, size = 2.5, repel = TRUE,
-##     layout = "fruchtermanreingold") +
-##   scale_colour_manual(
-##     values = c("#ff69b4", "#0099ff")) +
-##   xlim(c(-0.1, 1.1)) +
-##    theme_net() +
-##   theme(legend.position = "bottom")
-
-## ----madmen2_ggnetwork, size="footnotesize", opts.label="codefig", echo=FALSE, dependson="madmen2_ggnet2", eval=FALSE----
-## set.seed(1121991)
-## ggplot(
-##   ggnetwork(mm.dir,
-##             layout = "fruchtermanreingold"),
-##        aes(x, y, xend = xend, yend = yend)) +
-##   geom_edges(
-##     color = "grey50",
-##     arrow = arrow(length = unit(10, "pt"),
-##                   type = "closed")) +
-##   geom_nodes(size = 3, aes(color = gender)) +
-##   geom_nodetext(aes(label = vertex.names,
-##                     color = gender),
-##                 hjust = -0.1) +
-##   scale_color_manual(values = mm.col) +
-##   theme_blank() +
-##   theme(legend.position = "bottom")
 
 ## ----football_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE----
 #make data accessible
@@ -504,19 +447,18 @@ ggnet2(fb.net, mode = "fruchtermanreingold",
 
 ## ----football_geom_net, size="footnotesize", fig.height=10, opts.label="codefig", echo=TRUE----
 # data step: merge vertices and edges
-ftnet <- merge(
-  football$edges, football$vertices,
-  by.x = "from", by.y = "label", all = TRUE)
+# data step: merge vertices and edges
+ftnet <- fortify(as.edgedf(football$edges), football$vertices)
 
 # create new label variable for viewing independent schools
 ftnet$schools <- ifelse(
-  ftnet$value == "Independents", ftnet$from, "")
+  ftnet$value == "Independents", ftnet$from_id, "")
 
 # create data plot
 set.seed(5232011)
 ggplot(data = ftnet,
-       aes(from_id = from, to_id = to)) +
-  geom_net(layout = 'fruchtermanreingold',
+       aes(from_id = from_id, to_id = to_id)) +
+  geom_net(layout.alg = 'fruchtermanreingold',
     aes(colour = value, group = value,
         linetype = factor(same.conf != 1),
         label = schools),
@@ -595,10 +537,10 @@ davis$lcolour <-
 
 set.seed(8262013)
 ggplot(data = davis) + 
-  geom_net(layout = "kamadakawai",
+  geom_net(layout.alg = "kamadakawai",
     aes(from_id = from, to_id = to, 
         colour = type, shape = type), 
-    size = 15, label = TRUE, ealpha = 0.25,
+    size = 15, labelon = TRUE, ealpha = 0.25,
     vjust = 0.5, hjust = 0.5,
     labelcolour = davis$lcolour) +
   theme_net() + 
@@ -621,27 +563,29 @@ ggplot(data = ggnetwork(bip, layout = "kamadakawai"),
   theme_blank() + 
   theme(legend.position = "bottom") 
 
-## ----bikes_geom_net, echo=TRUE, warning=FALSE, fig.keep='all'------------
+## ----bikes_geom_net_data, echo=TRUE, warning=FALSE, fig.keep='all'-------
 # make data accessible
 data(bikes, package = 'geomnet')
 # data step for geomnet
-tripnet <- merge(bikes$trips, bikes$stations, by.x = "Start.station",
-                 by.y = "name", all = TRUE)
+tripnet <- fortify(as.edgedf(bikes$trips), bikes$stations[,c(2,1,3:5)])
 # create variable to identify Metro Stations
 tripnet$Metro = FALSE
-idx <- grep("Metro", tripnet$Start.station)
+idx <- grep("Metro", tripnet$from_id)
 tripnet$Metro[idx] <- TRUE
 
+## ----bikes_geom_net_remove_singleton, echo=FALSE, warning=FALSE, message=FALSE----
+tripnet <- tripnet[-which(tripnet$from_id == "Shady Grove Hospital"),]
+
+## ----bikes_geom_net, echo=TRUE, warning=FALSE, fig.keep='all'------------
 # plot the bike sharing network shown in Figure 7b
 set.seed(1232016)
-ggplot(aes(from_id = Start.station, to_id = End.station), data = tripnet) +
+ggplot(aes(from_id = from_id, to_id = to_id), data = tripnet) +
   geom_net(aes(linewidth = n / 15, colour = Metro),
-           label = TRUE, repel = TRUE) +
+           labelon = TRUE, repel = TRUE) +
   theme_net() +
   xlim(c(-0.1, 1.1)) +
   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
   theme(legend.position = "bottom")
-
 
 ## ----bikes_prepare, echo = TRUE------------------------------------------
 # data preparation for ggnet2 and ggnetwork
@@ -690,17 +634,16 @@ metro_map <- get_map(location = c(left = -77.22257, bottom = 39.05721,
 ## ----geographic_geomnet, echo=TRUE---------------------------------------
 # geomnet: overlay bike sharing network on geographic map
   ggmap(metro_map) + 
-  geom_net(data = tripnet, layout = NULL, label = TRUE,
+  geom_net(data = tripnet, layout.alg = NULL, labelon = TRUE,
            vjust = -0.5, ealpha = 0.5,
-           aes(from_id = Start.station,
-               to_id = End.station,
+           aes(from_id = from_id,
+               to_id = to_id,
                x = long, y = lat,
                linewidth = n / 15,
                colour = Metro)) +
   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
-  theme_net() %+replace% theme(aspect.ratio=NULL) +
-  coord_map() + 
-  theme(legend.position = "bottom")
+  theme_net() %+replace% theme(aspect.ratio=NULL, legend.position = "bottom") +
+  coord_map() 
 
 ## ----yeast_ggnet2, echo=FALSE, eval = FALSE, cache=FALSE-----------------
 ## # plot with ggnet2
@@ -710,14 +653,14 @@ metro_map <- get_map(location = c(left = -77.22257, bottom = 39.05721,
 ##       mode = "random", layout.par = list(dist = "uniang"),
 ##       edge.alpha = 0.05)
 
-## ----yeast_geom_net, echo=FALSE, cache=FALSE, eval=FALSE-----------------
-## # plot with geom_net
-## set.seed(10052016)
-## ggplot(data = protein$edges, aes(from_id = from, to_id = to)) +
-##   geom_net(alpha = 0.25, ealpha = 0.05, size = 2, colour = "magenta",
-##            ecolour = "grey70", linewidth = 0.5,
-##            layout = "random", layout.par = list(dist = "uniang")) +
-##   theme_net()
+## ----yeast_geom_net, echo=FALSE, cache=FALSE, eval=TRUE------------------
+# plot with geom_net
+yeast <- read.csv("data/protein-layout.csv", stringsAsFactors = FALSE)
+ggplot(data = yeast) + 
+  geom_net(layout.alg = NULL, 
+           aes(from_id = from, to_id = to,
+               x = x , y = y), size = 1, linewidth = .5, ealpha = .25, colour = 'black') + 
+  theme_net()
 
 ## ----yeast_ggnetwork, echo=FALSE, eval = FALSE,  cache=FALSE-------------
 ## # plot with ggnetwork
