@@ -160,7 +160,7 @@ Our efforts rely upon the most recent changes to \pkg{ggplot2}, which allow user
 \footnote{Version 2.1.0, released 1 March 2016. See \url{https://cran.r-project.org/web/packages/ggplot2/news.html} for the full list of changes in \pkg{ggplot2} 2.1.0, as well as the new package vignette, ``Extending ggplot2'', which explains how the internal \code{ggproto} system of object-oriented programming can be used to create new geoms.} %
   %
 
-In the remainder of this paper, we present three different approaches to network visualization through \pkg{ggplot2} wrappers. The first is a function, \code{ggnet2} from the \pkg{GGally} package, that acts as a wrapper around a network object to create a \pkg{ggplot2} graph. The second is a package, \pkg{geomnet}, that combines all network pieces (nodes, edges, and labels) into a single \code{geom} and is intended to look the most like other \pkg{ggplot2} \code{geom}s in use. The final is another package, \pkg{ggnetwork}, that performs some data manipulation and aliases other \code{geom}s in order to layer the differents network aspects one on top of the other. The section~\nameref{sec:background} introduces the basic terminology of networks and illustrates their ubiquity in natural and social life. The next section~\nameref{sec:implementations} then discusses the structure and capabilities of each of the three approaches that we offer. The section~\nameref{sec:examples} extends that discussion through several examples ranging from simple to complex networks, for which we provide the code corresponding to each approach alongside its graphical result. We follow with some considerations of runtime behavior in plotting networks in the section~\nameref{sec:speed} before closing with a discussion.
+In the remainder of this paper, we present three different approaches to network visualization through \pkg{ggplot2} wrappers. The first is a function, \code{ggnet2} from the \pkg{GGally} package, that acts as a wrapper around a network object to create a \pkg{ggplot2} graph. The second is a package, \pkg{geomnet}, that combines all network pieces (nodes, edges, and labels) into a single \code{geom} and is intended to look the most like other \pkg{ggplot2} \code{geom}s in use. The final is another package, \pkg{ggnetwork}, that performs some data manipulation and aliases other \code{geom}s in order to layer the different network aspects one on top of the other. The section~\nameref{sec:background} introduces the basic terminology of networks and illustrates their ubiquity in natural and social life. The next section~\nameref{sec:implementations} then discusses the structure and capabilities of each of the three approaches that we offer. The section~\nameref{sec:examples} extends that discussion through several examples ranging from simple to complex networks, for which we provide the code corresponding to each approach alongside its graphical result. We follow with some considerations of runtime behavior in plotting networks in the section~\nameref{sec:speed} before closing with a discussion.
 
 %\section{A quick primer to network structures}
 % XXX SCT-I did not love that other section title...can we agree on another?
@@ -189,7 +189,6 @@ As a reference example, we turn to a specific instance of a social network. A so
 <<madmen_geom_net, fig.width=7, fig.height=7.5>>=
 # make data accessible 
 data(madmen, package = "geomnet")
-
 # code for geom_net
 # data step: join the edge and node data with a fortify call
 MMnet <- fortify(as.edgedf(madmen$edges), madmen$vertices)
@@ -233,7 +232,7 @@ The \code{ggnet2} function is a part of the \pkg{GGally} package, a suite of fun
 %\footnote{The vignette can be viewed online at \url{https://briatte.github.io/ggnet/}.}%
 
 \begin{figure}[h]
-<<madmen_ggnet2, eval=FALSE, echo=TRUE, fig.cap="The code required to generate Figure~\\ref{fig.cap:madmen} using the \\code{ggnet2} function in the \\pkg{GGally} package.">>=
+<<madmen_ggnet2, eval=TRUE, echo=TRUE, fig.show = 'hide', fig.cap="The code required to generate Figure~\\ref{fig.cap:madmen} using the \\code{ggnet2} function in the \\pkg{GGally} package.">>=
 library(GGally)
 library(network)
 # make the data available
@@ -241,6 +240,7 @@ data(madmen, package = 'geomnet')
 # data step for both ggnet2 and ggnetwork
 # create undirected network
 mm.net <- network(madmen$edges[, 1:2], directed = FALSE)
+mm.net # glance at network object
 # create node attribute (gender)
 rownames(madmen$vertices) <- madmen$vertices$label
 mm.net %v% "gender" <- as.character(
@@ -271,7 +271,7 @@ Arguments such as \code{node.shape} or \code{edge.lty}, which  control the shape
 This last functionality builds on one of the strengths of the \code{"network"} class, which can store %meta-
 information on network edges and nodes as attributes that are then accessible to the user through the \code{\%e\%} and \code{\%v\%} operators respectively.%
 %
-\footnote{See \citet[p.~22-24]{network}. The equivalent operators in the \pkg{igraph} package are called \code{E} and \code{V}.} Usage examples of these operators can be seen in Figure~\ref{fig.cap:madmenggnet2}. The attribute of gender is assigned to nodes, which in turn is accessed to color the nodes and node labels by gender. If the \code{ggnet2} function is given the \code{node.alpha = "importance"} argument, it will interpret it as an attempt to map the vertex attribute called \samp{importance} to the transparency level of the nodes. This works exactly like the command \code{net \%v\% "importance"}, which returns the vertex attribute \samp{importance} of the \code{"network"} object \code{net}. % SCT : This sentence seems very redundant. %This same result can also be achieved by passing the more explicit argument \code{node.alpha = net \%v\% "importance"}.
+\footnote{See \citet[p.~22-24]{network}. The equivalent operators in the \pkg{igraph} package are called \code{E} and \code{V}.} Usage examples of these operators can be seen in Figure~\ref{fig.cap:madmenggnet2}. The attribute of gender is assigned to nodes, which in turn is accessed to color the nodes and node labels by gender.  If the \code{ggnet2} function is given the \code{node.alpha = "importance"} argument, it will interpret it as an attempt to map the vertex attribute called \samp{importance} to the transparency level of the nodes. This works exactly like the command \code{net \%v\% "importance"}, which returns the vertex attribute \samp{importance} of the \code{"network"} object \code{net}. % SCT : This sentence seems very redundant. %This same result can also be achieved by passing the more explicit argument \code{node.alpha = net \%v\% "importance"}.
   This functionality allows the \code{ggnet2} function to work in a similar fashion to \pkg{ggplot2} mappings of aesthetics within the \code{aes} operator.
 
 The \code{ggnet2} function also provides a few network-specific options, such as sizing the nodes as a function of their unweighted degree, or using the primary and secondary modes of a bipartite network as an aesthetic mapping for the nodes. 
@@ -473,7 +473,7 @@ We begin with a very simple example that most should be familiar with: blood don
 # make data accessible
 data(blood, package = "geomnet")
 
-# plot with ggnet2 (Figure 2a)
+# plot with ggnet2 (Figure 5a)
 set.seed(12252016)
 ggnet2(network(blood$edges[, 1:2], directed=TRUE), 
        mode = "circle", size = 15, label = TRUE, 
@@ -482,7 +482,8 @@ ggnet2(network(blood$edges[, 1:2], directed=TRUE),
 @
 
 <<blood_geom_net, echo=TRUE, fig.width=6, fig.height=6>>=
-# plot with geomnet (Figure 2b)
+head(blood$edges,3) # glance at the data
+# plot with geomnet (Figure 5b)
 set.seed(12252016)
 ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
   geom_net(colour = "darkred", layout.alg = "circle", labelon = TRUE, size = 15,
@@ -493,7 +494,7 @@ ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
 @
 
 <<blood_ggnetwork, echo=TRUE, fig.width=6, fig.height=6>>=
-# plot with ggnetwork (Figure 2c)
+# plot with ggnetwork (Figure 5c)
 set.seed(12252016)
 ggplot(ggnetwork(network(blood$edges[, 1:2]),
                  layout = "circle", arrow.gap = 0.05),
@@ -610,7 +611,12 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02,layout = "fruchtermanreingold"),
 \end{figure}
 \afterpage{\clearpage}
 
-The email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a directed network of emails between company employees with 55 vertices and 9,063 edges. Each vertex represents an employee of the company, and each edge represents an email sent from one employee to another. The arrow of the directed edge points to the recipient of the email. If an email has multiple recipients, multiple edges, one for each recipient, are included in the network. The network contains two business weeks of emails across the entire company. In order to better visualize the structure of the communication network between employees, emails that were sent out to all employees are removed.
+The email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a directed network of emails between company employees with 55 vertices and 9,063 edges. Each vertex represents an employee of the company, and each edge represents an email sent from one employee to another. The arrow of the directed edge points to the recipient of the email. If an email has multiple recipients, multiple edges, one for each recipient, are included in the network. The network contains two business weeks of emails across the entire company. In order to better visualize the structure of the communication network between employees, emails that were sent out to all employees are removed. A glimpse of the data objects used is below. 
+
+<<glimpseemail, echo = TRUE>>=
+em.net # ggnet2 and ggnetwork
+emailnet[1,c(1:2,7,21)] # geomnet
+@
 
 Emails taken by themselves form an event network, i.e.\ edges do not have any temporal duration. Here, however, we can think of emails as observable expressions of the underlying, unobservable, relationship between employees. We can think of this network as a dynamic temporal network, i.e.\ this network has the potential to change over time. The \CRANpkg{ndtv} package by \cite{ndtv} allows the analysis of such networks and provides impressive animations of the underlying dynamics. 
 Here, we are using two static approaches to visualize the network: first, we aggregate emails across the whole time frame (shown in Figure~\ref{fig.cap:email}), then we  
@@ -835,12 +841,22 @@ ggplot(ggnetwork(te.net, layout = "fruchtermanreingold"),
 
 %\afterpage{\clearpage}
 
-Code and plots of the inheritance structure are shown in Figure \ref{fig.cap:theme}. Note the various ways the packages adjust the side of the labels to correspond to the outdegree of the nodes, including the use of the \code{scale\_size\_continuous} function in Figure \ref{fig.cap:theme}(c). In each of these plots, it is easy to quickly determine  parent-child relationships, and to assess which theme elements are unrelated to all others. Nodes with the most children are the \code{rect}, \code{text}, and \code{line} elements, so we made their labels larger in order to emphasize their importance. In each case, the label size is a function of the out degree of the vertices.
+Code and plots of the inheritance structure are shown in Figure \ref{fig.cap:theme}. A glimpse of the data is below. 
+<<glimpesthemes, echo=TRUE>>=
+te.net
+head(TEnet)
+@
+Note the various ways the packages adjust the side of the labels to correspond to the outdegree of the nodes, including the use of the \code{scale\_size\_continuous} function in Figure \ref{fig.cap:theme}(c). In each of these plots, it is easy to quickly determine  parent-child relationships, and to assess which theme elements are unrelated to all others. Nodes with the most children are the \code{rect}, \code{text}, and \code{line} elements, so we made their labels larger in order to emphasize their importance. In each case, the label size is a function of the out degree of the vertices.
 %Using this plot made creation of the \code{theme\_net} object used throughout these examples very simple. We just made set each of the major parent elements, \code{text}, \code{rect}, and \code{line} to \code{element\_blank()} and then set the aspect ratio equal to one.
 
 \subsection{College football} % ================================================
 
-This next example comes from M.E.J. Newman's network data web page \citep{football}.  It is an undirected network consisting of all regular season college football games played between Division I schools in Fall of 2000.  There are 115 vertices and 613 edges: each vertex represents a school, and an edge represents a game played between two schools. There is an additional variable in the vertex data frame corresponding to the conference each team belongs to, and there is an additional variable in the edge data frame that is equal to one if the game occurred between teams in the same conference or zero if the game occurred between teams in different conferences.
+This next example comes from M.E.J. Newman's network data web page \citep{football}.  It is an undirected network consisting of all regular season college football games played between Division I schools in Fall of 2000.  There are 115 vertices and 613 edges: each vertex represents a school, and an edge represents a game played between two schools. There is an additional variable in the vertex data frame corresponding to the conference each team belongs to, and there is an additional variable in the edge data frame that is equal to one if the game occurred between teams in the same conference or zero if the game occurred between teams in different conferences. We take a look at the data used in the plots below.
+
+<<glimpsefb, echo=TRUE>>=
+fb.net
+head(ftnet)
+@
 
 The network of football games is given in figure \ref{fig.cap:football}. Here,  the \code{linetype} aesthetic  corresponds to games that occur between teams in the same conference or different conferences.  
 %
@@ -931,7 +947,7 @@ ggplot(
 \end{figure}
 %\afterpage{\clearpage}
 \noindent
-These lines are dotted and solid, respectively. We have also assigned a different color to each conference, so that the vertices and their labels are colored according to their conference. Additionally, in the first two implementations, the edges between two teams in the same conference share that conference color, while edges between teams in different conferences are a default gray color. This coloring and changing of the line types make the structure of the game network easier to view. Additionally, we use the \code{label} aesthetict in Figure \ref{fig.cap:football}(b) to label only a few schools that are of interest to us. This is the conference consisting of Navy, Notre Dame, Utah State, Central Florida, and Connecticut, which is spread out, whereas most other conferences' teams are all very close to each other because they play within conference much more than they play out of conference.  At the time, these five schools were all independents and did not have a home conference.  Without the coloring capability, we would not have been able to pick out that difference as easily.
+These lines are dotted and solid, respectively. We have also assigned a different color to each conference, so that the vertices and their labels are colored according to their conference. Additionally, in the first two implementations, the edges between two teams in the same conference share that conference color, while edges between teams in different conferences are a default gray color. This coloring and changing of the line types make the structure of the game network easier to view. Additionally, we use the \code{label} aesthetic in Figure \ref{fig.cap:football}(b) to label only a few schools that are of interest to us. This is the conference consisting of Navy, Notre Dame, Utah State, Central Florida, and Connecticut, which is spread out, whereas most other conferences' teams are all very close to each other because they play within conference much more than they play out of conference.  At the time, these five schools were all independents and did not have a home conference.  Without the coloring capability, we would not have been able to pick out that difference as easily.
 
 %' \subsection{Character co-appearances in \emph{Les Mis\'{e}rables}} % ===========
 %'
@@ -1120,8 +1136,7 @@ The two different types of nodes are shown by different shapes and colors. We se
 
 \subsection{Bike sharing in Washington D.C.} % ==================================
   
-The data shows trips taken with bikes from the bike share company Capital Bikeshare\footnote{\url{https://secure.capitalbikeshare.com/}} during the second quarter of 2015.
-While this bike sharing company is located in the heart of Washington D.C.\ the company offers a set of bike stations just outside of Washington in Rockville, MD and north of it. Each station is shown as a vertex, and edges between stations indicate that at least five trips were taken between these two stations; the wider the line, the more trips have been taken between stations. In order to reflect distance between stations, we use as an additional restriction that the fastest trip was at most ten minutes long.
+The data shows trips taken with bikes from the bike share company Capital Bikeshare\footnote{\url{https://secure.capitalbikeshare.com/}} during the second quarter of 2015. While this bike sharing company is located in the heart of Washington D.C.\ the company offers a set of bike stations just outside of Washington in Rockville, MD and north of it. Each station is shown as a vertex, and edges between stations indicate that at least five trips were taken between these two stations; the wider the line, the more trips have been taken between stations. In order to reflect distance between stations, we use as an additional restriction that the fastest trip was at most ten minutes long.
 Figure~\ref{fig:bikes} shows four renderings of this data. The first is a geographically true representation of the area overlaid by lines between bike stations, the other three are networks drawn with \pkg{geomnet}, \pkg{ggnet2}, and \pkg{ggnetwork}, respectively. 
 The code for these renderings is shown below:
 
@@ -1217,6 +1232,11 @@ To plot the geographically correct bike network layout in \CRANpkg{geomnet}, we 
 %
 % \sct{In \pkg{ggnetwork} and \code{ggnet2}, XXX Francois, explain how to do it in these packages to appease reviewer 1's comments about the custom layoutsXXX }
 %For the geographic representations we also made use of the three packages.
+A glance of the data that we used in the examples is shown below. 
+<<bikesdataglimps, echo = TRUE>>=
+bikes.net
+head(tripnet[,-c(4:5,8)])
+@
 Because all three approaches result in the same picture, we only show one of these in Figure~\ref{fig:bikes}a. The code for creating the map is given here:
  
 %% XXX ST: ggmap is compatible with ggplot2 again. The code below reflects that. Francois, can you make sure the code is correct under this new specification?
