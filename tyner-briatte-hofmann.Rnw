@@ -13,10 +13,12 @@ This paper explores three different approaches to visualize networks by building
 library(knitr)
 opts_chunk$set(
   tidy = FALSE, echo = FALSE, cache = FALSE, eval = TRUE,
-  message = FALSE, warning = FALSE, highlight = FALSE, 
+  message = FALSE, warning = FALSE, highlight = TRUE, 
   background = '#FFFFFF', dev = 'pdf', 
   fig.height = 8, fig.width = 8, fig.align = 'center', fig.show = 'hide'
 )
+thm <- knit_theme$get("greyscale2")
+knit_theme$set(thm)
 
 ## From Josh O'Brien's stackoverflow answer:
 ## http://stackoverflow.com/questions/11030898/knitr-how-to-align-code-and-plot-side-by-side
@@ -152,7 +154,7 @@ And so, our focus here is not on adding to the analysis of network data or to th
   % see also: port of ggplot2 to plotly? \url{https://plot.ly/ggplot2/} %% -- hh
   %
 %  This is the audience we are aiming at by making network visualizations a part of \pkg{ggplot2}.
-Because the syntax implemented in the \pkg{ggplot2} package is extendable to  different kinds of visualizations, many packages have built additional functionality on top of the  \pkg{ggplot2} framework. Examples include the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRANpkg{ggfortify} package by \citet{ggfortify} for visualizing statistical models, the package \CRANpkg{GGally} by \citet{ggally}, which encompasses various complementary visualization techniques to \pkg{ggplot2}, and the \BIOpkg{ggbio} and \BIOpkg{ggtree} Bioconductor packages by \citet{ggbio} and \citet{ggtree}, which both provide visualizations for biological data.
+Because the syntax implemented in the \pkg{ggplot2} package is extendable to  different kinds of visualizations, many packages have built additional functionality on top of the  \pkg{ggplot2} framework. Examples include the \CRANpkg{ggmap} package by \citet{ggmap} for spatial visualization, the \CRANpkg{ggfortify} package for visualizing statistical models (see \citet{ggfortify}, \citet{ggfortify2}), the package \CRANpkg{GGally} by \citet{ggally}, which encompasses various complementary visualization techniques to \pkg{ggplot2}, and the \BIOpkg{ggbio} and \BIOpkg{ggtree} Bioconductor packages by \citet{ggbio} and \citet{ggtree}, which both provide visualizations for biological data.
 These packages have expanded the utility of \pkg{ggplot2}, likely resulting in an  increase of its user base. We hope to appeal to this user base and potentially add to it by %extending 
 applying the benefits of the grammar of graphics implemented in \pkg{ggplot2} to network visualization.
 % Just as these examples have increased the utility of \pkg{ggplot2}, our additions aim to extend the benefits of the grammar of graphics to network visualization.
@@ -224,7 +226,7 @@ Coloring the vertices or edges in a graph is a quick way to visualize grouping a
 \label{sec:implementations}
 %
 % ==============================================================================
-We present two basic approaches to using the \pkg{ggplot2} framework for network visualization. First, we implement network visualizations by providing a wrapper function, \code{ggnet2} for the user to visualize a network using \pkg{ggplot2} elements. Second, we implement network visualizations using layering in \pkg{ggplot2}.  For the second approach, we have two ways of creating a network visualization. The first, \pkg{geomnet}, wraps all network structures, including vertices, edges, and vertex labels into a single \code{geom}. The second, \pkg{ggnetwork}, implements each of these structural components in an independent \code{geom} and layers them to create the visualization. In each package, our goal is to provide users with a way to map network properties to aesthetic properties of graphs that is familiar to them and straightforward to implement. Each package has a slightly different approach to accomplish this goal, and we will discuss all of these approaches in this section. For each implementation, we also provide the code necessary to create Figure~\ref{fig.cap:madmen}, and describe the arguments used. We conclude the section with a side-by-side comparison of the features available in all three implementations in Table~\ref{tab:comparison}.
+We present two basic approaches to using the \pkg{ggplot2} framework for network visualization. First, we implement network visualizations by providing a wrapper function, \code{ggnet2} for the user to visualize a network using \pkg{ggplot2} elements \citep{ggally}. Second, we implement network visualizations using layering in \pkg{ggplot2}.  For the second approach, we have two ways of creating a network visualization. The first, \pkg{geomnet}, wraps all network structures, including vertices, edges, and vertex labels into a single \code{geom} \citep{geomnet}. The second, \pkg{ggnetwork}, implements each of these structural components in an independent \code{geom} and layers them to create the visualization \citep{ggnetwork}. In each package, our goal is to provide users with a way to map network properties to aesthetic properties of graphs that is familiar to them and straightforward to implement. Each package has a slightly different approach to accomplish this goal, and we will discuss all of these approaches in this section. For each implementation, we also provide the code necessary to create Figure~\ref{fig.cap:madmen}, and describe the arguments used. We conclude the section with a side-by-side comparison of the features available in all three implementations in Table~\ref{tab:comparison}.
 
 \subsection{ggnet2} % ==========================================================
 
@@ -1497,8 +1499,53 @@ Users who are already familiar with \pkg{ggplot2} and some of the other `tidy-ve
 
 %  If you are experienced with network analysis in existing R packages and don’t have much experience with \pkg{ggplot2}, then look toward \pkg{ggnet}. If you are not as familiar with network analysis packages but are familiar with visualization in \pkg{ggplot2}, then \pkg{ggnetwork} is for you. And if you don’t know much about network analysis but you do know \pkg{ggplot2}, then your best approach will be \pkg{geomnet}.
 
-On a personal level we discovered that the collaboration on this paper has helped us to improve upon our initial versions of each of these packages. For instance, the edge coloring in the \code{ggnet2} function was designed so that edges between two vertices in the same group were colored with that group's vertex color. This  inspired an implementation of it in \code{geomnet} through the traditional \code{ggplot2} \code{group} operator. During the process of writing the paper the authors collaborated on a solution for the problem of nodes being plotted on top of arrow tips. This solution  was implemented in the \pkg{geomnet} \code{arrow.gap} parameter, which allows to re-track the tip of an arrow on a directed edge, and was also added to \pkg{ggnetwork}. Finally, the implementation of a \pkg{ggplot2} \code{geom} for networks within \pkg{geomnet} inspired the creation of the aliased \code{geom}s of the \pkg{ggnetwork} package. 
+On a personal level we discovered that the collaboration on this paper has helped us to improve upon our initial versions of each of these packages. For instance, the edge coloring in the \code{ggnet2} function was designed so that edges between two vertices in the same group were colored with that group's vertex color. This  inspired an implementation of it in \code{geomnet} through the traditional \code{ggplot2} \code{group} operator. During the process of writing the paper the authors collaborated on a solution for the problem of nodes being plotted on top of arrow tips. This solution  was implemented in the \pkg{geomnet} \code{arrow.gap} parameter, which allows to re-track the tip of an arrow on a directed edge, and was also added to \pkg{ggnetwork}. In addition, the implementation of a \pkg{ggplot2} \code{geom} for networks within \pkg{geomnet} inspired the creation of the aliased \code{geom}s of the \pkg{ggnetwork} package. 
 
+Finally, curious users may be interested in how these three packages can fit together and replicate each other, since they are in fact so similar. Thanks to the flexibility inherent to \pkg{ggnetwork}, it is possible to write wrapper functions around \pkg{ggnetwork} functions in order to recreate the behavior and functionality of \code{ggnet2} and \pkg{geomnet}. Simple examples of such wrapper functions, called \code{ggnetwork2} and \code{geom\_network}, respecively are shown below. 
+<<reviewer2code, eval=FALSE, echo=TRUE>>=
+library(ggnetwork)
+# mimics geom_net behavior
+geom_network <- function(edge.param, node.param) { 
+     edge_ly <- do.call(geom_edges, edge.param) 
+     node_ly <- do.call(geom_nodes, node.param) 
+     list(edge_ly, node_ly) 
+}
+# mimics ggnet2 behavoir
+ggnetwork2 <- function() { ggplot() + geom_network() }
+@
+
+Similarly, \pkg{geomnet} can mimic the the behavior of \code{ggnet2}, as shown below. 
+<<geomnetmimicry, echo=TRUE, eval = FALSE>>=
+library(geomnet)
+geomnet2 <- function(net) { 
+  ggplot(data = fortify(net),
+         aes(from_id = from_id, to_id = to_id)) + 
+    geom_net()
+}
+@
+
+Mimicking \pkg{ggnetwork} with \pkg{geomnet} requires a little bit more work because the native data input for \pkg{geomnet} is a data frame object fortified with \pkg{geomnet} methods, not a \pkg{network} object. Instead, the internal \pkg{ggplot2} function \code{ggplot\_build} allows a plot created with \pkg{geomnet} function calls to be recreated with \pkg{ggnetwork}-like syntax. An example of using a \pkg{geomnet} plot to create a similar plot in the style of \pkg{ggnetwork} follows to reproduce Figure~\ref{fig.cap:blood}(c).
+<<geomnettoggnetwork, echo=TRUE, eval=FALSE>>=
+library(geomnet)
+library(ggnetwork)
+library(dplyr)
+# a ggnetwork-like creation using a geomnet plot 
+data("blood")
+# first, create the geomnet plot to access the data later
+geomnetplot <- ggplot(data = blood$edges, aes(from_id = from, to_id =
+                                                to)) +
+                  geom_net(layout.alg = "circle", selfloops = TRUE) + 
+                theme_net() 
+# get the data
+dat <- ggplot_build(geomnetplot)$data[[1]]
+# ggnetwork-like construction for re-creating network shown in figure 5 
+ggplot(data = dat, aes(x = x, y = y, xend = xend, yend = yend)) + 
+  geom_segment(arrow = arrow(type = 'closed'), colour = 'grey40') + 
+  geom_point(size = 10, colour = 'darkred') +
+  geom_text(aes(label = from), colour = 'grey80', size = 4) + 
+  geom_circle() + 
+  theme_blank() + theme(aspect.ratio = 1)
+@
 
 \begin{center}
 {\large\bf Supplementary Material}
@@ -1512,6 +1559,13 @@ On a personal level we discovered that the collaboration on this paper has helpe
 
 \end{description}
 
+\begin{center}
+{\large\bf Acknowledgements}
+\end{center}
+
+\begin{description}
+\item The authors would like to thank the reviewers for their thoughtful input to and thorough reviews of our manuscript. We would also like to thank the editor of The R Journal for his enduring patience.  
+\end{description}
 
 
 \bibliography{tyner-briatte-hofmann}
