@@ -1524,7 +1524,7 @@ geomnet2 <- function(net) {
 }
 @
 
-Mimicking \pkg{ggnetwork} with \pkg{geomnet} requires a little bit more work because the native data input for \pkg{geomnet} is a data frame object fortified with \pkg{geomnet} methods, not a \pkg{network} object. Instead, the internal \pkg{ggplot2} function \code{ggplot\_build} allows a plot created with \pkg{geomnet} function calls to be recreated with \pkg{ggnetwork}-like syntax. An example of using a \pkg{geomnet} plot to create a similar plot in the style of \pkg{ggnetwork} follows to reproduce Figure~\ref{fig.cap:blood}(c).
+Mimicking \pkg{ggnetwork} with \pkg{geomnet} requires a little bit more work because the native data input for \pkg{geomnet} is a \code{"data.frame"} object fortified with \pkg{geomnet} methods, not a \code{"network"} object. Instead, the internal \pkg{ggplot2} function \code{ggplot\_build} allows a plot created with \pkg{geomnet} function calls to be recreated with \pkg{ggnetwork}-like syntax. An example of using a \pkg{geomnet} plot to create a similar plot in the style of \pkg{ggnetwork} follows to reproduce Figure~\ref{fig.cap:blood}(c).
 <<geomnettoggnetwork, echo=TRUE, eval=FALSE>>=
 library(geomnet)
 library(ggnetwork)
