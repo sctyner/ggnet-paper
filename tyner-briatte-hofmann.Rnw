@@ -142,11 +142,11 @@ The packages described in this paper have, by contrast, have one primary purpose
 % solution: ggplot2 as an implementation framework
 %\sct{This is redundant} In this article, 
 %Our objective is to bring network plotting capabilities to the popular \CRANpkg{ggplot2} package \citep{ggplot2}. 
-And so, our focus here is not on adding to the analysis of network data or to the field of graph drawing, \citep[cf.\ ][]{graphdrawing} but rather it is on implementing existing graph drawing capabilities in the \CRANpkg{ggplot2} framework, using the common data frame structure. The \pkg{ggplot2} package is hugely popular, and many other packages and tools interface with it in order to better visualize a wide variety of data types. By creating a \pkg{ggplot2} implementation, we hope to place network visualization within a large, active community of data visualization enthusiasts, bringing new eyes and potentially new innovations to the field of network visualization. With our approaches, we have two primary audiences in mind. The first audience is made up of frequent users of network structures and those who are fluent in the language of packages such as \pkg{network} or \pkg{igraph}. This audience will find that two of our three approaches (\code{ggnet2} and \pkg{ggnetwork}) directly incorporate the network structures and functions with which they are familiar with into the less familiar visualization paradigm of \pkg{ggplot2}. The second audience, targeted by  \pkg{geomnet}, is made up of those users who are not familiar with network structures, but are familiar with data manipulation and tidying, and who happen to find themselves examining some data that can be expressed as a network. For this audience, we do the heavy network lifting internally, while also relying on their familiarity with \pkg{ggplot2} externally. 
+And so, our focus here is not on adding to the analysis of network data or to the field of graph drawing, \citep[cf.\ ][]{graphdrawing} but rather it is on implementing existing graph drawing capabilities in the \CRANpkg{ggplot2} framework, using the common data frame structure. The \pkg{ggplot2} package is hugely popular, and many other packages and tools interface with it in order to better visualize a wide variety of data types. By creating a \pkg{ggplot2} implementation, we hope to place network visualization within a large, active community of data visualization enthusiasts, bringing new eyes and potentially new innovations to the field of network visualization. With our approaches, we have two primary audiences in mind. The first audience is made up of frequent users of network structures and those who are fluent in the language of packages such as \pkg{network} or \pkg{igraph}. This audience will find that two of our three approaches (\code{ggnet2} and \pkg{ggnetwork}) directly incorporate the network structures and functions with which they are familiar with into the less familiar visualization paradigm of \pkg{ggplot2}. The second audience, targeted by  \pkg{geomnet}, consists of those users who are not familiar with network structures, but are familiar with data manipulation and tidying, and who happen to find themselves examining some data that can be expressed as a network. For this audience, we do the heavy network lifting internally, while also relying on their familiarity with \pkg{ggplot2} externally. 
 
 \par The \CRANpkg{ggplot2} package was designed as an implementation of the `grammar of graphics' proposed by \citet{wilkinson:1999}, and it has become extremely popular among R users.%
   %
-  \footnote{In order to give an indication of how  large the user base of \pkg{ggplot2} is, we looked at its usage statistics from January 1, 2015 to December 31, 2015 (see \url{http://cran-logs.rstudio.com/}). Over this period, the \pkg{ggplot2} package was downloaded over 1.75 million times from CRAN, which amounts to over 6,200 downloads per day. Over 700 R packages list \pkg{ggplot2} as a dependency or as a suggestion.} %
+  \footnote{In order to give an indication of how  large the user base of \pkg{ggplot2} is, we looked at its usage statistics from January 1, 2016 to December 31, 2016 (see \url{http://cran-logs.rstudio.com/}). Over this period, the \pkg{ggplot2} package was downloaded over 3.2 million times from CRAN, which amounts to almost 9,000 downloads per day. Over 800 R packages list \pkg{ggplot2} as a dependency or as a suggestion.} %
 %\sct{XXX I do not think that the line about Python is relevant, as we are submitting this to the R journal. I have commented it out for now. XXX}
   %to the point that it has even inspired a port of its syntax to the Python programming language, which is a rare achievement for an R package.%
   %
@@ -184,7 +184,7 @@ one edge between two vertices, while one of the most commonly used and most comp
 
 %An even more common network example is a social network. 
 % Rewrite the hated sentence!
-As a reference example, we turn to a specific instance of a social network. A \dfn{social network} is a network that everyone is a part of in one way or another, whether through friends, family, or other human interactions. We do not necessarily refer here to social media like Facebook or LinkedIn, but rather to the connections we form with other people. To demonstrate the functionality of our tools for plotting networks, we have chosen an example of a social network from the popular television show \emph{Mad Men}. This network, which was compiled by \citet{madmen} and made available in \CRANpkg{gcookbook} \citep{gcookbook}, is made up of 52 vertices and 87 edges. Each vertex represents a character on the show, and there is an edge between every two characters who have had a romantic relationship.
+As a reference example, we turn to a specific instance of a social network. A \dfn{social network} is a network that everyone is a part of in one way or another, whether through friends, family, or other human interactions. We do not necessarily refer here to social media like Facebook or LinkedIn, but rather to the connections we form with other people. To demonstrate the functionality of our tools for plotting networks, we have chosen an example of a social network from the popular television show \emph{Mad Men}. This network, which was compiled by \citet{madmen} and made available in \CRANpkg{gcookbook} \citep{gcookbook}, consists of 52 vertices and 87 edges. Each vertex represents a character on the show, and there is an edge between every two characters who have had a romantic relationship.
 
 \begin{figure}[hbtp]
 \centering
@@ -216,7 +216,7 @@ is a visualization of this network. In the plot, we can see one central characte
 
 %%%%
 % Visualization of networks helps with analysis
-Coloring the vertices or edges in a graph is a quick way to visualize grouping and can help with pattern or cluster detection. The vertices in a network and the edges between them compose the structure of a network, and being able to visually discover patterns among them is a key part of network analysis. Viewing multiple layouts of the same network can also help reveal patterns or clusters that would not be discovered when only viewing one layout or analyzing only its underlying adjacency matrix.
+Coloring the vertices or edges in a graph is a quick way to visualize grouping and helps with pattern or cluster detection. The vertices in a network and the edges between them compose the structure of a network, and being able to visually discover patterns among them is a key part of network analysis. Viewing multiple layouts of the same network can also help reveal patterns or clusters that would not be discovered when only viewing one layout or analyzing only its underlying adjacency matrix.
 
 %%%%
 
@@ -675,6 +675,7 @@ To give some insight into how the relations between employees change over time, 
 \end{figure}
 \afterpage{\clearpage}
 
+\noindent
 First, the code for the \code{ggnet2} approach, which results in Figure~\ref{fig:email_facet}(a):
 <<email_facet_ggnet2, fig.height=4, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
 # data preparation. first, remove emails sent to all employees
@@ -711,6 +712,7 @@ for (i in 1:length(em.day)) {
 # arrange all of the network plots into one plot window
 gridExtra::grid.arrange(grobs = g, nrow = 2)
 @
+\noindent
 Second, the code for the \pkg{geomnet} approach, which results in Figure~\ref{fig:email_facet}(b):
 <<email_facet_geom_net, fig.height=4.5, fig.width=8, echo=TRUE, out.width='\\textwidth'>>=
 # data step: use the fortify.edgedf group argument to 
@@ -736,6 +738,7 @@ ggplot(data = emailnet, aes(from_id = from, to_id = to_id)) +
         plot.margin = unit(c(0, 0, 0, 0), "mm"))
 @
 
+\noindent
 Finally, the code for the \pkg{ggnetwork} approach, which results in Figure~\ref{fig:email_facet}(c):
 <<email_facet_ggnetwork, fig.height=4.5, fig.width=8,echo=TRUE, out.width='\\textwidth'>>=
 # create the network and aesthetics
@@ -843,6 +846,7 @@ ggplot(ggnetwork(te.net, layout = "fruchtermanreingold"),
 
 %\afterpage{\clearpage}
 
+\noindent
 Code and plots of the inheritance structure are shown in Figure \ref{fig.cap:theme}. A glimpse of the data is below. 
 <<glimpesthemes, echo=TRUE>>=
 te.net
@@ -855,8 +859,33 @@ Note the various ways the packages adjust the side of the labels to correspond t
 
 This next example comes from M.E.J. Newman's network data web page \citep{football}.  It is an undirected network consisting of all regular season college football games played between Division I schools in Fall of 2000.  There are 115 vertices and 613 edges: each vertex represents a school, and an edge represents a game played between two schools. There is an additional variable in the vertex data frame corresponding to the conference each team belongs to, and there is an additional variable in the edge data frame that is equal to one if the game occurred between teams in the same conference or zero if the game occurred between teams in different conferences. We take a look at the data used in the plots below.
 
-<<glimpsefb, echo=TRUE>>=
-fb.net
+<<hidethis, echo=FALSE>>=
+data(football, package = 'geomnet')
+rownames(football$vertices) <-
+  football$vertices$label
+# create network 
+fb.net <- network(football$edges[, 1:2],
+                  directed = TRUE)
+# create node attribute (what conference is team in?)
+fb.net %v% "conf" <-
+  football$vertices[
+    network.vertex.names(fb.net), "value"
+    ]
+# create edge attribute (between teams in same conference?)
+set.edge.attribute(
+  fb.net, "same.conf",
+  football$edges$same.conf)
+
+ftnet <- fortify(as.edgedf(football$edges), football$vertices)
+
+# create new label variable for viewing independent schools
+ftnet$schools <- ifelse(
+  ftnet$value == "Independents", ftnet$from_id, "")
+
+@
+  
+<<glimpsefb, dependson="hidethis", echo=TRUE>>=
+fb.net 
 head(ftnet)
 @
 
