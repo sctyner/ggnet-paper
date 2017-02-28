@@ -146,7 +146,7 @@ And so, our focus here is not on adding to the analysis of network data or to th
 
 \par The \CRANpkg{ggplot2} package was designed as an implementation of the `grammar of graphics' proposed by \citet{wilkinson:1999}, and it has become extremely popular among R users.%
   %
-  \footnote{In order to give an indication of how  large the user base of \pkg{ggplot2} is, we looked at its usage statistics from January 1, 2016 to December 31, 2016 (see \url{http://cran-logs.rstudio.com/}). Over this period, the \pkg{ggplot2} package was downloaded over 3.2 million times from CRAN, which amounts to almost 9,000 downloads per day. Over 800 R packages list \pkg{ggplot2} as a dependency or as a suggestion.} %
+  \footnote{In order to give an indication of how  large the user base of \pkg{ggplot2} is, we looked at its usage statistics from January 1, 2016 to December 31, 2016 (see \url{http://cran-logs.rstudio.com/}). Over this period, the \pkg{ggplot2} package was downloaded over 3.2 million times from CRAN, which amounts to almost 9,000 downloads per day. Almost 800 R packages import or depend on \pkg{ggplot2}.} %
 %\sct{XXX I do not think that the line about Python is relevant, as we are submitting this to the R journal. I have commented it out for now. XXX}
   %to the point that it has even inspired a port of its syntax to the Python programming language, which is a rare achievement for an R package.%
   %
