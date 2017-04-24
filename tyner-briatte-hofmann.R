@@ -1,84 +1,3 @@
-## ----setup_knitr, echo=FALSE---------------------------------------------
-library(knitr)
-opts_chunk$set(
-  tidy = FALSE, echo = FALSE, cache = FALSE, eval = TRUE,
-  message = FALSE, warning = FALSE, highlight = FALSE, 
-  background = '#FFFFFF', dev = 'pdf', 
-  fig.height = 8, fig.width = 8, fig.align = 'center', fig.show = 'hide'
-)
-
-## From Josh O'Brien's stackoverflow answer:
-## http://stackoverflow.com/questions/11030898/knitr-how-to-align-code-and-plot-side-by-side
-## These two settings control text width in codefig vs. usual code blocks
-partWidth <- 35
-fullWidth <- 60
-options(width = fullWidth)
-
-##  (1) CHUNK HOOK FUNCTION
-##   First, to set R's textual output width on a per-chunk basis, we
-## need to define a hook function which temporarily resets global R's
-## option() settings, just for the current chunk
-knit_hooks$set(r.opts = local({
-    ropts <- NA
-    function(before, options, envir) {
-        if (before) {
-            ropts <<- options(options$r.opts)
-        } else {
-            options(ropts)
-        }
-    }
-}))
-
-## (2) OUTPUT HOOK FUNCTION
-
-##   Define a custom output hook function. This function processes _all_
-## evaluated chunks, but will return the same output as the usual one,
-## UNLESS a 'codefig' argument appeared in the chunk's header.  In that
-## case, wrap the usual textual output in LaTeX code placing it in a
-## narrower adjustbox environment and setting the graphics that it
-## produced in another box beside it.
-
-defaultChunkHook <- environment(knit_hooks[["get"]])$defaults$chunk
-
-codefigChunkHook <- function(x, options) {
-        main <-  defaultChunkHook(x, options)
-        before <-
-            "\\vspace{1em}\n
-             \\begin{adjustbox}{valign=t}\n
-             \\begin{minipage}{.49\\textwidth}\n"
-        after <-
-            paste("\\vspace{1em}\n
-                   \\end{minipage}\n
-                  \\begin{minipage}{.49\\textwidth}\n",
-                   paste0("\\includegraphics[width=\\textwidth]{figure/",
-                          options[["label"]], "-1.pdf}\n
-                          \\end{minipage}\n
-                          \\end{adjustbox}"),
-                          sep = "\n")
-    ## Was a codefig option supplied in chunk header?
-    ## If so, wrap code block and graphical output with needed LaTeX code.
-    if (!is.null(options$codefig)) {
-      return(sprintf("%s %s %s", before, main, after))
-    } else {
-      return(main)
-    }
-}
-
-knit_hooks[["set"]](chunk = codefigChunkHook)
-
-
-## (3) TEMPLATE
-##   codefig=TRUE is just one of several options needed for the
-## side-by-side code block and a figure to come out right. Rather
-## than typing out each of them in every single chunk header, we
-## define a _template_ which bundles them all together. Then we can
-## set all of those options simply by typing opts.label="codefig".
-
-opts_template[["set"]](
-codefig = list(codefig = TRUE, fig.show = "hide",
-               r.opts = list(width = partWidth),
-               tidy.opts = list(width.cutoff = partWidth)))
-
 ## ----load_packages, echo=FALSE, results='hide'---------------------------
 library(dplyr)
 library(tidyr)
@@ -112,7 +31,6 @@ library(sna)
 ## ----madmen_geom_net, fig.width=7, fig.height=7.5------------------------
 # make data accessible 
 data(madmen, package = "geomnet")
-
 # code for geom_net
 # data step: join the edge and node data with a fortify call
 MMnet <- fortify(as.edgedf(madmen$edges), madmen$vertices)
@@ -127,26 +45,27 @@ ggplot(data = MMnet, aes(from_id = from_id, to_id = to_id)) +
   theme_net() +
   theme(legend.position = "bottom")
 
-## ----madmen_ggnet2, eval=FALSE, echo=TRUE, fig.cap="The code required to generate Figure~\\ref{fig.cap:madmen} using the \\code{ggnet2} function in the \\pkg{GGally} package."----
-## library(GGally)
-## library(network)
-## # make the data available
-## data(madmen, package = 'geomnet')
-## # data step for both ggnet2 and ggnetwork
-## # create undirected network
-## mm.net <- network(madmen$edges[, 1:2], directed = FALSE)
-## # create node attribute (gender)
-## rownames(madmen$vertices) <- madmen$vertices$label
-## mm.net %v% "gender" <- as.character(
-##   madmen$vertices[ network.vertex.names(mm.net), "Gender"]
-## )
-## # gender color palette
-## mm.col <- c("female" = "#ff69b4", "male" = "#0099ff")
-## # create plot for ggnet2
-## set.seed(10052016)
-## ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
-##        labelon = TRUE, label.color = mm.col[ mm.net %v% "gender" ],
-##        size = 2, vjust = -0.6, mode = "kamadakawai", label.size = 3)
+## ----madmen_ggnet2, eval=TRUE, echo=TRUE, fig.show = 'hide', fig.cap="The code required to generate Figure~\\ref{fig.cap:madmen} using the \\code{ggnet2} function in the \\pkg{GGally} package."----
+library(GGally)
+library(network)
+# make the data available
+data(madmen, package = 'geomnet')
+# data step for both ggnet2 and ggnetwork
+# create undirected network
+mm.net <- network(madmen$edges[, 1:2], directed = FALSE)
+mm.net # glance at network object
+# create node attribute (gender)
+rownames(madmen$vertices) <- madmen$vertices$label
+mm.net %v% "gender" <- as.character(
+  madmen$vertices[ network.vertex.names(mm.net), "Gender"]
+)
+# gender color palette
+mm.col <- c("female" = "#ff69b4", "male" = "#0099ff")
+# create plot for ggnet2
+set.seed(10052016)
+ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
+       labelon = TRUE, label.color = mm.col[ mm.net %v% "gender" ],
+       size = 2, vjust = -0.6, mode = "kamadakawai", label.size = 3)
 
 ## ----madmen_geom_net_code, echo=TRUE, eval=FALSE, fig.cap="The code required to generate Figure~\\ref{fig.cap:madmen} using the \\code{geom\\_net} function in the \\pkg{geomnet} package."----
 ## # also loads ggplot2
@@ -195,7 +114,7 @@ library(ggnetwork)
 # make data accessible
 data(blood, package = "geomnet")
 
-# plot with ggnet2 (Figure 2a)
+# plot with ggnet2 (Figure 5a)
 set.seed(12252016)
 ggnet2(network(blood$edges[, 1:2], directed=TRUE), 
        mode = "circle", size = 15, label = TRUE, 
@@ -203,7 +122,8 @@ ggnet2(network(blood$edges[, 1:2], directed=TRUE),
        node.color = "darkred", label.color = "grey80")
 
 ## ----blood_geom_net, echo=TRUE, fig.width=6, fig.height=6----------------
-# plot with geomnet (Figure 2b)
+head(blood$edges,3) # glance at the data
+# plot with geomnet (Figure 5b)
 set.seed(12252016)
 ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
   geom_net(colour = "darkred", layout.alg = "circle", labelon = TRUE, size = 15,
@@ -213,7 +133,7 @@ ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
   theme_net() 
 
 ## ----blood_ggnetwork, echo=TRUE, fig.width=6, fig.height=6---------------
-# plot with ggnetwork (Figure 2c)
+# plot with ggnetwork (Figure 5c)
 set.seed(12252016)
 ggplot(ggnetwork(network(blood$edges[, 1:2]),
                  layout = "circle", arrow.gap = 0.05),
@@ -287,6 +207,10 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02,layout = "fruchtermanreingold"),
                      palette = "Set1") +
   theme_blank() +
   theme(legend.position = "bottom")
+
+## ----glimpseemail, echo = TRUE-------------------------------------------
+em.net # ggnet2 and ggnetwork
+emailnet[1,c(1:2,7,21)] # geomnet
 
 ## ----email_facet_ggnet2, fig.height=4, fig.width=8, echo=TRUE, out.width='\\textwidth'----
 # data preparation. first, remove emails sent to all employees
@@ -421,6 +345,38 @@ ggplot(ggnetwork(te.net, layout = "fruchtermanreingold"),
   scale_size_continuous(range = c(4, 8)) +
   guides(size = FALSE) +
   theme_blank()
+
+## ----glimpesthemes, echo=TRUE--------------------------------------------
+te.net
+head(TEnet)
+
+## ----hidethis, echo=FALSE------------------------------------------------
+data(football, package = 'geomnet')
+rownames(football$vertices) <-
+  football$vertices$label
+# create network 
+fb.net <- network(football$edges[, 1:2],
+                  directed = TRUE)
+# create node attribute (what conference is team in?)
+fb.net %v% "conf" <-
+  football$vertices[
+    network.vertex.names(fb.net), "value"
+    ]
+# create edge attribute (between teams in same conference?)
+set.edge.attribute(
+  fb.net, "same.conf",
+  football$edges$same.conf)
+
+ftnet <- fortify(as.edgedf(football$edges), football$vertices)
+
+# create new label variable for viewing independent schools
+ftnet$schools <- ifelse(
+  ftnet$value == "Independents", ftnet$from_id, "")
+
+
+## ----glimpsefb, dependson="hidethis", echo=TRUE--------------------------
+fb.net 
+head(ftnet)
 
 ## ----football_ggnet2, size="footnotesize", opts.label="codefig", echo=TRUE----
 #make data accessible
@@ -626,6 +582,10 @@ ggplot(data = ggnetwork(bikes.net, layout = "fruchtermanreingold"),
   theme_blank() +
   theme(legend.position = "bottom", legend.box = "horizontal")
 
+## ----bikesdataglimps, echo = TRUE----------------------------------------
+bikes.net
+head(tripnet[,-c(4:5,8)])
+
 ## ----geographic_common, echo=TRUE----------------------------------------
   library(ggmap)
 metro_map <- get_map(location = c(left = -77.22257, bottom = 39.05721, 
@@ -734,4 +694,44 @@ qplot(data = g, network_size, time, colour = `Visualization approach`, alpha = I
   ylab("Time (in seconds)") +
   theme_bw() +
   theme(legend.position = "bottom")
+
+## ----reviewer2code, eval=FALSE, echo=TRUE--------------------------------
+## library(ggnetwork)
+## # mimics geom_net behavior
+## geom_network <- function(edge.param, node.param) {
+##      edge_ly <- do.call(geom_edges, edge.param)
+##      node_ly <- do.call(geom_nodes, node.param)
+##      list(edge_ly, node_ly)
+## }
+## # mimics ggnet2 behavoir
+## ggnetwork2 <- function() { ggplot() + geom_network() }
+
+## ----geomnetmimicry, echo=TRUE, eval = FALSE-----------------------------
+## library(geomnet)
+## geomnet2 <- function(net) {
+##   ggplot(data = fortify(net),
+##          aes(from_id = from_id, to_id = to_id)) +
+##     geom_net()
+## }
+
+## ----geomnettoggnetwork, echo=TRUE, eval=FALSE---------------------------
+## library(geomnet)
+## library(ggnetwork)
+## library(dplyr)
+## # a ggnetwork-like creation using a geomnet plot
+## data("blood")
+## # first, create the geomnet plot to access the data later
+## geomnetplot <- ggplot(data = blood$edges, aes(from_id = from, to_id =
+##                                                 to)) +
+##                   geom_net(layout.alg = "circle", selfloops = TRUE) +
+##                 theme_net()
+## # get the data
+## dat <- ggplot_build(geomnetplot)$data[[1]]
+## # ggnetwork-like construction for re-creating network shown in figure 5
+## ggplot(data = dat, aes(x = x, y = y, xend = xend, yend = yend)) +
+##   geom_segment(arrow = arrow(type = 'closed'), colour = 'grey40') +
+##   geom_point(size = 10, colour = 'darkred') +
+##   geom_text(aes(label = from), colour = 'grey80', size = 4) +
+##   geom_circle() +
+##   theme_blank() + theme(aspect.ratio = 1)
 
