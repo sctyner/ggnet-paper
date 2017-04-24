@@ -163,9 +163,9 @@ em.net %v% "curr_empl_type" <-
   em.cet[ network.vertex.names(em.net) ]
 set.seed(10312016)
 ggnet2(em.net, color = "curr_empl_type",
-       size = 4, palette = "Set1",
-       arrow.size = 5, arrow.gap = 0.02,
-       edge.alpha = 0.25, mode = "fruchtermanreingold",
+       size = 4, palette = "Set1", arrow.gap = 0.02,
+       arrow.size = 5, edge.alpha = 0.25, 
+       mode = "fruchtermanreingold",
        edge.color = c("color", "grey50"),
        color.legend = "Employment Type") +
   theme(legend.position = "bottom")
@@ -183,8 +183,7 @@ ggplot(data = emailnet,
     aes(colour = CurrentEmploymentType,
         group = CurrentEmploymentType,
         linewidth = 3 * (...samegroup.. / 8 + .125)),
-    ealpha = 0.25,
-    size = 4, curvature = 0.05,
+    ealpha = 0.25, size = 4, curvature = 0.05,
     directed = TRUE, arrowsize = 0.5) +
   scale_colour_brewer("Employment Type", palette = "Set1") +
   theme_net() +
@@ -193,7 +192,8 @@ ggplot(data = emailnet,
 ## ----email_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE, out.width='\\textwidth'----
 # use em.net created in ggnet2step
 set.seed(10312016)
-ggplot(ggnetwork(em.net, arrow.gap = 0.02,layout = "fruchtermanreingold"),
+ggplot(ggnetwork(em.net, arrow.gap = 0.02,
+              layout = "fruchtermanreingold"),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges(
     aes(color = curr_empl_type),
@@ -306,8 +306,9 @@ te.net <- network(theme_elements$edges)
 te.net %v% "size" <-
   sqrt(10 * (sna::degree(te.net) + 1))
 set.seed(3272016)
-ggnet2(te.net, label = TRUE, color = "white", label.size = "size",
-       mode = "fruchtermanreingold", layout.exp = 0.15)
+ggnet2(te.net, label = TRUE, color = "white", 
+       label.size = "size", layout.exp = 0.15,
+       mode = "fruchtermanreingold")
 
 ## ----theme_geom_net, size="footnotesize", opts.label="codefig", echo=TRUE, fig.width=7, fig.height = 7----
 # data step: merge nodes and edges and
@@ -336,7 +337,8 @@ ggplot(data = TEnet,
 ## ----theme_ggnetwork, size="footnotesize", opts.label="codefig", echo=TRUE----
 set.seed(3272016)
 # use network created in ggnet2 data step
-ggplot(ggnetwork(te.net, layout = "fruchtermanreingold"),
+ggplot(ggnetwork(te.net, 
+                 layout = "fruchtermanreingold"),
        aes(x, y, xend = xend, yend = yend)) +
   geom_edges() +
   geom_nodes(size = 12, color = "white") +
@@ -386,12 +388,14 @@ rownames(football$vertices) <-
 # create network 
 fb.net <- network(football$edges[, 1:2],
                   directed = TRUE)
-# create node attribute (what conference is team in?)
+# create node attribute 
+# (what conference is team in?)
 fb.net %v% "conf" <-
   football$vertices[
     network.vertex.names(fb.net), "value"
     ]
-# create edge attribute (between teams in same conference?)
+# create edge attribute 
+# (between teams in same conference?)
 set.edge.attribute(
   fb.net, "same.conf",
   football$edges$same.conf)
@@ -404,9 +408,10 @@ ggnet2(fb.net, mode = "fruchtermanreingold",
 ## ----football_geom_net, size="footnotesize", fig.height=10, opts.label="codefig", echo=TRUE----
 # data step: merge vertices and edges
 # data step: merge vertices and edges
-ftnet <- fortify(as.edgedf(football$edges), football$vertices)
+ftnet <- fortify(as.edgedf(football$edges), 
+                 football$vertices)
 
-# create new label variable for viewing independent schools
+# create new label variable for independent schools
 ftnet$schools <- ifelse(
   ftnet$value == "Independents", ftnet$from_id, "")
 
@@ -456,7 +461,7 @@ detach(package:tnet)
 detach(package:igraph)
 
 ## ----data_davis_list, dependson='davis_data_1', echo=TRUE----------------
-head(elist)
+head(elist,4)
 
 ## ----davis_data_2, dependson='davis_data_1', echo=TRUE-------------------
 elist$Lady <- paste("L", elist$Lady, sep="")
@@ -510,10 +515,12 @@ ggplot(data = davis) +
 set.vertex.attribute(bip, "mode", 
   c(rep("event", 14), rep("woman", 18)))
 set.seed(8262013)
-ggplot(data = ggnetwork(bip, layout = "kamadakawai"),
-       aes(x = x, y = y, xend = xend, yend = yend)) + 
+ggplot(data = ggnetwork(bip, 
+        layout = "kamadakawai"),
+    aes(x = x, y = y, xend = xend, yend = yend)) + 
   geom_edges(colour = "grey80") +
-  geom_nodes(aes(colour = mode, shape = mode), size = 15) +
+  geom_nodes(aes(colour = mode, shape = mode), 
+             size = 15) +
   geom_nodetext(aes(label = vertex.names)) +
   scale_colour_brewer(palette = "Set2") +
   theme_blank() + 
@@ -727,7 +734,7 @@ qplot(data = g, network_size, time, colour = `Visualization approach`, alpha = I
 ##                 theme_net()
 ## # get the data
 ## dat <- ggplot_build(geomnetplot)$data[[1]]
-## # ggnetwork-like construction for re-creating network shown in figure 5
+## # ggnetwork-like construction for re-creating network shown in Figure 5
 ## ggplot(data = dat, aes(x = x, y = y, xend = xend, yend = yend)) +
 ##   geom_segment(arrow = arrow(type = 'closed'), colour = 'grey40') +
 ##   geom_point(size = 10, colour = 'darkred') +
