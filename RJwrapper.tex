@@ -753,7 +753,8 @@ This example comes from the \code{theme()} help page in the \pkg{ggplot2} docume
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{example}
+{\footnotesize
+\begin{example}
 # make data accessible
 data(theme_elements, package = "geomnet")
 
@@ -766,9 +767,8 @@ set.seed(3272016)
 ggnet2(te.net, label = TRUE, color = "white", 
        label.size = "size", layout.exp = 0.15,
        mode = "fruchtermanreingold")
-
-
 \end{example} 
+}
 
                    \end{minipage}
 
@@ -788,7 +788,8 @@ ggnet2(te.net, label = TRUE, color = "white",
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{example}
+{\footnotesize
+\begin{example}
 # data step: merge nodes and edges and
 # introduce a degree-out variable
 # data step: merge nodes and edges and
@@ -811,9 +812,8 @@ ggplot(data = TEnet,
     linewidth = 0.5, repel = TRUE) +
   theme_net() +
   xlim(c(-0.05, 1.05))
-
-
 \end{example} 
+}
 
                    \end{minipage}
 
@@ -838,7 +838,8 @@ ggplot(data = TEnet,
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{example}
+{\footnotesize 
+\begin{example}
 set.seed(3272016)
 # use network created in ggnet2 data step
 ggplot(ggnetwork(te.net, 
@@ -851,9 +852,8 @@ ggplot(ggnetwork(te.net,
   scale_size_continuous(range = c(4, 8)) +
   guides(size = FALSE) +
   theme_blank()
-
-
 \end{example} 
+}
 
                    \end{minipage}
 
@@ -943,8 +943,6 @@ head(ftnet)
 ## 4        
 ## 5        
 ## 6
-
-
 \end{example}
 
 The network of football games is given in Figure~\ref{fig.cap:football}. Here,  the \code{linetype} aesthetic  corresponds to games that occur between teams in the same conference or different conferences.  
@@ -957,7 +955,8 @@ The network of football games is given in Figure~\ref{fig.cap:football}. Here,  
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{example}
+{\footnotesize
+\begin{example}
 #make data accessible
 data(football, package = 'geomnet')
 rownames(football$vertices) <-
@@ -981,10 +980,8 @@ ggnet2(fb.net, mode = "fruchtermanreingold",
        color = "conf",  palette = "Paired",
        color.legend = "Conference",
        edge.color = c("color", "grey75"))
-
-
 \end{example} 
-
+}
                    \end{minipage}
 
                   \begin{minipage}{.49\textwidth}
@@ -1007,7 +1004,8 @@ ggnet2(fb.net, mode = "fruchtermanreingold",
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{example}
+{\footnotesize
+\begin{example}
 # data step: merge vertices and edges
 # data step: merge vertices and edges
 ftnet <- fortify(as.edgedf(football$edges), 
@@ -1031,9 +1029,8 @@ ggplot(data = ftnet,
   theme(legend.position = "bottom") +
   scale_colour_brewer("Conference", palette = "Paired")  +
   guides(linetype = FALSE)
-
-
 \end{example} 
+}
 
                    \end{minipage}
 
@@ -1054,7 +1051,8 @@ ggplot(data = ftnet,
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{example}
+{\footnotesize 
+\begin{example}
 # use network from ggnet2 step
 set.seed(5232011)
 ggplot(
@@ -1071,9 +1069,8 @@ ggplot(
   scale_linetype_manual(values = c(2,1)) +
   guides(linetype = FALSE) +
   theme_blank()
-
-
 \end{example} 
+}
 
                    \end{minipage}
 
@@ -1134,8 +1131,6 @@ davis <- elist
 names(davis) <- c("from", "to")
 davis <- rbind(davis, data.frame(from=davis$to, to=davis$from))
 davis$type <- factor(c(rep("Lady", nrow(elist)), rep("Event", nrow(elist))))
-
-
 \end{example}
 
 \begin{figure}[bh]
@@ -1146,7 +1141,8 @@ davis$type <- factor(c(rep("Lady", nrow(elist)), rep("Event", nrow(elist))))
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{example}
+{\footnotesize              
+\begin{example}
 # Southern women network in ggnet2
 # create affiliation matrix
 bip = xtabs(~Event+Lady, data=elist)
@@ -1163,9 +1159,8 @@ ggnet2(bip, color = "mode", palette = "Set2",
        shape = "mode", mode = "kamadakawai",
        size = 15, label = TRUE) +
   theme(legend.position="bottom")
-
-
 \end{example} 
+}
 
                    \end{minipage}
 
@@ -1188,7 +1183,8 @@ ggnet2(bip, color = "mode", palette = "Set2",
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{example}
+{\footnotesize
+\begin{example}
 # Southern women network in geomnet
 # change labelcolour
 davis$lcolour <- 
@@ -1206,10 +1202,8 @@ ggplot(data = davis) +
   scale_colour_brewer("Type of node", palette = "Set2") +
   scale_shape("Type of node") +
   theme(legend.position = "bottom")
-
-
 \end{example} 
-
+}
                    \end{minipage}
 
                   \begin{minipage}{.49\textwidth}
@@ -1227,7 +1221,8 @@ ggplot(data = davis) +
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{example}
+{\footnotesize             
+\begin{example}
 # Southern women network in ggnetwork. Use data from ggnet2 step
 # assign vertex attributes (Node type and label)
 set.vertex.attribute(bip, "mode", 
@@ -1243,10 +1238,8 @@ ggplot(data = ggnetwork(bip,
   scale_colour_brewer(palette = "Set2") +
   theme_blank() + 
   theme(legend.position = "bottom") 
-
-
 \end{example} 
-
+}
                    \end{minipage}
 
                   \begin{minipage}{.49\textwidth}
