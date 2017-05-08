@@ -36,7 +36,7 @@
 \definecolor{messagecolor}{rgb}{0, 0, 0}
 \definecolor{warningcolor}{rgb}{1, 0, 1}
 \definecolor{errorcolor}{rgb}{1, 0, 0}
-\newenvironment{knitrout}{}{} % an empty environment to be redefined in TeX
+\newenvironment{example}{}{} % an empty environment to be redefined in TeX
 
 \usepackage{alltt}
 \usepackage[utf8]{inputenc}
@@ -135,9 +135,7 @@ We present two basic approaches to using the \pkg{ggplot2} framework for network
 The \code{ggnet2} function is a part of the \pkg{GGally} package, a suite of functions developed to extend the plotting capabilities of \pkg{ggplot2} \citep{ggally}.  A detailed description of the \code{ggnet2} function is available from within the package as a vignette. Some example code to recreate Figure~\ref{fig.cap:madmen} using \code{ggnet2} is presented in Figure~\ref{fig.cap:madmenggnet2}. 
 
 \begin{figure}[h]
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 library(GGally)
 library(network)
 # make the data available
@@ -163,19 +161,19 @@ mm.net # glance at network object
 ## No edge attributes
 # create node attribute (gender)
 rownames(madmen$vertices) <- madmen$vertices$label
-mm.net %v% "gender" <- as.character(
+mm.net \%v\% "gender" <- as.character(
   madmen$vertices[ network.vertex.names(mm.net), "Gender"]
 )
 # gender color palette
 mm.col <- c("female" = "#ff69b4", "male" = "#0099ff")
 # create plot for ggnet2
 set.seed(10052016)
-ggnet2(mm.net, color = mm.col[ mm.net %v% "gender" ],
-       labelon = TRUE, label.color = mm.col[ mm.net %v% "gender" ],
+ggnet2(mm.net, color = mm.col[ mm.net \%v\% "gender" ],
+       labelon = TRUE, label.color = mm.col[ mm.net \%v\% "gender" ],
        size = 2, vjust = -0.6, mode = "kamadakawai", label.size = 3)
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 \caption{\label{fig.cap:madmenggnet2} The code required to generate Figure~\ref{fig.cap:madmen} using the \code{ggnet2} function in the \pkg{GGally} package.}
 \end{figure}
 
@@ -198,9 +196,7 @@ All in all, the \code{ggnet2} function combines two different kinds of processes
 \subsection{geomnet} 
 
 \begin{figure}[h]
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 # also loads ggplot2
 library(geomnet)
 
@@ -216,9 +212,7 @@ ggplot(data = MMnet, aes(from_id = from_id, to_id = to_id)) +
   xlim(c(-0.05, 1.05)) +
   theme_net() +
   theme(legend.position = "bottom")
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+\end{example}
 \caption{\label{fig.cap:madmengeomnet} The code required to generate Figure~\ref{fig.cap:madmen} using the \code{geom\_net} function in the \pkg{geomnet} package.}
 \end{figure}
 
@@ -231,9 +225,7 @@ In network analysis there are usually two sources of information: one data set c
 
 A usage example of the \code{fortify.edgedf} method is presented in Figure~\ref{fig.cap:madmengeomnet} with the creation of the \code{MMnet} data set. Two dataframes, \code{madmen\$edges} and \code{madmen\$vertices} are joined to create the required data. The first few rows of these data sets and their merged result are below. 
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 head(as.edgedf(madmen$edges), 3)
 ##        from_id         to_id
 ## 1 Betty Draper Henry Francis
@@ -249,9 +241,9 @@ head(fortify(as.edgedf(madmen$edges), madmen$vertices), 3)
 ## 1 Betty Draper Henry Francis female
 ## 2 Betty Draper    Random guy female
 ## 3   Don Draper       Allison   male
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 
 The formal requirements of \code{stat\_net} are two columns, called \code{from\_id} and \code{to\_id}. During this routine, columns \code{x, y} and \code{xend, yend} are calculated and used as a required input for \code{geom\_net}.
 
@@ -285,9 +277,7 @@ Note that the edge specific aesthetics that overwrite node aesthetics are curren
 \pkg{ggnetwork} is a small R package that mimics the behavior of \code{geomnet} by defining several geoms to achieve similar results. 
 
 \begin{figure}[h]
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 # create plot for ggnetwork. uses same data created for ggnet2 function
 library(ggnetwork)
 set.seed(10052016)
@@ -301,9 +291,9 @@ ggplot(data = ggnetwork(mm.net, layout = "kamadakawai"),
   xlim(c(-0.05, 1.05)) +
   theme_blank() +
   theme(legend.position = "bottom")
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 \caption{\label{fig.cap:madmenggnetwork} The code required to generate Figure~\ref{fig.cap:madmen} using the \pkg{ggnetwork} package.}
 \end{figure}
 
@@ -364,24 +354,20 @@ Draw self-loops? &  No & Yes & No \\
 In this section, we demonstrate some of the current capabilities of \code{ggnet2}, \pkg{geomnet}, and \pkg{ggnetwork} in a series of side by side examples. While the output is nearly identical for each method of network visualization, the code and implementations differ across the three methods. For each of these examples, we present the code necessary to produce the network visualization in each of the three packages, and discuss each application in detail.
 
 For the following examples we will be loading all three packages under comparison. In practice, only one of these packages would be needed to visualize a network in the \pkg{ggplot2} framework:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 library(ggplot2)
 library(GGally)
 library(geomnet)
 library(ggnetwork)
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 
 \subsection{Blood donation} 
 
 We begin with a very simple example that most should be familiar with: blood donation. In this directed network, there are eight vertices and 27 edges.  The vertices represent the eight different blood types in humans that are most important for donation: the ABO blood types A, B, AB, and O, combined with the RhD positive (+) and negative (-) types. The edges are directed: a person whose blood type is that of a \emph{from} vertex can to donate blood to a person whose blood type is that of a corresponding \emph{to} vertex.  This network is shown in Figure~\ref{fig.cap:blood}. The code to produce each one of the networks is shown above Figure~\ref{fig.cap:blood}. We take advantage of each approach's ability to assign identity values to the aesthetic values. The color is changed to a dark red, the size of the nodes is changed to be large enough to accomodate the blood type label, which we also change the color of, and we use the directed and arrow arguments of each implementation to show the precise blood donation relationships. Additionally, we change the node layout to circle, and the placement of the labels with the \code{hjust} and \code{vjust} options. 
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 # make data accessible
 data(blood, package = "geomnet")
 
@@ -391,13 +377,11 @@ ggnet2(network(blood$edges[, 1:2], directed=TRUE),
        mode = "circle", size = 15, label = TRUE, 
        arrow.size = 10, arrow.gap = 0.05, vjust = 0.5,
        node.color = "darkred", label.color = "grey80")
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+
+\end{example}
+
+\begin{example}
 head(blood$edges,3) # glance at the data
 ##   from  to group_to
 ## 1  AB- AB+     same
@@ -411,13 +395,11 @@ ggplot(data = blood$edges, aes(from_id = from, to_id = to)) +
            arrowsize = 1.5, linewidth = 0.5, arrowgap = 0.05,
            selfloops = TRUE, ecolour = "grey40") + 
   theme_net() 
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+
+\end{example}
+
+\begin{example}
 # plot with ggnetwork (Figure 5c)
 set.seed(12252016)
 ggplot(ggnetwork(network(blood$edges[, 1:2]),
@@ -428,9 +410,9 @@ ggplot(ggnetwork(network(blood$edges[, 1:2]),
   geom_nodes(size = 15, color = "darkred") +
   geom_nodetext(aes(label = vertex.names), color = "grey80") +
   theme_blank()
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 \noindent
 In this example every vertex has a self-reference, as blood between two people of matching ABO and RhD type can always be exchanged.  The \pkg{geomnet} approach shows these self-references as circles looping back to the vertex, which is controlled by using the parameter setting \code{selfloops = TRUE}.
 
@@ -457,14 +439,13 @@ In this example every vertex has a self-reference, as blood between two people o
 \begin{figure}[hbt]
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
-\vspace{1em}
+
 
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+{\footnotesize
+ \begin{example}
 # make data accessible
 data(email, package = 'geomnet')
 
@@ -479,7 +460,7 @@ edges <- subset(email$edges, nrecipients < 54)
 em.net <- edges[, c("From", "to") ]
 em.net <- network(em.net, directed = TRUE)
 # create employee type node attribute
-em.net %v% "curr_empl_type" <-
+em.net \%v\% "curr_empl_type" <-
   em.cet[ network.vertex.names(em.net) ]
 set.seed(10312016)
 ggnet2(em.net, color = "curr_empl_type",
@@ -488,10 +469,9 @@ ggnet2(em.net, color = "curr_empl_type",
        mode = "fruchtermanreingold",
        edge.color = c("color", "grey50"),
        color.legend = "Employment Type") +
-  theme(legend.position = "bottom")
-\end{verbatim}
-\end{kframe}
-\end{knitrout} \vspace{1em}
+  theme(legend.position = "bottom")}
+\end{example} 
+}
 
                    \end{minipage}
 
@@ -507,14 +487,13 @@ ggnet2(em.net, color = "curr_empl_type",
 
 \begin{subfigure}[t]{\textwidth}
 \caption{geomnet}
-\vspace{1em}
+
 
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+{\footnotesize
+\begin{example}
 # data step for the geomnet plot
 email$edges <- email$edges[, c(1,5,2:4,6:9)]
 emailnet <- fortify(
@@ -532,9 +511,8 @@ ggplot(data = emailnet,
   scale_colour_brewer("Employment Type", palette = "Set1") +
   theme_net() +
   theme(legend.position = "bottom")
-\end{verbatim}
-\end{kframe}
-\end{knitrout} \vspace{1em}
+\end{example} 
+}
 
                    \end{minipage}
 
@@ -549,14 +527,13 @@ ggplot(data = emailnet,
 
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork}
-\vspace{1em}
+
 
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+{\footnotesize
+\begin{example}
 # use em.net created in ggnet2step
 set.seed(10312016)
 ggplot(ggnetwork(em.net, arrow.gap = 0.02,
@@ -574,9 +551,8 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02,
                      palette = "Set1") +
   theme_blank() +
   theme(legend.position = "bottom")
-\end{verbatim}
-\end{kframe}
-\end{knitrout} \vspace{1em}
+\end{example} 
+}
 
                    \end{minipage}
 
@@ -595,9 +571,7 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02,
 
 The email network comes from the 2014 VAST Challenge \citep{emailnet}. It is a directed network of emails between company employees with 55 vertices and 9,063 edges. Each vertex represents an employee of the company, and each edge represents an email sent from one employee to another. The arrow of the directed edge points to the recipient of the email. If an email has multiple recipients, multiple edges, one for each recipient, are included in the network. The network contains two business weeks of emails across the entire company. In order to better visualize the structure of the communication network between employees, emails that were sent out to all employees are removed. A glimpse of the data objects used is below. 
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 em.net # ggnet2 and ggnetwork
 ##  Network attributes:
 ##   vertices = 55 
@@ -621,9 +595,9 @@ emailnet[1,c(1:2,7,21)] # geomnet
 ## 1 Ingrid.Barranco@gastech.com.kronos  10
 ##   CurrentEmploymentType
 ## 1             Executive
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 
 Emails taken by themselves form an event network, i.e.\ edges do not have any temporal duration. Here, however, we can think of emails as observable expressions of the underlying, unobservable, relationship between employees. We can think of this network as a dynamic temporal network, i.e.\ this network has the potential to change over time. The \CRANpkg{ndtv} package by \cite{ndtv} allows the analysis of such networks and provides impressive animations of the underlying dynamics. 
 Here, we are using two static approaches to visualize the network: first, we aggregate emails across the whole time frame (shown in Figure~\ref{fig.cap:email}), then we  
@@ -668,9 +642,7 @@ To give some insight into how the relations between employees change over time, 
 
 \noindent
 First, the code for the \code{ggnet2} approach, which results in Figure~\ref{fig:email_facet}(a):
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 # data preparation. first, remove emails sent to all employees
 em.day <- subset(email$edges, nrecipients < 54)[, c("From", "to", "day") ]
 # for small multiples by day, create one element in a list per day 
@@ -681,7 +653,7 @@ em.day <- lapply(unique(em.day$day),
 em.day <- lapply(em.day, network, directed = TRUE)
 # create vertex (employee type) and network (day) attributes for each element in list
 for (i in 1:length(em.day)) {
-  em.day[[ i ]] %v% "curr_empl_type" <-
+  em.day[[ i ]] \%v\% "curr_empl_type" <-
     em.cet[ network.vertex.names(em.day[[ i ]]) ]
   em.day[[ i ]] %n% "day" <- unique(email$edges$day)[ i ]
 }
@@ -704,14 +676,12 @@ for (i in 1:length(em.day)) {
 }
 # arrange all of the network plots into one plot window
 gridExtra::grid.arrange(grobs = g, nrow = 2)
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 \noindent
 Second, the code for the \pkg{geomnet} approach, which results in Figure~\ref{fig:email_facet}(b):
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 # data step: use the fortify.edgedf group argument to 
 # combine the edge and node data and allow all nodes to 
 # show up on all days. Also, remove emails sent to all  
@@ -733,15 +703,13 @@ ggplot(data = emailnet, aes(from_id = from, to_id = to_id)) +
   theme(legend.position = "bottom",
         panel.border = element_rect(fill = NA, colour = "grey60"),
         plot.margin = unit(c(0, 0, 0, 0), "mm"))
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 
 \noindent
 Finally, the code for the \pkg{ggnetwork} approach, which results in Figure~\ref{fig:email_facet}(c):
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 # create the network and aesthetics
 # first, remove emails sent to all employees
 edges <- subset(email$edges, nrecipients < 54)
@@ -751,7 +719,7 @@ em.net <- network(edges[, 1:2])
 # assign edge attributes (day)
 set.edge.attribute(em.net, "day", edges[, 3])
 # assign vertex attributes (employee type)
-em.net %v% "curr_empl_type" <- em.cet[ network.vertex.names(em.net) ]
+em.net \%v\% "curr_empl_type" <- em.cet[ network.vertex.names(em.net) ]
 
 # create the plot
 set.seed(7042016)
@@ -766,9 +734,9 @@ ggplot(ggnetwork(em.net, arrow.gap = 0.02, by = "day",
   scale_color_brewer("Employment Type", palette = "Set1") +
   facet_wrap(~day, nrow = 2, labeller = "label_both") +
   theme_facet(legend.position = "bottom")
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 
 Note the two key differences in the visualizations of Figure~\ref{fig:email_facet}: whether singletons (isolated nodes) are plotted (as in the \pkg{ggnetwork} method), and whether \emph{one} layout is used across all panels (as for the \code{ggnetwork} example) or whether individual layouts are fit to each of the subsets (as for the \code{ggnet2} and the \code{geomnet} examples). Plotting isolated nodes in \pkg{geomnet} is possible by setting \code{singletons = TRUE}, and it would be possible in \code{ggnet2} by including all nodes in the creation of the list of networks. Using the same layout for plotting small multiples in \code{geomnet} is controlled by the argument \code{fiteach}. By default, \code{fiteach = TRUE}, but \code{fiteach = FALSE} results in all panels sharing the same layout. Having the same layout in each panel makes seeing specific differences in ties between nodes easier, while having a different layout in each panel emphasizes the overall structural differences between the sub-networks. It would be interesting to be able to have a hybrid of these two approaches, but at the moment this is beyond the capability of any of the methods.
 Through the faceting it becomes obvious that there are several days where one or more of the departments does not communicate with any of the other departments. There are only two days, day 13 and day 15, without any isolated department communications. Faceting is one of the major benefits of implementing tools for network visualization in \pkg{ggplot2}. Faceting allows the user to quickly separate dense networks into smaller sub-networks for easy visual comparison and analyses, a feature that the other network visualization tools do not have.
@@ -780,29 +748,27 @@ This example comes from the \code{theme()} help page in the \pkg{ggplot2} docume
 \begin{figure}[hbtp]
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
-\vspace{1em}
+
 
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+ \begin{example}
 # make data accessible
 data(theme_elements, package = "geomnet")
 
 # create network object
 te.net <- network(theme_elements$edges)
 # assign node attribut (size based on node degree)
-te.net %v% "size" <-
+te.net \%v\% "size" <-
   sqrt(10 * (sna::degree(te.net) + 1))
 set.seed(3272016)
 ggnet2(te.net, label = TRUE, color = "white", 
        label.size = "size", layout.exp = 0.15,
        mode = "fruchtermanreingold")
-\end{verbatim}
-\end{kframe}
-\end{knitrout} \vspace{1em}
+
+
+\end{example} 
 
                    \end{minipage}
 
@@ -817,14 +783,12 @@ ggnet2(te.net, label = TRUE, color = "white",
 
 \begin{subfigure}[t]{\textwidth}
 \caption{geomnet}
-\vspace{1em}
+
 
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+ \begin{example}
 # data step: merge nodes and edges and
 # introduce a degree-out variable
 # data step: merge nodes and edges and
@@ -832,8 +796,8 @@ ggnet2(te.net, label = TRUE, color = "white",
 TEnet <- fortify(
   as.edgedf(theme_elements$edges[,c(2,1)]),
             theme_elements$vertices)
-TEnet <- TEnet %>%
-  group_by(from_id) %>%
+TEnet <- TEnet \%>\%
+  group_by(from_id) \%>\%
   mutate(degree = sqrt(10 * n() + 1))
 
 # create plot:
@@ -847,9 +811,9 @@ ggplot(data = TEnet,
     linewidth = 0.5, repel = TRUE) +
   theme_net() +
   xlim(c(-0.05, 1.05))
-\end{verbatim}
-\end{kframe}
-\end{knitrout} \vspace{1em}
+
+
+\end{example} 
 
                    \end{minipage}
 
@@ -869,14 +833,12 @@ ggplot(data = TEnet,
 \ContinuedFloat
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}
-\vspace{1em}
+
 
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+ \begin{example}
 set.seed(3272016)
 # use network created in ggnet2 data step
 ggplot(ggnetwork(te.net, 
@@ -889,9 +851,9 @@ ggplot(ggnetwork(te.net,
   scale_size_continuous(range = c(4, 8)) +
   guides(size = FALSE) +
   theme_blank()
-\end{verbatim}
-\end{kframe}
-\end{knitrout} \vspace{1em}
+
+
+\end{example} 
 
                    \end{minipage}
 
@@ -908,9 +870,7 @@ ggplot(ggnetwork(te.net,
 
 \noindent
 Code and plots of the inheritance structure are shown in Figure \ref{fig.cap:theme}. A glimpse of the data is below. 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 te.net
 ##  Network attributes:
 ##   vertices = 53 
@@ -939,9 +899,9 @@ head(TEnet)
 ## 4    text  strip.text 6.403124
 ## 5    line   axis.line 5.567764
 ## 6    line  axis.ticks 5.567764
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 Note the various ways the packages adjust the side of the labels to correspond to the outdegree of the nodes, including the use of the \code{scale\_size\_continuous} function in Figure \ref{fig.cap:theme}(c). In each of these plots, it is easy to quickly determine  parent-child relationships, and to assess which theme elements are unrelated to all others. Nodes with the most children are the \code{rect}, \code{text}, and \code{line} elements, so we made their labels larger in order to emphasize their importance. In each case, the label size is a function of the out degree of the vertices.
 
 \subsection{College football}
@@ -950,9 +910,7 @@ This next example comes from M.E.J. Newman's network data web page \citep{footba
 
 
   
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 fb.net 
 ##  Network attributes:
 ##   vertices = 115 
@@ -985,23 +943,21 @@ head(ftnet)
 ## 4        
 ## 5        
 ## 6
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 
 The network of football games is given in Figure~\ref{fig.cap:football}. Here,  the \code{linetype} aesthetic  corresponds to games that occur between teams in the same conference or different conferences.  
 
 \begin{figure}[hbtp]
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnet2}\vspace{-.5cm}
-\vspace{1em}
+
 
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+ \begin{example}
 #make data accessible
 data(football, package = 'geomnet')
 rownames(football$vertices) <-
@@ -1011,7 +967,7 @@ fb.net <- network(football$edges[, 1:2],
                   directed = TRUE)
 # create node attribute 
 # (what conference is team in?)
-fb.net %v% "conf" <-
+fb.net \%v\% "conf" <-
   football$vertices[
     network.vertex.names(fb.net), "value"
     ]
@@ -1025,9 +981,9 @@ ggnet2(fb.net, mode = "fruchtermanreingold",
        color = "conf",  palette = "Paired",
        color.legend = "Conference",
        edge.color = c("color", "grey75"))
-\end{verbatim}
-\end{kframe}
-\end{knitrout} \vspace{1em}
+
+
+\end{example} 
 
                    \end{minipage}
 
@@ -1046,14 +1002,12 @@ ggnet2(fb.net, mode = "fruchtermanreingold",
 \ContinuedFloat
 \begin{subfigure}[t]{\textwidth}
 \caption{geomnet}\vspace{-.5cm}
-\vspace{1em}
+
 
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+ \begin{example}
 # data step: merge vertices and edges
 # data step: merge vertices and edges
 ftnet <- fortify(as.edgedf(football$edges), 
@@ -1077,9 +1031,9 @@ ggplot(data = ftnet,
   theme(legend.position = "bottom") +
   scale_colour_brewer("Conference", palette = "Paired")  +
   guides(linetype = FALSE)
-\end{verbatim}
-\end{kframe}
-\end{knitrout} \vspace{1em}
+
+
+\end{example} 
 
                    \end{minipage}
 
@@ -1095,14 +1049,12 @@ ggplot(data = ftnet,
 \begin{subfigure}[t]{\textwidth}
 \caption{ggnetwork}\vspace{-.5cm}
 
-\vspace{1em}
+
 
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+ \begin{example}
 # use network from ggnet2 step
 set.seed(5232011)
 ggplot(
@@ -1119,9 +1071,9 @@ ggplot(
   scale_linetype_manual(values = c(2,1)) +
   guides(linetype = FALSE) +
   theme_blank()
-\end{verbatim}
-\end{kframe}
-\end{knitrout} \vspace{1em}
+
+
+\end{example} 
 
                    \end{minipage}
 
@@ -1149,38 +1101,32 @@ One of the questions for these type of networks is gain insight in the interplay
 The data for the example of the Southern women is reported as edge list in form of `lady $X$ attending event $Y$'.
 With a bit of data preparation as detailed below, we can visualize the graph as shown in Figure~\ref{fig:davis}. In creating the plots, we use the \code{shape} and \code{colour} aesthetics to map the two different modes to two different shapes and colours. 
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 # access the data and rename it for convenience
 library(tnet)
 
 data(tnet)
 elist <- data.frame(Davis.Southern.women.2mode)
 names(elist) <- c("Lady", "Event")
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 
 \noindent
 The edge list for the Southern women's data consists of women attending events:
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 head(elist,4)
 ##   Lady Event
 ## 1    1     1
 ## 2    1     2
 ## 3    1     3
 ## 4    1     4
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 \noindent
 In order to distinguish between nodes from different types, we have to add an additional identifier element, so that we can tell the `first' woman $L1$ apart from the first event, $E1$.
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 elist$Lady <- paste("L", elist$Lady, sep="")
 elist$Event <- paste("E", elist$Event, sep="")
 
@@ -1188,21 +1134,19 @@ davis <- elist
 names(davis) <- c("from", "to")
 davis <- rbind(davis, data.frame(from=davis$to, to=davis$from))
 davis$type <- factor(c(rep("Lady", nrow(elist)), rep("Event", nrow(elist))))
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 
 \begin{figure}[bh]
 \begin{subfigure}[t]{\textwidth}
 \caption{\code{ggnet2}}
-\vspace{1em}
+
 
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+ \begin{example}
 # Southern women network in ggnet2
 # create affiliation matrix
 bip = xtabs(~Event+Lady, data=elist)
@@ -1219,9 +1163,9 @@ ggnet2(bip, color = "mode", palette = "Set2",
        shape = "mode", mode = "kamadakawai",
        size = 15, label = TRUE) +
   theme(legend.position="bottom")
-\end{verbatim}
-\end{kframe}
-\end{knitrout} \vspace{1em}
+
+
+\end{example} 
 
                    \end{minipage}
 
@@ -1239,14 +1183,12 @@ ggnet2(bip, color = "mode", palette = "Set2",
 \ContinuedFloat
 \begin{subfigure}[t]{\textwidth}
 \caption{\pkg{geomnet}}
-\vspace{1em}
+
 
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+ \begin{example}
 # Southern women network in geomnet
 # change labelcolour
 davis$lcolour <- 
@@ -1264,9 +1206,9 @@ ggplot(data = davis) +
   scale_colour_brewer("Type of node", palette = "Set2") +
   scale_shape("Type of node") +
   theme(legend.position = "bottom")
-\end{verbatim}
-\end{kframe}
-\end{knitrout} \vspace{1em}
+
+
+\end{example} 
 
                    \end{minipage}
 
@@ -1280,14 +1222,12 @@ ggplot(data = davis) +
 \end{subfigure}
 \begin{subfigure}[t]{\textwidth}
 \caption{\pkg{ggnetwork}}
-\vspace{1em}
+
 
              \begin{adjustbox}{valign=t}
 
              \begin{minipage}{.49\textwidth}
- \begin{knitrout}\footnotesize
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+ \begin{example}
 # Southern women network in ggnetwork. Use data from ggnet2 step
 # assign vertex attributes (Node type and label)
 set.vertex.attribute(bip, "mode", 
@@ -1303,9 +1243,9 @@ ggplot(data = ggnetwork(bip,
   scale_colour_brewer(palette = "Set2") +
   theme_blank() + 
   theme(legend.position = "bottom") 
-\end{verbatim}
-\end{kframe}
-\end{knitrout} \vspace{1em}
+
+
+\end{example} 
 
                    \end{minipage}
 
@@ -1329,9 +1269,7 @@ The data shows trips taken with bikes from the bike share company Capital Bikesh
 Figure~\ref{fig:bikes} shows four renderings of this data. The first is a geographically true representation of the area overlaid by lines between bike stations, the other three are networks drawn with \pkg{geomnet}, \code{ggnet2}, and \pkg{ggnetwork}, respectively. 
 The code for these renderings is shown below:
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 # make data accessible
 data(bikes, package = 'geomnet')
 # data step for geomnet
@@ -1340,13 +1278,11 @@ tripnet <- fortify(as.edgedf(bikes$trips), bikes$stations[,c(2,1,3:5)])
 tripnet$Metro = FALSE
 idx <- grep("Metro", tripnet$from_id)
 tripnet$Metro[idx] <- TRUE
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+
+\end{example}
+
+\begin{example}
 # plot the bike sharing network shown in Figure 7b
 set.seed(1232016)
 ggplot(aes(from_id = from_id, to_id = to_id), data = tripnet) +
@@ -1356,47 +1292,41 @@ ggplot(aes(from_id = from_id, to_id = to_id), data = tripnet) +
   xlim(c(-0.1, 1.1)) +
   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
   theme(legend.position = "bottom")
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+
+\end{example}
+
+\begin{example}
 # data preparation for ggnet2 and ggnetwork
 bikes.net <- network(bikes$trips[, 1:2 ], directed = FALSE)
 # create edge attribute (number of trips)
 network::set.edge.attribute(bikes.net, "n", bikes$trips[, 3 ] / 15)
 # create vertex attribute for Metro Station
-bikes.net %v% "station" <-  grepl("Metro", network.vertex.names(bikes.net))
-bikes.net %v% "station" <-  1 + as.integer(bikes.net %v% "station")
+bikes.net \%v\% "station" <-  grepl("Metro", network.vertex.names(bikes.net))
+bikes.net \%v\% "station" <-  1 + as.integer(bikes.net \%v\% "station")
 rownames(bikes$stations) <- bikes$stations$name
 # create node attributes (coordinates)
-bikes.net %v% "lon" <-
+bikes.net \%v\% "lon" <-
   bikes$stations[ network.vertex.names(bikes.net), "long" ]
-bikes.net %v% "lat" <-
+bikes.net \%v\% "lat" <-
   bikes$stations[ network.vertex.names(bikes.net), "lat" ]
 bikes.col <- c("grey40", "darkorange")
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
   
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 # Non-geographic placement
 set.seed(1232016)
 ggnet2(bikes.net, mode = "fruchtermanreingold", size = 4, label = TRUE,
        vjust = -0.5, edge.size = "n", layout.exp = 1.1,
-       color = bikes.col[ bikes.net %v% "station" ],
-       label.color = bikes.col[ bikes.net %v% "station" ])
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+       color = bikes.col[ bikes.net \%v\% "station" ],
+       label.color = bikes.col[ bikes.net \%v\% "station" ])
+
+
+\end{example}
   
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 # Non-geographic placement. Use data from ggnet2 step.
 set.seed(1232016)
 ggplot(data = ggnetwork(bikes.net, layout = "fruchtermanreingold"),
@@ -1410,9 +1340,9 @@ ggplot(data = ggnetwork(bikes.net, layout = "fruchtermanreingold"),
                       values = c("grey40", "darkorange")) +
   theme_blank() +
   theme(legend.position = "bottom", legend.box = "horizontal")
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
   
 
 \begin{figure}[hbtp]
@@ -1436,9 +1366,7 @@ ggplot(data = ggnetwork(bikes.net, layout = "fruchtermanreingold"),
 \end{figure}
 
 To plot the geographically correct bike network layout in \pkg{geomnet}, we use the \samp{layout.alg = NULL} option and provide the latitude and longitude coordinates of the bike stations from the company's data. A glance of the data that we used in the examples is shown below. 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 bikes.net
 ##  Network attributes:
 ##   vertices = 20 
@@ -1478,24 +1406,20 @@ head(tripnet[,-c(4:5,8)])
 ## 4 FALSE
 ## 5 FALSE
 ## 6 FALSE
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 Because all three approaches result in the same picture, we only show one of these in Figure~\ref{fig:bikes}a. The code for creating the map is given here:
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
   library(ggmap)
 metro_map <- get_map(location = c(left = -77.22257, bottom = 39.05721, 
                                   right = -77.11271, top = 39.14247))
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
   
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 # geomnet: overlay bike sharing network on geographic map
   ggmap(metro_map) + 
   geom_net(data = tripnet, layout.alg = NULL, labelon = TRUE,
@@ -1508,9 +1432,9 @@ metro_map <- get_map(location = c(left = -77.22257, bottom = 39.05721,
   scale_colour_manual("Metro Station", values = c("grey40", "darkorange")) +
   theme_net() %+replace% theme(aspect.ratio=NULL, legend.position = "bottom") +
   coord_map() 
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
   
 We can also make use of the option \samp{layout.alg = NULL} whenever we do not want to use an in-built layout algorithm but make use of a user-defined custom layout. In this case, the coordinates of the layout have to be created outside of the visualization and $x$ and $y$ coordinates have to be made available instead.
 
@@ -1575,9 +1499,7 @@ On a personal level we discovered that the collaboration on this paper has helpe
 
 Finally, curious users may be interested in how these three packages can fit together and replicate each other, since they are in fact so similar. Thanks to the flexibility inherent to \pkg{ggnetwork}, it is possible to write wrapper functions around \pkg{ggnetwork} functions in order to recreate the behavior and functionality of \code{ggnet2} and \pkg{geomnet}. Simple examples of such wrapper functions, called \code{ggnetwork2} and \code{geom\_network}, respecively are shown below. 
 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 library(ggnetwork)
 # mimics geom_net behavior
 geom_network <- function(edge.param, node.param) { 
@@ -1587,28 +1509,24 @@ geom_network <- function(edge.param, node.param) {
 }
 # mimics ggnet2 behavoir
 ggnetwork2 <- function() { ggplot() + geom_network() }
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 
 Similarly, \pkg{geomnet} can mimic the the behavior of \code{ggnet2}, as shown below. 
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 library(geomnet)
 geomnet2 <- function(net) { 
   ggplot(data = fortify(net),
          aes(from_id = from_id, to_id = to_id)) + 
     geom_net()
 }
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 
 Mimicking \pkg{ggnetwork} with \pkg{geomnet} requires a little bit more work because the native data input for \pkg{geomnet} is a \code{"data.frame"} object fortified with \pkg{geomnet} methods, not a \code{"network"} object. Instead, the internal \pkg{ggplot2} function \code{ggplot\_build} allows a plot created with \pkg{geomnet} function calls to be recreated with \pkg{ggnetwork}-like syntax. An example of using a \pkg{geomnet} plot to create a similar plot in the style of \pkg{ggnetwork} follows to reproduce Figure~\ref{fig.cap:blood}(c).
-\begin{knitrout}
-\definecolor{shadecolor}{rgb}{1, 1, 1}\color{fgcolor}\begin{kframe}
-\begin{verbatim}
+\begin{example}
 library(geomnet)
 library(ggnetwork)
 library(dplyr)
@@ -1628,9 +1546,9 @@ ggplot(data = dat, aes(x = x, y = y, xend = xend, yend = yend)) +
   geom_text(aes(label = from), colour = 'grey80', size = 4) + 
   geom_circle() + 
   theme_blank() + theme(aspect.ratio = 1)
-\end{verbatim}
-\end{kframe}
-\end{knitrout}
+
+
+\end{example}
 
 \begin{center}
 {\large\bf Supplementary Material}
